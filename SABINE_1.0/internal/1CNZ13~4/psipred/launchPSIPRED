@@ -1,0 +1,2 @@
+cd ./PSIPRED
+./runpsipred_single /rahome/eichner/sabine_project/SABINE_instances/internal/12.07.2009_18:35/psipred/jrbbcyhxga.fasta

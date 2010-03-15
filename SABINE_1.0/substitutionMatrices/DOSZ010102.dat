@@ -1,0 +1,40 @@
+#  DOSZ010102
+#  Normalised version of SM_SAUSAGE (Dosztanyi-Torda, 2001)
+#  PMID:11524370
+#  Dosztanyi, Z. and Torda, A.E.
+#  Amino acid similarity matrices based on force fields
+#  Bioinformatics. 17, 686-699 (2001)
+#  #SM_SAUS_NORM
+#  #Normalised version of SM_SAUSAGE
+#  #For each matrix element of SM_SAUSAGE, the average over its column and row were subtracted.
+#  #Supplementary material
+#  #http://www.rsc.anu.edu.au/~zsuzsa/suppl/matrices/SM_SAUS_NORM
+#  #Zsuzsanna Doszt?yi and Andrew E. Torda
+#  #Amino acid similarity matrices based on force fields
+#  #The amino acids are ordered according to the first principal component of the SM_SAUSAGE matrix.
+#  rows = ARNDCQEGHILKMFPSTWYV, cols = ARNDCQEGHILKMFPSTWYV
+    A   R   N   D   C   Q   E   G   H   I   L   K   M   F   P   S   T   W   Y   V   B   Z   X   *
+A   3  -2  -4  -3   1  -2  -2   0  -2  -1   0  -2  -1  -1  -4  -1  -2  -2  -2  -1  -3  -2  -1 -12
+R  -2   3   1   1  -7   2   2  -1   0  -5  -5   5  -3  -4  -2   0   0  -4  -4  -5   1   2  -1 -12
+N  -4   1   5   7  -9   3   4   1   1 -10  -8   4  -5  -6   0   3   2  -5  -5 -10   6   3  -1 -12
+D  -3   1   7  12 -11   3   7   2   1 -12  -9   3  -6  -7   2   5   2  -4  -5 -12   9   5  -1 -12
+C   1  -7  -9 -11  12  -7 -10   0  -1   3   3 -11   1   4  -5  -4  -5   3   3   4 -10  -9  -2 -12
+Q  -2   2   3   3  -7   3   3   0   0  -7  -5   4  -3  -5   0   1   0  -4  -4  -7   3   3  -1 -12
+E  -2   2   4   7 -10   3   6   1   0  -8  -7   3  -4  -6   1   2   0  -4  -4  -9   6   5  -1 -12
+G   0  -1   1   2   0   0   1  11   0 -10  -8   2  -6  -5   2   3   0  -4  -4  -9   2   0  -1 -12
+H  -2   0   1   1  -1   0   0   0   0  -4  -3   1  -2  -3   0  -1  -1  -2  -2  -4   1   0  -1 -12
+I  -1  -5 -10 -12   3  -7  -8 -10  -4  13  10  -9   4   6  -6 -10  -5   2   3  13 -11  -8  -2 -12
+L   0  -5  -8  -9   3  -5  -7  -8  -3  10   8  -8   4   4  -6  -8  -5   2   2   9  -9  -6  -2 -12
+K  -2   5   4   3 -11   4   3   2   1  -9  -8   6  -4  -5   1   1   1  -4  -4  -8   4   4  -1 -12
+M  -1  -3  -5  -6   1  -3  -4  -6  -2   4   4  -4   3   2  -5  -5  -4   0   1   4  -6  -4  -1 -12
+F  -1  -4  -6  -7   4  -5  -6  -5  -3   6   4  -5   2   3  -4  -6  -4   1   2   6  -7  -5  -1 -12
+P  -4  -2   0   2  -5   0   1   2   0  -6  -6   1  -5  -4  11   1   0  -2  -3  -6   1   0  -1 -12
+S  -1   0   3   5  -4   1   2   3  -1 -10  -8   1  -5  -6   1   6   3  -4  -4  -9   4   1  -1 -12
+T  -2   0   2   2  -5   0   0   0  -1  -5  -5   1  -4  -4   0   3   2  -3  -3  -4   2   0  -1 -12
+W  -2  -4  -5  -4   3  -4  -4  -4  -2   2   2  -4   0   1  -2  -4  -3   2   1   4  -5  -4  -1 -12
+Y  -2  -4  -5  -5   3  -4  -4  -4  -2   3   2  -4   1   2  -3  -4  -3   1   2   5  -5  -4  -1 -12
+V  -1  -5 -10 -12   4  -7  -9  -9  -4  13   9  -8   4   6  -6  -9  -4   4   5  12 -11  -8  -1 -12
+B  -3   1   6   9 -10   3   6   2   1 -11  -9   4  -6  -7   1   4   2  -5  -5 -11   8   4  -1 -12
+Z  -2   2   3   5  -9   3   5   0   0  -8  -6   4  -4  -5   0   1   0  -4  -4  -8   4   4  -1 -12
+X  -1  -1  -1  -1  -2  -1  -1  -1  -1  -2  -2  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1 -12
+* -12 -12 -12 -12 -12 -12 -12 -12 -12 -12 -12 -12 -12 -12 -12 -12 -12 -12 -12 -12 -12 -12 -12   1

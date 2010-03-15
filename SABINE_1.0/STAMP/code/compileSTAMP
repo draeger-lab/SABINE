@@ -1,0 +1,1 @@
+g++ -O3 -o STAMP Motif.cpp Alignment.cpp ColumnComp.cpp PlatformSupport.cpp PlatformTesting.cpp Tree.cpp NeuralTree.cpp MultipleAlignment.cpp RandPSSMGen.cpp ProteinDomains.cpp main.cpp -lgsl -lm -lgslcblas -L$1/GSL/gsl-1.10/lib -I$1/GSL/gsl-1.10/include

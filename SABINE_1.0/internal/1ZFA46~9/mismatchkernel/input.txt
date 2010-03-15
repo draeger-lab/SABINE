@@ -1,0 +1,4 @@
+>seq1
+H S G A R P F Q C V R C Q R E F K
+>seq2
+F A C Q D C G R R F H Q S T K L I Q H Q R V H

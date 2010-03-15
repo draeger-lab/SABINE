@@ -1,0 +1,4 @@
+>seq1
+K R P R T T I T A K Q L E T L K N A Y N N S P K P A R H V R E Q L S S E T G L D M R V V Q V W F Q N R R A K E K R
+>seq2
+K R P R T T I T A K Q L E T L K S A Y N T S P K P A R H V R E Q L S S E T G L D M R V V Q V W F Q N R R A K E K R
