@@ -27,12 +27,16 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
 import java.util.ArrayList;
 import java.util.StringTokenizer;
 
 public class TransfacParser {
 	
 	ArrayList<String> tf_names = new ArrayList<String>();
+	ArrayList<String> fa_names = new ArrayList<String>();
+	ArrayList<String[]> sy_names = new ArrayList<String[]>();
 	ArrayList<String> species = new ArrayList<String>();
 	ArrayList<String> crossrefs = new ArrayList<String>();
 	ArrayList<String> classes = new ArrayList<String>();
@@ -42,6 +46,8 @@ public class TransfacParser {
 	ArrayList<ArrayList<String>> domains = new ArrayList<ArrayList<String>>();
 	ArrayList<ArrayList<String>> pfm_names = new ArrayList<ArrayList<String>>();
 	ArrayList<ArrayList<String[]>> pfms = new ArrayList<ArrayList<String[]>>();
+	ArrayList<ArrayList<double[]>> matricies = new ArrayList<ArrayList<double[]>>();
+	ArrayList<String> pfm_ID = new ArrayList<String>();
 	
 	ArrayList<ArrayList<String>> pfam_IDs = new ArrayList<ArrayList<String>>();
 	ArrayList<ArrayList<String>> smarts_IDs = new ArrayList<ArrayList<String>>();
@@ -997,6 +1003,493 @@ public class TransfacParser {
 		}
 	}
 	
+	public void parseFactorTable(String infile) {
+
+		String line;
+
+		String curr_acc, curr_spec, curr_class, curr_seq, curr_ref, curr_dom, curr_ID, id_type, curr_fa, curr_sy;
+		curr_acc = curr_spec = curr_seq = curr_dom = curr_ID = id_type = curr_fa = curr_sy = null;
+		curr_ref = curr_class = "NA";
+
+		String[] split;
+		StringTokenizer strtok;
+
+		int entry_counter, line_counter, human_counter;
+		entry_counter = line_counter = human_counter = 0;
+
+		String[] sy = new String[1];
+		ArrayList<String> curr_pfam_domains = new ArrayList<String>();
+		ArrayList<String> curr_smarts_domains = new ArrayList<String>();
+		ArrayList<String> curr_prosite_domains = new ArrayList<String>();
+		ArrayList<String> curr_pfam_IDs = new ArrayList<String>();
+		ArrayList<String> curr_smarts_IDs = new ArrayList<String>();
+		ArrayList<String> curr_prosite_IDs = new ArrayList<String>();
+		ArrayList<String> curr_pfm_names = new ArrayList<String>();
+
+		try {
+
+			/*
+			 * count factors
+			 */
+
+			BufferedReader br = new BufferedReader(new FileReader(new File(
+					infile)));
+
+			while ((line = br.readLine()) != null) {
+				if (line.startsWith("AC  "))
+					entry_counter++;
+			}
+
+			boolean[] acc_parsed = new boolean[entry_counter];
+			boolean[] fa_parsed = new boolean[entry_counter];
+			boolean[] sy_parsed = new boolean[entry_counter];
+			boolean[] species_parsed = new boolean[entry_counter];
+			boolean[] class_parsed = new boolean[entry_counter];
+			boolean[] seq_parsed = new boolean[entry_counter];
+			boolean[] ref_parsed = new boolean[entry_counter];
+			boolean[] dom_parsed = new boolean[entry_counter];
+
+			/*
+			 * parse factors
+			 */
+
+			entry_counter = 0;
+
+			br = new BufferedReader(new FileReader(new File(infile)));
+
+			br.readLine(); // skip first three lines
+			br.readLine();
+			br.readLine();
+			line_counter += 3;
+
+			while ((line = br.readLine()) != null) {
+				line_counter++;
+
+				// parse accession number
+				if (line.startsWith("AC")) {
+					strtok = new StringTokenizer(line.substring(4));
+					curr_acc = strtok.nextToken().trim();
+					acc_parsed[entry_counter] = true;
+				}
+
+				// parse name
+				if (line.startsWith("FA")) {
+					curr_fa = line.substring(4).trim();
+					fa_parsed[entry_counter] = true;
+				}
+
+				// parse synonym names
+				if (line.startsWith("SY")) {
+					curr_sy = line.substring(4).trim();
+					sy = curr_sy.split(";");
+					sy_parsed[entry_counter] = true;
+				}
+
+				// parse species
+				if (line.startsWith("OS")) {
+					curr_spec = line.substring(4).trim();
+					if ((split = curr_spec.split(",")).length == 2)
+						curr_spec = split[1].trim();
+					if (!line.contains("/"))
+						species_parsed[entry_counter] = true;
+
+				}
+
+				// parse TRANSFAC class
+				if (line.startsWith("CL")) {
+					curr_class = line.substring(4).trim();
+					class_parsed[entry_counter] = true;
+				}
+
+				// parse sequence
+				if (line.startsWith("SQ")) {
+
+					curr_seq = line.substring(4).trim();
+
+					while ((line = br.readLine()).startsWith("SQ")) {
+						curr_seq += line.substring(4).trim();
+						line_counter++;
+					}
+					line_counter++;
+					seq_parsed[entry_counter] = true;
+				}
+
+				// parse reference to UniProt
+				if (line.startsWith("SC")) {
+					if (line.contains("SwissProt") && line.matches(".*#.*")) {
+						curr_ref = line.substring(4).split("#")[1];
+						ref_parsed[entry_counter] = true;
+					}
+					/*
+					 * System.out.println(line.substring(4).split("#")[1]);
+					 * strtok = new StringTokenizer(line); while
+					 * (strtok.hasMoreTokens()) { if
+					 * (strtok.nextToken().trim().equals("Swiss-Prot")) {
+					 * //System.out.println(strtok.nextToken()); if
+					 * (strtok.hasMoreTokens()) { curr_ref =
+					 * strtok.nextToken().substring(1) .trim();
+					 * 
+					 * ref_parsed[entry_counter] = true; } break; } }
+					 */
+				}
+				
+				if(!ref_parsed[entry_counter] && line.startsWith("DR  SWISSPROT:")){
+					
+					curr_ref = line.split(":")[1].replaceAll("\\p{Punct}", "").trim();
+					ref_parsed[entry_counter] = true;
+					
+				}
+
+				// parse domains
+				if (line.startsWith("FT")) {
+
+					curr_pfam_domains = new ArrayList<String>();
+					curr_smarts_domains = new ArrayList<String>();
+					curr_prosite_domains = new ArrayList<String>();
+
+					curr_pfam_IDs = new ArrayList<String>();
+					curr_smarts_IDs = new ArrayList<String>();
+					curr_prosite_IDs = new ArrayList<String>();
+
+					while (line.startsWith("FT")) {
+						id_type = "";
+						if (line.substring(4).matches(".*PF\\d{5}\\p{Punct}.*"))
+							id_type = "PF";
+						if (line.substring(4).matches(".*SM\\d{5}\\p{Punct}.*"))
+							id_type = "SM";
+						if (line.substring(4).matches(".*PS\\d{5}\\p{Punct}.*"))
+							id_type = "PS";
+
+						if (id_type.length() == 2) {
+							strtok = new StringTokenizer(line.substring(4));
+
+							curr_dom = strtok.nextToken().trim() + "\t"
+									+ strtok.nextToken().trim();
+							curr_ID = strtok.nextToken().trim();
+							curr_ID = curr_ID
+									.substring(0, curr_ID.length() - 1);
+							dom_parsed[entry_counter] = true;
+
+							if (id_type.equals("PF")) {
+								curr_pfam_domains.add(curr_dom);
+								curr_pfam_IDs.add(curr_ID);
+							} else if (id_type.equals("SM")) {
+								curr_smarts_domains.add(curr_dom);
+								curr_smarts_IDs.add(curr_ID);
+							} else if (id_type.equals("PS")) {
+								curr_prosite_domains.add(curr_dom);
+								curr_prosite_IDs.add(curr_ID);
+							}
+						}
+						line = br.readLine();
+					}
+				}
+
+				if (line.startsWith("MX")) {
+					// parse matrix names
+					curr_pfm_names = new ArrayList<String>();
+					String curr_pfm_ID;
+
+					while (line.startsWith("MX")) {
+
+						strtok = new StringTokenizer(line.substring(4)); // parse
+						// matrix
+						// name
+						curr_pfm_ID = strtok.nextToken(";").trim();
+
+						curr_pfm_names.add(curr_pfm_ID);
+						line = br.readLine(); // XX
+						line_counter++;
+
+					}
+				}
+
+				// check parsed information
+				if (line.startsWith("//")) {
+
+					if (species_parsed[entry_counter])
+						human_counter++;
+
+					if (acc_parsed[entry_counter]
+							&& species_parsed[entry_counter]
+							&& seq_parsed[entry_counter]
+							&& dom_parsed[entry_counter]) {
+
+						tf_names.add(curr_acc);
+						fa_names.add(curr_fa);
+						sy_names.add(sy);
+						species.add(curr_spec);
+						crossrefs.add(curr_ref);
+						classes.add(curr_class);
+						sequences1.add(curr_seq);
+						pfm_names.add(curr_pfm_names);
+						pfam_IDs.add(curr_pfam_IDs);
+						smarts_IDs.add(curr_smarts_IDs);
+						prosite_IDs.add(curr_prosite_IDs);
+						pfam_domains.add(curr_pfam_domains);
+						smarts_domains.add(curr_smarts_domains);
+						prosite_domains.add(curr_smarts_domains);
+
+					}
+					entry_counter++;
+					curr_ref = "NA";
+					curr_class = "NA";
+					curr_pfm_names = new ArrayList<String>();
+				}
+			}
+			br.close();
+
+			/*
+			 * print statistics
+			 */
+
+			if (!silent) {
+
+				int acc_counter, spec_counter, class_counter, seq_counter, ref_counter, dom_counter;
+				acc_counter = spec_counter = class_counter = seq_counter = ref_counter = dom_counter = 0;
+
+				for (int i = 0; i < entry_counter; i++)
+					if (acc_parsed[i])
+						acc_counter++;
+				for (int i = 0; i < entry_counter; i++)
+					if (species_parsed[i])
+						spec_counter++;
+				for (int i = 0; i < entry_counter; i++)
+					if (class_parsed[i])
+						class_counter++;
+				for (int i = 0; i < entry_counter; i++)
+					if (seq_parsed[i])
+						seq_counter++;
+				for (int i = 0; i < entry_counter; i++)
+					if (ref_parsed[i])
+						ref_counter++;
+				for (int i = 0; i < entry_counter; i++)
+					if (dom_parsed[i])
+						dom_counter++;
+
+				System.out.println("Number of transcription factors: "
+						+ entry_counter);
+				System.out.println("Number of parsed factors:        "
+						+ tf_names.size() + "\n");
+
+				System.out.println("Accession numbers:  " + acc_counter);
+				System.out.println("Species:            " + spec_counter);
+				System.out.println("Species is Human:   " + human_counter);
+				System.out.println("TRANSFAC class:     " + class_counter);
+				System.out.println("Sequences:          " + seq_counter);
+				System.out.println("UniProt References: " + ref_counter);
+				System.out.println("Domains:            " + dom_counter);
+
+			}
+		} catch (IOException ioe) {
+			System.out.println(ioe.getMessage());
+			System.out
+					.println("IOException occurred while parsing transcription factors from FACTOR table.");
+		}
+		
+	}
+
+	public void parsePFMatrix(String infile) {
+
+		String line;
+
+		int entry_counter = 0, line_counter = 0;
+
+		double A, C, G, T, ATCG_sum;
+
+		ArrayList<double[]> curr_pfm;
+
+		String[] split;
+		StringTokenizer strtok;
+
+		try {
+
+			/*
+			 * count factors
+			 */
+
+			BufferedReader br = new BufferedReader(new FileReader(new File(
+					infile)));
+
+			while ((line = br.readLine()) != null) {
+				if (line.startsWith("AC  "))
+					entry_counter++;
+			}
+
+			boolean[] id_parsed = new boolean[entry_counter];
+			boolean[] pfm_parsed = new boolean[entry_counter];
+
+			/*
+			 * parse factors
+			 */
+
+			entry_counter = 0;
+
+			br = new BufferedReader(new FileReader(new File(infile)));
+
+			br.readLine(); // skip first three lines
+			br.readLine();
+			br.readLine();
+			line_counter += 3;
+
+			String curr_id = "NA";
+
+			while ((line = br.readLine()) != null) {
+				line_counter++;
+
+				// parse matrix id
+				if (line.startsWith("AC")) {
+					strtok = new StringTokenizer(line.substring(4));
+					curr_id = strtok.nextToken().trim();
+					id_parsed[entry_counter] = true;
+				}
+
+				curr_pfm = new ArrayList<double[]>();
+
+				if (line.startsWith("P0")) {
+					line = br.readLine();
+
+					while (!(line.startsWith("XX"))) {
+						strtok = new StringTokenizer(line.substring(4));
+
+						double[] curr_ACGT = new double[4];
+
+						A = Double.parseDouble(strtok.nextToken());
+						C = Double.parseDouble(strtok.nextToken());
+						G = Double.parseDouble(strtok.nextToken());
+						T = Double.parseDouble(strtok.nextToken());
+
+						ATCG_sum = A + C + G + T;
+
+						curr_ACGT[0] = A / ATCG_sum;
+						curr_ACGT[1] = C / ATCG_sum;
+						curr_ACGT[2] = G / ATCG_sum;
+						curr_ACGT[3] = T / ATCG_sum;
+
+						curr_pfm.add(curr_ACGT);
+						line = br.readLine();
+					}
+					pfm_parsed[entry_counter] = true;
+
+					if (id_parsed[entry_counter] && pfm_parsed[entry_counter]) {
+						matricies.add(curr_pfm);
+						pfm_ID.add(curr_id);
+					}
+					line = br.readLine();
+				}
+			}
+
+		} catch (IOException ioe) {
+			System.out.println(ioe.getMessage());
+			System.out
+					.println("IOException occurred while parsing transcription factors from FACTOR table.");
+		}
+		//System.out.println(pfm_names);
+		//System.out.println(pfm_ID);
+
+	}
+
+	public void writeTFsToFile(String outfile) {
+
+		int SEQLINELENGTH = 60;
+		String curr_seq;
+		
+		DecimalFormat fmt = new DecimalFormat();
+		DecimalFormatSymbols symbs = new DecimalFormatSymbols();
+		symbs.setDecimalSeparator('.');
+		fmt.setDecimalFormatSymbols(symbs);
+		fmt.setMaximumFractionDigits(4);
+		fmt.setMinimumFractionDigits(4);
+		
+
+		try {
+
+			BufferedWriter bw = new BufferedWriter(new FileWriter(new File(
+					outfile)));
+			for (int i = 0; i < tf_names.size(); i++) {
+				bw.write("NA  " + tf_names.get(i) + "  ");
+				if (sy_names.get(i) != null) {
+					for (int j = 0; j < sy_names.get(i).length; j++) {
+						if (!sy_names.get(i)[j].endsWith(".")) {
+							bw.write(sy_names.get(i)[j].trim() + "  ");
+						} else {
+							bw.write(sy_names.get(i)[j].trim().substring(0,
+									sy_names.get(i)[j].length() - 2)
+									+ "  ");
+						}
+					}
+				}
+
+				bw.write("\nXX\n" + "SP  " + species.get(i) + "\nXX\n" + "RF  "
+						+ crossrefs.get(i) + "\nXX\n" + "CL  " + classes.get(i)
+						+ "\nXX\n");
+
+				curr_seq = sequences1.get(i);
+
+				if (curr_seq != null) {
+
+					for (int j = 0; j < (curr_seq.length() / SEQLINELENGTH); j++) {
+
+						bw.write("S1  ");
+						bw.write(curr_seq.toUpperCase(), j * SEQLINELENGTH,
+								SEQLINELENGTH);
+						bw.write("\n");
+					}
+
+					if (curr_seq.length() - (curr_seq.length() / SEQLINELENGTH)
+							* SEQLINELENGTH > 0) {
+
+						bw.write("S1  ");
+						bw.write(curr_seq.toUpperCase(),
+								(curr_seq.length() / SEQLINELENGTH)
+										* SEQLINELENGTH, curr_seq.length()
+										- (curr_seq.length() / SEQLINELENGTH)
+										* SEQLINELENGTH);
+						bw.write("\n");
+					}
+
+					bw.write("XX\n");
+				}
+
+				ArrayList<String> curr_pfam = pfam_IDs.get(i);
+				ArrayList<String> curr_domains = pfam_domains.get(i);
+
+				while (!curr_pfam.isEmpty()) {
+					bw.write("FT  " + curr_pfam.get(0) + "\t"
+							+ curr_domains.get(0) + "\n");
+					curr_pfam.remove(curr_pfam.get(0));
+					curr_domains.remove(curr_domains.get(0));
+				}
+
+				bw.write("XX" + "\n");
+
+				
+				for(int m = 0; m< pfm_names.get(i).size(); m++){
+				int matrix = pfm_ID.indexOf(pfm_names.get(i).get(m));
+
+				bw.write("MN  " + pfm_names.get(i).get(m) + "\nXX\n");
+				if (matrix >= 0) {
+					for (int j = 0; j < 4; j++) {
+						bw.write("MA  ");
+						for (int k = 0; k < matricies.get(matrix).size(); k++) {
+							bw.write(fmt.format(matricies.get(matrix).get(k)[j]) + "\t");
+						}
+						bw.write("\n");
+					}
+				}
+				bw.write("XX\n");
+			}
+				bw.write("//\nXX\n");
+			}
+		}
+
+		catch (IOException ioe) {
+			System.out.println(ioe.getMessage());
+			System.out
+					.println("IOException occurred while parsing transcription factors .");
+		}
+
+	}
 	
 	
 	public static void main(String[] args) {
