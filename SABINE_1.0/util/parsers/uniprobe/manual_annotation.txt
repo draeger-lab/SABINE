@@ -1,0 +1,13 @@
+2.2.1 Zf_GATA
+2.4 Zn2Cys6
+3.3 Fork-head
+3.3 Fork_head
+3.4.1 HSF_DNA-bind
+4.4 MADS
+4.7 HMG_box
+3.1 Homeo
+3.2.1 PAX
+2 Zf_C2H2
+2 ZnF_C2H2
+3 HTH
+3.1 homeodomain
