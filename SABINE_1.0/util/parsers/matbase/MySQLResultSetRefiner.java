@@ -107,7 +107,7 @@ public class MySQLResultSetRefiner {
 	}
 	
 	
-	// process rs of matrix-data (dirty)
+	// process rs of matrix-data (dirty) includes absolute to relative values conversion
 	public ArrayList<ArrayList<String>> processMat(ResultSet rs) {
 		
 		// current matrix
@@ -137,6 +137,14 @@ public class MySQLResultSetRefiner {
 					float c = (rs.getFloat("c"));
 					float g = (rs.getFloat("g"));
 					float t = (rs.getFloat("t"));
+					
+					// absolute to relative values conversion
+					float sum = a+c+g+t;
+					
+					a/=sum;
+					c/=sum;
+					g/=sum;
+					t/=sum;
 					
 					astr = astr.concat(a + "   ");
 					cstr = cstr.concat(c + "   ");
@@ -177,6 +185,13 @@ public class MySQLResultSetRefiner {
 					float c = (rs.getFloat("c"));
 					float g = (rs.getFloat("g"));
 					float t = (rs.getFloat("t"));
+					
+					float sum = a+c+g+t;
+					
+					a/=sum;
+					c/=sum;
+					g/=sum;
+					t/=sum;
 					
 					astr = astr.concat(a + "   ");
 					cstr = cstr.concat(c + "   ");
