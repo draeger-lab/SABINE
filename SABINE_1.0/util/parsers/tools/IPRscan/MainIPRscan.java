@@ -1,15 +1,6 @@
-/*
- * ===============================================
- * (C) Florian Topf, University of Tuebingen, 2010
- * ===============================================
- */
 package util.parsers.tools.IPRscan;
-/*
- * Main Class
- * Input: File in SABINE-FORMAT with "IP" extension (missing domain/binding)
- * Output: File in SABINE-FORMAT
- */
 import java.util.ArrayList;
+
 
 public class MainIPRscan {
 	
@@ -39,10 +30,16 @@ public static void main(String[] args) {
 		// convert matrices from absolute to relative (depreciated)
 		//matrices = converter.a2r(matrices);
 		
+		//// Filter
+		// filter remaining flagged entries
+		Filter filter = new Filter();
+		filter.checkFlag(symbols, uniprot_ids, species, matrices, sequences, bindings, transfac, flags_arr, MN);
+		
 		//// Output
 		// convert ArrayList to Array
 		boolean[] flags = converter.l2r(flags_arr);		
-		// output
+		
+		// write
 		OutputFileWriter outputfilewriter = new OutputFileWriter();
 		outputfilewriter.writeOutfile(symbols, uniprot_ids, species, matrices, sequences, bindings, transfac, flags, MN, outfile);
 

@@ -1,8 +1,3 @@
-/*
- * ===============================================
- * (C) Florian Topf, University of Tuebingen, 2010
- * ===============================================
- */
 package util.parsers.tools.IPRscan;
 /*
  * Converter Class

@@ -1,12 +1,8 @@
+package util.parsers.tools.IPRscan;
 /*
  * ===============================================
  * (C) Florian Topf, University of Tuebingen, 2010
  * ===============================================
- */
-package util.parsers.tools.IPRscan;
-
-/*
- * OutputFileWriter to conform to SABINE-InputFileFormat
  */
 
 import java.io.BufferedWriter;
@@ -17,6 +13,9 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.StringTokenizer;
 
+/*
+ * OutputFileWriter to conform to SABINE-InputFileFormat
+ */
 
 public class OutputFileWriter {
 	
