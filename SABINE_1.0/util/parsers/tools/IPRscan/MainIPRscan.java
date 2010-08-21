@@ -25,15 +25,31 @@ public static void main(String[] args) {
 		ArrayList<ArrayList<String>> MN = inputfileparser.getMN();
 		
 		
-		////
+		//// Convert
 		Converter converter = new Converter();
-		// convert matrices from absolute to relative (depreciated)
-		//matrices = converter.a2r(matrices);
+		// convert matrices from absolute to relative (depreciated -> integrated into MatbasePipe)
+		matrices = converter.a2r(matrices);
+		
 		
 		//// Filter
-		// filter remaining flagged entries
 		Filter filter = new Filter();
-		filter.checkFlag(symbols, uniprot_ids, species, matrices, sequences, bindings, transfac, flags_arr, MN);
+		// pick relevant uniprot_ids and sequences
+		filter.picker(uniprot_ids, sequences, bindings);
+		
+		// TODO:
+		// IPRscan for entries marked by "IP" -> (flag == true)
+		
+		//// IPRscan
+		// run InterProScan for those with flag "IP"
+		//IPRAPI iprapi = new IPRAPI();
+		//iprapi.run(symbols, uniprot_ids, species, matrices, sequences, bindings, transfac, flags_arr, MN);
+		
+
+		// flag those without binding and transfac
+		flags_arr = filter.setflags(bindings, transfac, flags_arr);
+		// filter remaining flagged entries
+		// TODO: uncomment
+		//filter.checkFlag(symbols, uniprot_ids, species, matrices, sequences, bindings, transfac, flags_arr, MN);
 		
 		//// Output
 		// convert ArrayList to Array
@@ -45,7 +61,3 @@ public static void main(String[] args) {
 
 	}
 }
-
-
-// TODO:
-// IPRscan for entries marked by "IP" -> (flag == true)
