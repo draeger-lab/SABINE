@@ -4,7 +4,6 @@
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="lib" path="biojava-1.5.jar"/>
 	<classpathentry kind="lib" path="jmathplot.jar"/>
-	<classpathentry kind="lib" path="util/parsers/matbase/libs/mysql-connector-java-5.1.12-bin.jar"/>
 	<classpathentry kind="lib" path="util/parsers/matbase/libs/bridgedb-lib/org.bridgedb.jar"/>
 	<classpathentry kind="lib" path="util/parsers/matbase/libs/bridgedb-lib/org.bridgedb.webservice.synergizer.jar"/>
 	<classpathentry kind="lib" path="util/parsers/matbase/libs/bridgedb-lib/synergizer-client.jar"/>
