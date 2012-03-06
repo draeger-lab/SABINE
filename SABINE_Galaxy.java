@@ -258,9 +258,11 @@ public class SABINE_Galaxy {
 			bw.write("XX\n");
 			bw.write("SP  " + organism + "\n");
 			bw.write("XX\n");
-			bw.write("CL  " + superclass + ".0.0.0.0.\n");
-			bw.write("XX\n");
-
+			if (superclass < 5) {
+				bw.write("CL  " + superclass + ".0.0.0.0.\n");
+				bw.write("XX\n");
+			}
+				
 			// write sequence
 			int SEQLINELENGTH = 60;
 

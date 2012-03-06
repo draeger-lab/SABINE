@@ -504,20 +504,20 @@ public class FormatConverter {
 			
 			if (!strtok.nextToken().equals("NA")) {
 				System.out.println("Parse Error. Invalid format. \"NA\" expected at the beginning of the line. Aborting.");
+				System.out.println("Please specify the name of the transcription factor in the given input file.");
 				System.exit(0);
 			}	
 			
 			String name = strtok.nextToken().trim();
-			
 			br.readLine();					// XX
 			
 			
 		// parse species and check it
 			
-			String spec = br.readLine();
-			
+			String spec = br.readLine();	
 			if (!spec.startsWith("SP")) {	
 				System.out.println("Parse Error. Invalid format. \"SP\" expected at the beginning of the line. Aborting.");
+				System.out.println("Please specify the species in the given input file.");
 				System.exit(0);
 			}	
 			
@@ -526,26 +526,13 @@ public class FormatConverter {
 			String[] split = spec.split(",");
 				
 			if(split.length == 1) {
-			
 				spec = split[0];
-			
+			} else if(split.length == 2) {
+				spec = split[1].substring(0,split[1].length()).trim();
+			} else {	
+				System.out.println("Error while parsing species of " + name + "\nSpecies: " + spec);
 			}
-			
-			else {
-					
-				if(split.length == 2) {
-					
-					spec = split[1].substring(0,split[1].length()).trim();
-					
-				}
-					
-				else {
-						
-					System.out.println("Error while parsing species of " + name + "\nSpecies: " + spec);
 
-				}
-					
-			}
 			
 			ArrayList<String> known_species = new ArrayList<String>();
 			
@@ -588,17 +575,15 @@ public class FormatConverter {
 			}
 			
 			
-			String class_id = "class0";
+			String class_id = null;
 			
 		// parse class, if available	
 			
 			if(line.startsWith("CL")) {
 				
 				class_id = "class" + getTransfacClass(line.substring(2).trim()).substring(0,1);
-				
 				line = br.readLine();
 				line = br.readLine(); 
-				
 			}
 
 		// parse sequence(s)
@@ -608,7 +593,7 @@ public class FormatConverter {
 			
 			if(line.startsWith("S1")) {
 				sequence1 = line.substring(2,line.length()).trim();
-				while ( (line = br.readLine()).startsWith("S1") ) {
+				while ((line = br.readLine()) != null && line.startsWith("S1")) {
 					sequence1 += line.substring(2,line.length()).trim();
 				}
 				line = br.readLine();
@@ -618,7 +603,7 @@ public class FormatConverter {
 			
 			if(line != null && line.startsWith("S2")) {
 				sequence2 = line.substring(2,line.length()).trim();
-				while ( (line = br.readLine()).startsWith("S2") ) {
+				while ((line = br.readLine()) != null && line.startsWith("S2") ) {
 					sequence2 += line.substring(2,line.length()).trim();
 				}
 				line = br.readLine();

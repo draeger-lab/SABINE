@@ -22,6 +22,7 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashSet;
 
 import org.biojava.bio.BioException;
 
@@ -163,36 +164,78 @@ public class FBPPredictor {
 	
 	
 	public void calculateFBP(String name, String class_id, String species, String sequence1, String sequence2, ArrayList<String> domains, String base_dir, String train_dir, String model_file) {
+
+		/*
+		 *  predict superclass if necessary
+		 */
 		
-		
-		if (! silent) System.out.println("\nCalculating features.");
-		if (gui_output_mode) System.out.println("Calculating features:");
-		
-		
-		int num_entries = getTrainingSetSize(class_id, train_dir);
-		boolean[] irrelevantPairs = new boolean[num_entries];
-		
-		
-		domaincalculator.silent = true;
-		domaincalculator.basedir = base_dir;
-		sequencecalculator.silent = true;
-		sequencecalculator.basedir = base_dir;
-		
-		
-		
+		if (class_id == null) {
+			class_id = "class0";
+			if (!silent) System.out.println("\nSuperclass not found. Predicting superclass based on sequence homology.");
+
+			String[] all_class_ids = new String[]{"class0", "class1", "class2", "class3", "class4"};
+			String[] all_class_names = new String[]{"Other", "Basic Domain", "Zinc Finger", "Helix-Turn-Helix", "Beta Scaffold"};
+			
+			try {
+				// read available protein sequences for all superclasses
+				
+				double max_score = Double.NEGATIVE_INFINITY;
+				for (int c=0; c<all_class_ids.length; c++) {
+					
+					SequenceFeatureCalculator seqCalc = new SequenceFeatureCalculator();
+					seqCalc.silent = true;
+					boolean [] irrelPairs = new boolean[getTrainingSetSize(all_class_ids[c], train_dir)];
+					seqCalc.parseRelevantDomainsAndSequences(irrelPairs, all_class_ids[c], train_dir);
+					SequenceAligner class_predictor = new SequenceAligner("BLOSUM_62.dat", "NW");
+					
+					HashSet<String> all_seqs = new HashSet<String>();
+					all_seqs.addAll(seqCalc.get_other_sequences1());
+					all_seqs.addAll(seqCalc.get_other_sequences2());
+					all_seqs.remove("NO SEQUENCE.");
+					String[] class_seqs = all_seqs.toArray(new String[]{});
+	
+					for(int i=0; i<class_seqs.length; i++) {	
+						
+						double blosum_score = class_predictor.getSMBasedSimilarity(sequence1, class_seqs[i]);
+						
+						if (blosum_score > max_score) {
+							max_score = blosum_score;
+							class_id = "class" + c;
+						}
+					}
+				}
+			} catch(IOException ioe) {
+				System.out.println(ioe.getMessage());
+				System.out.println("IOException occurred while predicting superclass.");
+				
+			} catch(BioException bioe) {
+				System.out.println(bioe.getMessage());
+				System.out.println("BioException occurred while predicting superclass.");
+			}
+			
+			int class_num = Integer.parseInt(class_id.substring(5));
+			System.out.println("\n  Predicted class: " + class_num + " (" + all_class_names[class_num] + ")");
+		}
+
 		/*
 		 * 
 		 * calculate 2 features for all pairs
 		 * 
 		 */
 		
+		int num_entries = getTrainingSetSize(class_id, train_dir);
+		boolean[] irrelevantPairs = new boolean[num_entries];
+
+		domaincalculator.silent = true;
+		domaincalculator.basedir = base_dir;
+		sequencecalculator.silent = true;
+		sequencecalculator.basedir = base_dir;
+		
+		
 		if (! silent) System.out.println("\n  Calculating features for all tf pairs.");
 		
 		domaincalculator.parseRelevantDomains(irrelevantPairs, class_id, train_dir);
-		
-		
 
-		
 		
 		/*
 		 *  predict DNA binding domain if no domain assignment is available
@@ -206,7 +249,7 @@ public class FBPPredictor {
 		
 		try {
 			if (domains.isEmpty()) {
-				System.out.println("\n  Predicting DNA-binding domain.");
+				if (!silent) System.out.println("\nDNA-binding domain not found. Predicting domain based on sequence homology.");
 				SequenceAligner dom_predictor;
 				domaincalculator.predicted_domains = true;
 				sequencecalculator.predicted_domains = true;
@@ -214,19 +257,21 @@ public class FBPPredictor {
 				dom_predictor = new SequenceAligner("BLOSUM_62.dat", "SW");
 
 				for(int i=0; i<domaincalculator.get_other_domains().size(); i++) {	
-					for(int j=0; j<domaincalculator.get_other_domains().get(j).size(); j++) {
+					for(int j=0; j<domaincalculator.get_other_domains().get(i).size(); j++) {
 						
 						res1 = new String[3];
 						res2 = new String[3];
 						score1 = score2 = Double.NEGATIVE_INFINITY;
 						
+						String curr_domain_seq = domaincalculator.get_other_domains().get(i).get(j); 
+						
 						if (sequence1 != null) {
-							res1 = dom_predictor.getMatchingRegionAndScore(sequence1, domaincalculator.get_other_domains().get(i).get(j) );
+							res1 = dom_predictor.getMatchingRegionAndScore(sequence1, curr_domain_seq);
 							score1 = Double.parseDouble(res1[0]);
 							seq_idx = 1;
 						}
 						if (sequence2 != null) {
-							res2 = dom_predictor.getMatchingRegionAndScore(sequence2, domaincalculator.get_other_domains().get(i).get(j) );
+							res2 = dom_predictor.getMatchingRegionAndScore(sequence2, curr_domain_seq);
 							score2 = Double.parseDouble(res2[0]);
 							seq_idx = 2;
 						}
@@ -270,7 +315,8 @@ public class FBPPredictor {
 		 * calculate 30 feature values for all relevant tf pairs
 		 * 
 		 */
-		
+		if (! silent) System.out.println("\nCalculating features.");
+		if (gui_output_mode) System.out.println("Calculating features:");
 		if (! silent) System.out.println("\n  Calculating features for relevant tf pairs.");
 		
 		domaincalculator.parseRelevantDomains(irrelevantPairs, class_id, train_dir);
@@ -430,7 +476,9 @@ public class FBPPredictor {
 		
 		if (! silent) {
 			System.out.println("  Name    : "  + name);
-			System.out.println("  Class   : "  + class_id.substring(5));
+			if (class_id != null) {
+				System.out.println("  Class   : "  + class_id.substring(5));
+			}
 			System.out.println("  Species : "  + species);
 		}
 		
@@ -488,7 +536,7 @@ public class FBPPredictor {
 		 *
 		 */
 		String verbose_option = "y";
-		String train_dir = "trainingsets/";  // directory that contains training factors (= candidates for PWM transfer)
+		String train_dir = "trainingsets_public/";  // directory that contains training factors (= candidates for PWM transfer)
 		String base_dir = null;
 		String model_file = null;
 		

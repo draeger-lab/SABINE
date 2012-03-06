@@ -262,6 +262,7 @@ public class SABINE_GUI extends JFrame implements ActionListener, ChangeListener
 
 		// add combo box for superclass selection
 		superClassSelect = new JComboBox(superclasses);
+		superClassSelect.addItem("Auto-detect");
 		superClassSelect.setBackground(Color.white);
 		
 		JPanel firstPanel = new JPanel();
@@ -535,19 +536,22 @@ public class SABINE_GUI extends JFrame implements ActionListener, ChangeListener
 		for (int i = 0; i < superclasses.length; i++) {
 			classes.add(superclasses[i]);
 		}
-		String class_id = (classes.indexOf(superclass) + 1) % 5 + ".0.0.0.0.";
-
+		String class_id = null;
+		if (classes.contains(superclass)) {
+			class_id = (classes.indexOf(superclass) + 1) % 5 + ".0.0.0.0.";
+		}
 		BufferedWriter bw;
 		try {
 			bw = new BufferedWriter(new FileWriter(new File(filename)));
-
 			bw.write("NA  QueryTF\n");
 			bw.write("XX\n");
 			bw.write("SP  " + organism + "\n");
 			bw.write("XX\n");
-			bw.write("CL  " + class_id + "\n");
-			bw.write("XX\n");
-
+			if (class_id != null) {
+				bw.write("CL  " + class_id + "\n");
+				bw.write("XX\n");
+			}
+			
 			// write sequence
 			int SEQLINELENGTH = 60;
 
@@ -604,8 +608,8 @@ public class SABINE_GUI extends JFrame implements ActionListener, ChangeListener
 					String time_stamp = time_gen.getTimeStamp();
 					
 					// Hack: fixed base directory
-					//base_dir = "tmp/" + time_stamp + "_" + randnum + "/";
-					base_dir = "tmp/fixed_basedir_highconf/";
+					base_dir = "tmp/" + time_stamp + "_" + randnum + "/";
+					//base_dir = "tmp/fixed_basedir_highconf/";
 					File base_dir_path = new File(base_dir);
 	
 					if (!base_dir_path.exists() && !base_dir_path.mkdir()) {
@@ -620,9 +624,10 @@ public class SABINE_GUI extends JFrame implements ActionListener, ChangeListener
 				
 				String input_file = base_dir + "infile.tmp";
 				
-				writeInputFile(input_file, (String) organismSelect
-						.getSelectedItem(), (String) superClassSelect
-						.getSelectedItem(), seq, domList);
+				writeInputFile(input_file, 
+						(String) organismSelect.getSelectedItem(), 
+						(String) superClassSelect.getSelectedItem(), 
+						seq, domList);
 
 				/*
 				 * launch SABINE
@@ -647,8 +652,8 @@ public class SABINE_GUI extends JFrame implements ActionListener, ChangeListener
 				dir_creator.createTempDirectories(base_dir);
 
 				// reassign output and error stream
-				//System.setOut(msg.getOutStream());
-				//System.setErr(msg.getErrorStream());
+				System.setOut(msg.getOutStream());
+				System.setErr(msg.getErrorStream());
 			
 
 				// run SABINE on generated input file

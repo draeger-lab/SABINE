@@ -40,7 +40,7 @@ ________________________________________________________________________________
 
   To extract the gzipped tar archive of SABINE obtained from our downloads section use the command:
 
-     tar -xzf sabine.tar.gz
+    tar -xzf sabine.tar.gz
 
   For convenience, a shell script was implemented to simplify the installation of SABINE. 
   Start the installation script with the following command:
@@ -48,25 +48,13 @@ ________________________________________________________________________________
     install.sh
 
   The script will install SABINE and all required third-party software packages and libraries on your system.
-  To test if the program is working properly, you can use the sample command:
+  To test if the program is working properly, you can validate your installation using the command:
 
-    sabine.sh input/test.tf
+    sabine.sh -check-install
 
-  If things are working the predicted PFM should look like this:
-
-  MA	  0	      50	    0	       40	 10	r
-  MA	  1	      25	    15	       7	 53	n
-  MA	  2	      14	    1	       3	 82	T  
-  MA	  3	      91	    2	       5	 2	A
-  MA	  4	      92	    0	       5	 3	A
-  MA	  5	      0		    0	       0	 100	T
-  MA	  6	      2		    0	       0	 98	T
-  MA	  7	      100	    0	       0	 0	A
-  MA	  8	      88	    8	       4	 0	A
-  MA	  9	      22	    9	       4	 65	T
-  MA	  10	      3		    7	       13	 77	T
-  MA	  11	      40	    15	       0	 45	w
-
+  
+  Note: Please ensure that the tcsh shell is installed on your system, as it is required by the tool PSIPRED, 
+        which is employed by SABINE to predict secondary structures. 
   ____________________________________________________________________________________________________________________________
 
 

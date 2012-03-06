@@ -56,6 +56,17 @@ public class SequenceFeatureCalculator {
 	
 	ArrayList<String> other_names = null;
 	
+	public ArrayList<ArrayList<String>> get_other_domains() {
+		return other_domains;
+	}
+	
+	public ArrayList<String> get_other_sequences2() {
+		return other_sequences1;
+	}
+	
+	public ArrayList<String> get_other_sequences1() {
+		return other_sequences2;
+	}
 	
 	/*
 	 * 
