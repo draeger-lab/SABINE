@@ -1,4 +1,0 @@
->seq1
-R R V A N N A R E R L R V R D I N E A F K E L G R M C Q L H L N S E K P Q T K
->seq2
-R R V A N N A R E R L R V R D I N E A F K E L G R M C Q L H L S S E K P Q T K

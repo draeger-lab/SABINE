@@ -1,2 +1,0 @@
-export LD_LIBRARY_PATH=/rahome/eichner/sabine_project/SABINE_1.0/GSL/gsl-1.10/lib
-STAMP/code/STAMP -tf /rahome/eichner/sabine_project/SABINE_1.0/internal/25.09.2009_18:10/stamp/input.motifs -sd STAMP/ScoreDists/JaspRand_PCC_SWU.scores -cc PCC -align SWU -ma IR -printpairwise -match STAMP/jaspar.motifs -out /rahome/eichner/sabine_project/SABINE_1.0/internal/25.09.2009_18:10/stamp/output

@@ -1,4 +1,0 @@
->seq1
-T L W R R N A G G D P V C N A C G L Y Y K L H N V N R P L T M K K E G I Q T R N R
->seq2
-P L W R R D E H G A M L C N A C G L F L K L H G K P R P I S L K T D V I K S R N R K

@@ -1,2 +1,0 @@
-cd ./MismatchKernel/src/
-./string-kernel -K -L 4 -D 1 /rahome/eichner/sabine_project/SABINE_instances/internal/13.07.2009_11:54/mismatchkernel/input.txt
