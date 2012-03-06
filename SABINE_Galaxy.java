@@ -261,7 +261,7 @@ public class SABINE_Galaxy {
 			if (superclass < 5) {
 				bw.write("CL  " + superclass + ".0.0.0.0.\n");
 				bw.write("XX\n");
-			}
+			} 
 				
 			// write sequence
 			int SEQLINELENGTH = 60;
