@@ -1,0 +1,3 @@
+export LD_LIBRARY_PATH=/rahome/ragast5/gsl_lib/lib
+./STAMP -tf ../test.motifs -sd ../ScoreDists/JaspRand_PCC_SWU.scores -cc PCC -align SWU -ma IR -printpairwise -match ../jaspar.motifs -out ../outfile
+

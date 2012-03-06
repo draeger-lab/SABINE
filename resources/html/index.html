@@ -1,0 +1,79 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+  <head>
+  <title>SABINE help</title>
+  </head>
+  <body style='font-family:arial'>
+    
+    <table border="0" style="margin: auto"><tr valign="middle"><td><img src="../img/sabine_logo.png" style="padding-right:20px;"></td></tr></table>
+    <br>
+    <h2>Short Description</h2>  
+    Given the organism, superclass, protein sequence and DNA-binding domains (DBD) of a transcription factor, 
+    SABINE predicts the binding specificity in terms of a position frequency matrix (PFM).<br>
+    The transcription factor of your interest is compared to a large set of factors with annotated PFMs and 
+    the PFM similarity to these factors is estimated based on diverse sequence-based features using support vector regression. 
+    As a result the factors which exhibit the highest PFM similarity to the query factor are reported as best matches.  
+    In the next step the PWMs of the best matches are merged using STAMP and in turn transferred to the query
+    factor. If the PWMs of the predicted best matches are publicly available from databases, such as TRANSFAC Public 
+    or JASPAR, the transferred consensus PFM is reported along with a sequence logo illustrating the nucleotide distribution
+    at each position of the predicted DNA motif.
+    <br><br>
+    <h2>Getting started</h2>
+    Use the &#8220;Demo&#8221;-Button to generate a showcase input for SABINE. By clicking the 
+    &#8220;Run&#8221;-Button you can apply SABINE to predict the binding specificity of the exemplary transcription factor
+    using the default parameters.<br>
+    Follow the Steps listed below, if you want to use SABINE to predict the binding specificity of an individual transcription factor:<br>
+    <ol>
+    <li> Choose the organism and the superclass of the transcription factor of your interest. The corresponding superclass can be looked up at 
+         <a href="http://www.gene-regulation.com/pub/databases/transfac/cl.html"> TRANSFAC</a>.
+    <li> Paste or type the entire amino acid sequence (in single letter code) into the corresponding text box.
+    <li> Specify the start and end positions of the DNA-binding domain(s) of the factor and press the &#8221;Add&#8221;-Button.
+    <li> Click the &#8221;Run&#8221;-Button to predict the binding specificity of the entered transcription factor.
+    </ol> 
+    <br>
+    <h2>Parameters</h2>
+    <b>Best Match Threshold:</b><br> 
+    This parameter defines a lower bound for the predicted PFM similarity of a best match to the query factor (default: 0.95). 
+    The more stringent the threshold value is chosen, the higher is the prediction accuracy, i.e. the expected correspondence 
+    between the transferred and the true PFM of the query factor.
+    Choosing a less stringent cutoff increases the chance that a PFM transfer is possible, but also reduces the expected quality of the prediction.<br><br> 
+
+    <b>Maximum Number of Best Matches:</b><br> 
+    This parameter can be used to specify a limit for the number of PFMs which shall be merged to generate a prediction for the query factor.
+    By default the PFMs of at most 5 best matches are merged to generate the predicted consensus PFM. 
+    If you want to avoid merging PFMs, you can set this parameter to 1. This setting will cause SABINE to directly transfer the PFM of the best match 
+    which has been predicted with highest confidence. <br><br> 
+    
+    <b>Outlier Filter Threshold:</b><br> 
+    This parameter serves to adjust the stringency of the outlier filter, which avoids the merging of dissimilar PFMs (default: 0.5). 
+    The lower the cutoff is chosen, the more stringent is the criterion for exclusion and the higher is the homogeneity of the PFMs which are
+    merged to generate a prediction.
+    
+
+    <h2>Homepage</h2>
+    You can find further information at the 
+    <a href="http://www.ra.cs.uni-tuebingen.de/software/SABINE/welcome_e.html">
+    SABINE homepage</a>.
+    
+    <h2>License</h2>
+    This version of SABINE is distributed under the 
+    <a href="http://www.gnu.org/licenses/gpl.html">Gnu General Public License (GPL)</a>.
+
+    <h2>References</h2>
+    Please cite one of the following articles if you are using SABINE in your work:
+    <table  border="0" cellspacing="5" cellpadding="5" align="left">
+      <tr>
+       	<td width="180px"><b>Applications Note:</b><br></td>
+        <td>Johannes Eichner, Adrian Schr&ouml;der, Jonas Eichner, Andreas Dr&auml;ger, Dierk Wanke, Jochen Supper, Andreas Zell<br>
+	<b>SABINE: a tool to predict binding specificities of transcription factors using support vector regression</b>
+	</td>
+      </tr>
+      <tr>
+      <td width="180px"><b>Method Paper:</b><br></td>
+      <td>Adrian Schr&ouml;der, Johannes Eichner, Jonas Eichner, Dierk Wanke, Jochen Supper, Carsten Henneges, Andreas Zell<br>
+      <b>Predicting DNA-binding specicities of eukaryotic transcription factors</b></td>
+      </tr>
+    </table>
+
+  </body>
+</html>

@@ -1,0 +1,2 @@
+cd ./MismatchKernel/src/
+./string-kernel -K -L 6 -D 1 ../data/input.txt
