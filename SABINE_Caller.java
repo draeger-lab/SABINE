@@ -296,7 +296,7 @@ public class SABINE_Caller {
 		System.out.println("            -m <max_num_best_matches> (max. number of best matches)             default = 5");		
 		System.out.println("            -o <outlier_filter_param> (max. deviation of a single best match)   default = 0.5");
 		//System.out.println("            -t <training_set_dir>  	  (directory that contains training sets)   default = /trainingsets");
-		System.out.println("            -b <base_dir>  	  		  (directory that contains temporary files)  ");
+		System.out.println("            -b <base_dir>             (directory that contains temporary files)  ");
 		//System.out.println("            -c <model_file>  	      (custom-built model file)  ");
 		System.out.println("            -f <output_filename>      (file to save the results)                default = <input_filename>.out");
 		System.out.println("            -v <verbose_mode>         (write status to standard output)         default = y (yes)\n\n");

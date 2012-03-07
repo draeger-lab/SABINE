@@ -466,31 +466,27 @@ public class SABINE_Galaxy {
 			double medium_conf_bmt = thresholds[1];
 			
 			// append confidence sign
-			String path2database = "../../../static/images/sabine/";
+			String conf_img_path = "../../../static/images/static_code/sabine_static/";
 			
-			
-			String conf_img_path = "";
-			
-			if (lowest_score > high_conf_bmt)
-				conf_img_path = "sabine_static/high_conf.png";
-			else if (lowest_score > medium_conf_bmt) {
-				conf_img_path = "sabine_static/medium_conf.png";
+			if (lowest_score > high_conf_bmt) {
+				conf_img_path = conf_img_path + "high_conf.png";
+			} else if (lowest_score > medium_conf_bmt) {
+				conf_img_path = conf_img_path + "medium_conf.png";
+			} else {
+				conf_img_path = conf_img_path + "low_conf.png";
 			}
-			else {
-				conf_img_path = "sabine_static/low_conf.png";
-			}
-			bw.write("<img src=\"" + path2database + conf_img_path + "\" height=\"50px\">\n\n");
+			bw.write("<img src=\"" + conf_img_path + "\" height=\"50px\">\n\n");
 			bw.write("<br><br>\n\n");
 			
 			// append sequence logo
-			String png_file = outputfile.substring(0, outputfile.length()-4) + ".png";
+			String png_file = outputfile.substring(0, outputfile.length()-4) + "_files/seq_logo.png";
 			javax.imageio.ImageIO.write(SequenceLogo.drawSequenceLogo(logoArray, 100), "png", new File(png_file));
 			png_file = png_file.substring(png_file.lastIndexOf('/')+1, png_file.length());
 			
 
 			
 			bw.write("<h1>Sequence logo</h1>\n");
-			bw.write("<img src=\"" + path2database + png_file + "\" height=\"100px\">\n\n");
+			bw.write("<img src=\"" + png_file + "\" height=\"100px\">\n\n");
 			
 			// close HTML file
 			bw.write("</body>\n");

@@ -46,12 +46,13 @@ public class SABINE_Validator {
 			System.out.println("The installation was successfully validated.");
 			System.out.println("Type \"sabine.sh --gui\" to start the graphical interface or use the " +
 							   "command \"sabine.sh --help\" to view a list of the provided command line options.");
-			System.out.println("See the \"readme.txt\" or visit the SABINE website (http://www.ra.cs.uni-tuebingen.de/software/SABINE/) for a " +
-							   "comprehensive documentation of the tool.");
 		}
 		else {
 			System.out.println("The installation of the tool is invalid.");
+			System.out.println("Please use the webservice version of SABINE (http://webservices.cs.uni-tuebingen.de/?tool=sabine).");
 		}
+		System.out.println("See the \"readme.txt\" or visit the SABINE website (http://www.ra.cs.uni-tuebingen.de/software/SABINE/) for a " +
+		                   "comprehensive documentation of the tool.");
 	}
 	
 	public boolean compareOutfiles(String reffile, String outfile) {
