@@ -18,10 +18,10 @@
 
 
 import extension.DirectoryRemover;
-import gui.ReversedSpinnerListModel;
 import gui.JHelpBrowser;
 import gui.LayoutHelper;
 import gui.MessageProcessor;
+import gui.ReversedSpinnerListModel;
 import gui.SABINEfileFilter;
 import gui.SequenceLogo;
 import help.RandomStringGenerator;
@@ -49,6 +49,7 @@ import java.io.OutputStream;
 import java.io.PrintStream;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.Properties;
 import java.util.StringTokenizer;
 import java.util.Vector;
 
@@ -68,8 +69,9 @@ import javax.swing.JTable;
 import javax.swing.JTextArea;
 import javax.swing.SpinnerModel;
 import javax.swing.SpinnerNumberModel;
+import javax.swing.ToolTipManager;
 import javax.swing.UIManager;
-import javax.swing.UnsupportedLookAndFeelException;
+import javax.swing.UIManager.LookAndFeelInfo;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.event.DocumentEvent;
@@ -78,9 +80,9 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
 import org.biojava.bio.gui.DistributionLogo;
+import org.biojava.bio.gui.sequence.GUITools;
 import org.biojava.bio.seq.ProteinTools;
 import org.biojava.bio.symbol.IllegalSymbolException;
-import org.biojava.bio.symbol.SymbolList;
 
 import resources.Resource;
 
@@ -171,36 +173,96 @@ public class SABINE_GUI extends JFrame implements ActionListener, ChangeListener
 	public double medium_conf_bmt = 0.0;
 	public double low_conf_bmt = 0.0;
 	
+	public final static String appName = "SABINE 1.0";
 
 	static {
-		try {
-			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-		} catch (ClassNotFoundException exc) {
-			JOptionPane.showMessageDialog(null, "<html>" + exc.getMessage()
-					+ "</html>", exc.getClass().getName(),
-					JOptionPane.WARNING_MESSAGE);
-			exc.printStackTrace();
-		} catch (InstantiationException exc) {
-			JOptionPane.showMessageDialog(null, "<html>" + exc.getMessage()
-					+ "</html>", exc.getClass().getName(),
-					JOptionPane.WARNING_MESSAGE);
-			exc.printStackTrace();
-		} catch (IllegalAccessException exc) {
-			JOptionPane.showMessageDialog(null, "<html>" + exc.getMessage()
-					+ "</html>", exc.getClass().getName(),
-					JOptionPane.WARNING_MESSAGE);
-			exc.printStackTrace();
-		} catch (UnsupportedLookAndFeelException exc) {
-			JOptionPane.showMessageDialog(null, "<html>" + exc.getMessage()
-					+ "</html>", exc.getClass().getName(),
-					JOptionPane.WARNING_MESSAGE);
-			exc.printStackTrace();
-		}
-
+		initLaF(appName);
 	}
+	
+	
+  /**
+   * 
+   * @return
+   */
+  public static boolean isMacOSX() {
+    return (System.getProperty("mrj.version") != null)
+        || (System.getProperty("os.name").toLowerCase().indexOf("mac") != -1);
+  }
+  
+  /**
+   * Initializes the look and feel.
+   */
+  public static void initLaF() {
+    // 15 s for tooltips to be displayed
+    ToolTipManager.sharedInstance().setDismissDelay(15000);
+    try { 
+      UIManager.setLookAndFeel(new javax.swing.plaf.metal.MetalLookAndFeel());
+      String osName = System.getProperty("os.name");
+      if (osName.equals("Linux") || osName.equals("FreeBSD")) {
+        UIManager.setLookAndFeel("com.sun.java.swing.plaf.gtk.GTKLookAndFeel");
+        // UIManager.setLookAndFeel("com.sun.java.swing.plaf.motif.MotifLookAndFeel");
+      } else if (isMacOSX()) {
+        UIManager.setLookAndFeel("ch.randelshofer.quaqua.QuaquaLookAndFeel");
+      } else if (osName.contains("Windows")) {
+        UIManager.setLookAndFeel("com.sun.java.swing.plaf.windows.WindowsLookAndFeel");
+      } else {
+        UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+      }
+    } catch (Throwable e) {
+      try {
+        UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+      } catch (Throwable e1) {
+        // If Nimbus is not available, you can set the GUI to another look
+        // and feel.
+        // Native look and feel for Windows, MacOS X. GTK look and
+        // feel for Linux, FreeBSD
+        try {
+          for (LookAndFeelInfo info : UIManager.getInstalledLookAndFeels()) {
+            if ("Nimbus".equals(info.getName())) {
+              UIManager.setLookAndFeel(info.getClassName());
+              break;
+            }
+          }
+        } catch (Throwable exc) {
+          // ignore.
+        }
+      }
+    }
+  }
+  
+  /**
+   * Initializes the look and feel. This method is only useful when the calling
+   * class contains the main method of your program and is also derived from this
+   * class ({@link GUITools}).
+   * 
+   * @param title
+   *        the title to be displayed in the xDock in case of MacOS. Note that
+   *        this title can only be displayed if this method belongs to the class
+   *        that has the main method (or is in a super class of it), i.e., in
+   *        order to make use of this method in a proper way, you have to extend
+   *        this {@link GUITools} and to put the main method into your derived
+   *        class. From this main method you then have to call this method.
+   *        Otherwise, this title will not have any effect.
+   */
+  public static void initLaF(String title) {
+    if (isMacOSX()) {
+      Properties p = System.getProperties();
+      // also use -Xdock:name="Some title" -Xdock:icon=path/to/icon on command line
+      p.setProperty("apple.awt.graphics.EnableQ2DX", "true");
+      p.setProperty("apple.laf.useScreenMenuBar", "true");
+      p.setProperty("com.apple.macos.smallTabs", "true");
+      p.setProperty("com.apple.macos.useScreenMenuBar", "true");
+      if ((title != null) && (title.length() > 0)) {
+        p.setProperty("com.apple.mrj.application.apple.menu.about.name", title);
+      }
+      p.setProperty("com.apple.mrj.application.growbox.intrudes", "false");
+      p.setProperty("com.apple.mrj.application.live-resize", "true");
+    }
+    initLaF();
+  }
 
 	public SABINE_GUI() {
-		super("SABINE 1.0");
+		super(appName);
 
 		/*
 		 * adapt JFrame to operating system
@@ -464,7 +526,7 @@ public class SABINE_GUI extends JFrame implements ActionListener, ChangeListener
 		 *  Text area for output
 		 */
 		
-		output = new JTextArea(4, 20);
+		output = new JTextArea(25, 75);
 		output.getDocument().putProperty("name", "output");
 		output.getDocument().addDocumentListener(this);
 		
@@ -473,7 +535,7 @@ public class SABINE_GUI extends JFrame implements ActionListener, ChangeListener
 				 								JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 		outputScroller.setVisible(false);
 		
-		LayoutHelper.addComponent(mainPanel, (GridBagLayout) mainPanel.getLayout(), outputScroller, 0, 5, 1, 1, 0, 0);
+		//LayoutHelper.addComponent(mainPanel, (GridBagLayout) mainPanel.getLayout(), outputScroller, 0, 5, 1, 1, 0, 0);
 		
 		msg = new MessageProcessor(new PrintStream(new OutputStream() {
 			@Override
@@ -518,12 +580,16 @@ public class SABINE_GUI extends JFrame implements ActionListener, ChangeListener
 		this.getContentPane().setLayout(new BorderLayout());
 		this.getContentPane().add(titlePanel, BorderLayout.NORTH);
 		this.getContentPane().add(mainPanel, BorderLayout.CENTER);
+		this.getContentPane().add(outputScroller, BorderLayout.SOUTH);
+		
 		this.setDefaultCloseOperation(EXIT_ON_CLOSE);
 		this.setName("mainframe");
 		this.addWindowListener(this);
 		pack();
+		
 		setLocationRelativeTo(null);
 		setVisible(true);
+		setResizable(false);
 	}
 	
 	
@@ -597,25 +663,43 @@ public class SABINE_GUI extends JFrame implements ActionListener, ChangeListener
 
 			if (b.getName().equals("run")) {
 
+			  // Show a message on windows
+	       boolean isWindows = (System.getProperty("os.name").toLowerCase().contains("windows"));
+	        if (isWindows) {
+	          JOptionPane.showMessageDialog(this, "Sorry, " + appName + " is using third party" +
+	              " libraries that are not available for windows.\n\nPlease run this application" +
+	              " on a UNIX system.", appName, JOptionPane.WARNING_MESSAGE);
+	          return;
+	        }
+	        else if (isMacOSX()) {
+	          // TODO: Show something?
+            //JOptionPane.showMessageDialog(this, appName + " has been designed for LINUX." +
+              //" You are using a MAC", appName, JOptionPane.INFORMATION_MESSAGE);
+	        }
+	        
+	        
 				/*
 				 * generate temporary base directory and write input file
 				 */
-				
+			    
 				if (base_dir == null) {
 				
 					int randnum = RandomStringGenerator.randomNumber(3);
 					TimeStampGenerator time_gen = new TimeStampGenerator();
-					String time_stamp = time_gen.getTimeStamp();
+					String time_stamp = time_gen.getTimeStamp().replace(':', '.');
 					
 					// Hack: fixed base directory
 					base_dir = "tmp/" + time_stamp + "_" + randnum + "/";
 					//base_dir = "tmp/fixed_basedir_highconf/";
 					File base_dir_path = new File(base_dir);
+					try {
+					  base_dir_path.mkdirs();
+					} catch (Exception ex){}
 	
-					if (!base_dir_path.exists() && !base_dir_path.mkdir()) {
-						System.out.println("\nInvalid base directory. Aborting.");
-						System.out.println("Base directory: " + base_dir + "\n");
-						System.exit(0);
+					if (!base_dir_path.exists()) {
+						System.err.println("Invalid base directory. Aborting.");
+						System.err.println("Base directory: " + base_dir + "\n");
+						System.exit(1);
 					}
 				}
 				
@@ -682,6 +766,8 @@ public class SABINE_GUI extends JFrame implements ActionListener, ChangeListener
 				addButton.setEnabled(false);
 				deleteButton.setEnabled(false);
 
+				// XXX WE're hiding the main panel here.
+				mainPanel.setVisible(false);
 				outputScroller.setVisible(true);
 				output.setText("");
 				validate();
@@ -904,7 +990,7 @@ public class SABINE_GUI extends JFrame implements ActionListener, ChangeListener
 			} else if (b.getName().equals("back")) {
 				this.getContentPane().remove(resultsPanel);
 				this.getContentPane().add(mainPanel, BorderLayout.CENTER);
-				LayoutHelper.addComponent(mainPanel, (GridBagLayout) mainPanel.getLayout(), outputScroller, 0, 5, 1, 1, 0, 0);
+				this.getContentPane().add(outputScroller, BorderLayout.SOUTH);
 				outputScroller.setVisible(false);
 				validate();
 				pack();
@@ -1026,10 +1112,9 @@ public class SABINE_GUI extends JFrame implements ActionListener, ChangeListener
 			String seq = sequenceArea.getText().replaceAll("\\s", "").replaceAll("\\n", "");
 		
 			try {
-				
-				SymbolList aa = ProteinTools.createProtein(seq);
+				ProteinTools.createProtein(seq);
 			} catch (IllegalSymbolException ex) {
-				JOptionPane.showMessageDialog(this, "Invalid protein sequence.", ex.getClass().getName().substring(ex.getClass().getName().lastIndexOf(".") + 1),
+				JOptionPane.showMessageDialog(this, "Invalid protein sequence.", ex.getClass().getSimpleName(),
 						JOptionPane.ERROR_MESSAGE);
 			}
 			
@@ -1155,6 +1240,7 @@ public class SABINE_GUI extends JFrame implements ActionListener, ChangeListener
 		outlierFilterThreshold.setEnabled(true);
 		runButton.setEnabled(true);
 		addButton.setEnabled(true);
+		mainPanel.setVisible(true);
 
 		validate();
 		pack();
@@ -1162,7 +1248,7 @@ public class SABINE_GUI extends JFrame implements ActionListener, ChangeListener
 		boolean pfm_transferred = readOutfile(base_dir + "prediction.out");
 		
 		if (pfm_transferred) {
-			mainPanel.remove(outputScroller);
+		  this.getContentPane().remove(outputScroller);
 			this.getContentPane().remove(mainPanel);
 			showResults();	
 		}
