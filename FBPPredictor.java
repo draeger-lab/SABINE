@@ -16,6 +16,12 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import help.FeatureFileGenerator;
+import help.FormatConverter;
+import help.LibSVMFeatureScaler;
+import help.ModelFileObtainer;
+import help.TFNamePairsFileGenerator;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -24,10 +30,10 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashSet;
 
-import org.biojava.bio.BioException;
-
 import libsvm.LabeledTF;
 import libsvm.SVMPredictor;
+
+import org.biojava.bio.BioException;
 
 import core.DomainFeatureCalculator;
 import core.FeatureRepairer;
@@ -36,11 +42,7 @@ import core.SVMPairwiseFeatureCalculator;
 import core.SequenceAligner;
 import core.SequenceFeatureCalculator;
 import core.SpeciesFeatureCalculator;
-import help.FeatureFileGenerator;
-import help.FormatConverter;
-import help.LibSVMFeatureScaler;
-import help.ModelFileObtainer;
-import help.TFNamePairsFileGenerator;
+import de.zbit.util.progressbar.AbstractProgressBar;
 
 
 public class FBPPredictor {
@@ -70,53 +72,53 @@ public class FBPPredictor {
 	 */
 	FormatConverter converter = new FormatConverter();
 	
-	/*
+	/**
 	 * calculates alignment- and kernel-scores of two binding-domains
 	 */
 	DomainFeatureCalculator domaincalculator = new DomainFeatureCalculator();
 	
 	
-	/*
+	/**
 	 * calculates alignment scores of domain-environments and secondary structures
 	 */
 	SequenceFeatureCalculator sequencecalculator = new SequenceFeatureCalculator();
 	
 	
-	/*
+	/**
 	 * looks up phylogentic distances between species
 	 */
 	SpeciesFeatureCalculator speciescalculator = new SpeciesFeatureCalculator();
 	
-	/*
+	/**
 	 * calculates scores according to the svm-pairwise approach 
 	 */
 	SVMPairwiseFeatureCalculator svmpairwisecalculator = new SVMPairwiseFeatureCalculator();
 	
 	
-	/*
+	/**
 	 * eliminates numerical instabilities within certain features (MEHP950101, MEHP950103, MIYT790101)
 	 */
 	FeatureRepairer repairer = new FeatureRepairer();
 	
 	
-	/*
+	/**
 	 * produces an unlabeled feature file in libsvm-format  
 	 */
 	FeatureFileGenerator libsvmfilegenerator = new FeatureFileGenerator();
 	
-	/*
+	/**
 	 * scales features in unlabeled feature file with respect to a given training set
 	 */
 	LibSVMFeatureScaler featurescaler = new LibSVMFeatureScaler();
 	
 	
-	/*
+	/**
 	 * predicts FBP-similarity scores of TF-pairs, extracts best matches and performs the FBP-transfer
 	 */
 	SVMPredictor predictor = new SVMPredictor();
 	
 	
-	/*
+	/**
 	 * looks up the optimal libsvm-modelfile for the predictions
 	 */
 	ModelFileObtainer obtainer = new ModelFileObtainer();
@@ -127,6 +129,14 @@ public class FBPPredictor {
 	 */
 	TFNamePairsFileGenerator namepairsfilegenerator = new TFNamePairsFileGenerator();
 	
+	 /**
+   * 
+   */
+  AbstractProgressBar progress = null;
+  
+  public void setProgressBar(AbstractProgressBar progress) {
+    this.progress = progress;
+  }
 	
 	public static double[] getThresholdValues() {
 		return new double[] {high_conf_bmt , medium_conf_bmt , low_conf_bmt};
@@ -230,6 +240,7 @@ public class FBPPredictor {
 		domaincalculator.basedir = base_dir;
 		sequencecalculator.silent = true;
 		sequencecalculator.basedir = base_dir;
+		domaincalculator.setProgressBar(null);
 		
 		
 		if (! silent) System.out.println("\n  Calculating features for all tf pairs.");
@@ -324,6 +335,13 @@ public class FBPPredictor {
 		sequencecalculator.parseRelevantDomainsAndSequences(irrelevantPairs, class_id, train_dir);
 		sequencecalculator.parseRelevantSecondaryStructures(irrelevantPairs, class_id, train_dir);
 		
+		// Configure the progress bar
+    if (progress!=null) {
+      progress.setNumberOfTotalCalls(30);
+      progress.setEstimateTime(false);
+      domaincalculator.setProgressBar(progress);
+    }
+		
 		if (! silent) System.out.println("\n    Calculating substitution matrix based alignment scores.");
 		if (gui_output_mode) System.out.print("  Calculating substitution matrix based alignment scores...");
 		
@@ -373,23 +391,32 @@ public class FBPPredictor {
 		if (gui_output_mode) System.out.print("done.\n  Calculating secondary structure scores...");
 		
 		sequencecalculator.calculateSequenceFeatureFile(name, domains, sequence1, sequence2, "SecondaryStructure", null, "BLOSUM_62.dat", base_dir + "relevantpairs/domain_scores_secstr_blo62.out");
+		if (progress!=null) progress.DisplayBar(); // 25.
 		
 		if (! silent) System.out.println("    Calculating DNA-binding domain environment scores.");
 		if (gui_output_mode) System.out.print("done.\n  Calculating DNA-binding domain environment scores...");
 		
 		sequencecalculator.calculateSequenceFeatureFile(name, domains, sequence1, sequence2, "Environments", new String[] {"25"}, "BLOSUM_62.dat", base_dir + "relevantpairs/domain_scores_env_25_BLOSUM_62.out");
+		if (progress!=null) progress.DisplayBar();  // 26.
 		sequencecalculator.calculateSequenceFeatureFile(name, domains, sequence1, sequence2, "Environments", new String[] {"50"}, "BLOSUM_62.dat", base_dir + "relevantpairs/domain_scores_env_50_BLOSUM_62.out");
+		if (progress!=null) progress.DisplayBar();  // 27.
 		
 		if (! silent) System.out.println("    Calculating phylogenetic distance based scores.");
 		if (gui_output_mode) System.out.print("done.\n  Calculating phylogenetic distance based scores...");
 		
 		speciescalculator.calculatePhylogeneticDistances(name, species, class_id, irrelevantPairs, train_dir + "new_phylogenetic_distances.out", base_dir + "relevantpairs/domain_scores_phyl_dist.out", train_dir);
+		if (progress!=null) progress.DisplayBar();  // 28.
 		
 		if (! silent) System.out.println("    Calculating SVM pairwise scores.");
 		if (gui_output_mode) System.out.print("done.\n  Calculating SVM pairwise scores...");
 		
 		svmpairwisecalculator.calculateSVMPairwiseScores(name, base_dir + "relevantpairs/domain_scores_BLOSUM_62.out", base_dir + "allpairs/domain_scores_BLOSUM_62.out", train_dir + "trainingset_" + class_id + ".blo62", base_dir + "relevantpairs/domain_scores_svm_pairwise_BLOSUM_62.out");
+		if (progress!=null) progress.DisplayBar();  // 29.
 		svmpairwisecalculator.calculateSVMPairwiseScores(name, base_dir + "relevantpairs/domain_scores_PAM_080.out", base_dir + "allpairs/domain_scores_PAM_080.out", train_dir + "trainingset_" + class_id + ".pam80", base_dir + "relevantpairs/domain_scores_svm_pairwise_PAM_080.out");
+		if (progress!=null) {
+		  progress.DisplayBar();  // 30.
+		  progress.finished();
+		}
 		
 		if (! silent) System.out.println("\nScreening features for numerical instabilities.");
 		

@@ -1,3 +1,7 @@
+import javax.annotation.processing.AbstractProcessor;
+
+import de.zbit.util.progressbar.AbstractProgressBar;
+
 /*
     SABINE predicts binding specificities of transcription factors.
     Copyright (C) 2009 ZBIT, University of Tübingen, Johannes Eichner
@@ -25,6 +29,7 @@ public class SABINE_Runner implements Runnable {
 	private int mnb;
 	private double oft;
 	private GUIListener gui;
+	private AbstractProgressBar progressBar=null;
 	
 	public SABINE_Runner(String base_dir, double bmt, boolean dyn_bmt, int mnb, double oft, GUIListener gui) {
 		this.base_dir = base_dir;
@@ -34,6 +39,10 @@ public class SABINE_Runner implements Runnable {
 		this.oft = oft;
 		this.gui = gui;
 	}
+  
+  public void setProgressBar(AbstractProgressBar progress) {
+    this.progressBar = progress;
+  }
 
 	public void run() {
 		
@@ -45,6 +54,7 @@ public class SABINE_Runner implements Runnable {
 		predictor.outlier_filter_threshold = oft;
 		predictor.silent = true;
 		predictor.gui_output_mode = true;
+		predictor.setProgressBar(progressBar);
 		
 
 		// create directories for temporary files

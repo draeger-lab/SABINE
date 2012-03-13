@@ -17,7 +17,6 @@
  */
 
 
-import extension.DirectoryRemover;
 import gui.JHelpBrowser;
 import gui.LayoutHelper;
 import gui.MessageProcessor;
@@ -63,6 +62,7 @@ import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JProgressBar;
 import javax.swing.JScrollPane;
 import javax.swing.JSpinner;
 import javax.swing.JTable;
@@ -85,6 +85,8 @@ import org.biojava.bio.seq.ProteinTools;
 import org.biojava.bio.symbol.IllegalSymbolException;
 
 import resources.Resource;
+import de.zbit.util.progressbar.gui.ProgressBarSwing;
+import extension.DirectoryRemover;
 
 public class SABINE_GUI extends JFrame implements ActionListener, ChangeListener,
 		DocumentListener, ListSelectionListener, GUIListener, WindowListener {
@@ -120,6 +122,10 @@ public class SABINE_GUI extends JFrame implements ActionListener, ChangeListener
 	private JTextArea output;
 	
 	private JScrollPane outputScroller;
+	
+	private JProgressBar progressBar;
+  
+  private JPanel outputPanel;
 
 	private MessageProcessor msg;
 
@@ -533,7 +539,14 @@ public class SABINE_GUI extends JFrame implements ActionListener, ChangeListener
 		
 		outputScroller = new JScrollPane(output,JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
 				 								JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-		outputScroller.setVisible(false);
+		
+    progressBar = new JProgressBar();
+    
+    outputPanel = new JPanel(new BorderLayout());
+		outputPanel.add(progressBar, BorderLayout.NORTH);
+		outputPanel.add(outputScroller, BorderLayout.CENTER);
+		outputPanel.setVisible(false);
+		
 		
 		//LayoutHelper.addComponent(mainPanel, (GridBagLayout) mainPanel.getLayout(), outputScroller, 0, 5, 1, 1, 0, 0);
 		
@@ -580,7 +593,7 @@ public class SABINE_GUI extends JFrame implements ActionListener, ChangeListener
 		this.getContentPane().setLayout(new BorderLayout());
 		this.getContentPane().add(titlePanel, BorderLayout.NORTH);
 		this.getContentPane().add(mainPanel, BorderLayout.CENTER);
-		this.getContentPane().add(outputScroller, BorderLayout.SOUTH);
+		this.getContentPane().add(outputPanel, BorderLayout.SOUTH);
 		
 		this.setDefaultCloseOperation(EXIT_ON_CLOSE);
 		this.setName("mainframe");
@@ -742,6 +755,7 @@ public class SABINE_GUI extends JFrame implements ActionListener, ChangeListener
 
 				// run SABINE on generated input file
 				SABINE_Runner runner = new SABINE_Runner(base_dir, bmt, dyn_bmt, mnb, oft, this);
+				runner.setProgressBar(new ProgressBarSwing(progressBar));
 				currRun = new Thread(runner);
 				currRun.start();
 				
@@ -766,9 +780,9 @@ public class SABINE_GUI extends JFrame implements ActionListener, ChangeListener
 				addButton.setEnabled(false);
 				deleteButton.setEnabled(false);
 
-				// XXX WE're hiding the main panel here.
+				// XXX We're hiding the main panel here.
 				mainPanel.setVisible(false);
-				outputScroller.setVisible(true);
+				outputPanel.setVisible(true);
 				output.setText("");
 				validate();
 				pack();
@@ -790,7 +804,7 @@ public class SABINE_GUI extends JFrame implements ActionListener, ChangeListener
 				runButton.setEnabled(false);
 				addButton.setEnabled(true);
 
-				outputScroller.setVisible(false);
+				outputPanel.setVisible(false);
 				
 				// reset 
 				organismSelect.setSelectedItem("Homo Sapiens");
@@ -990,8 +1004,8 @@ public class SABINE_GUI extends JFrame implements ActionListener, ChangeListener
 			} else if (b.getName().equals("back")) {
 				this.getContentPane().remove(resultsPanel);
 				this.getContentPane().add(mainPanel, BorderLayout.CENTER);
-				this.getContentPane().add(outputScroller, BorderLayout.SOUTH);
-				outputScroller.setVisible(false);
+				this.getContentPane().add(outputPanel, BorderLayout.SOUTH);
+				outputPanel.setVisible(false);
 				validate();
 				pack();
 				
@@ -1248,7 +1262,7 @@ public class SABINE_GUI extends JFrame implements ActionListener, ChangeListener
 		boolean pfm_transferred = readOutfile(base_dir + "prediction.out");
 		
 		if (pfm_transferred) {
-		  this.getContentPane().remove(outputScroller);
+		  this.getContentPane().remove(outputPanel);
 			this.getContentPane().remove(mainPanel);
 			showResults();	
 		}

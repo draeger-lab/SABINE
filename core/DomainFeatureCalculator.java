@@ -28,7 +28,11 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.StringTokenizer;
 
+import javax.annotation.processing.AbstractProcessor;
+
 import org.biojava.bio.BioException;
+
+import de.zbit.util.progressbar.AbstractProgressBar;
 
 
 public class DomainFeatureCalculator {
@@ -43,6 +47,15 @@ public class DomainFeatureCalculator {
 	ArrayList<ArrayList<String>> other_domains = null;
 	
 	ArrayList<String> other_names = null;
+	
+	/**
+	 * 
+	 */
+	AbstractProgressBar progress = null;
+	
+	public void setProgressBar(AbstractProgressBar progress) {
+	  this.progress = progress;
+	}
 	
 	
 	/*
@@ -148,6 +161,9 @@ public class DomainFeatureCalculator {
 	
 	public void calculateDomainFeatureFile(String tfname, ArrayList<String> domains1, String featuretype, String[] params, String matrix, String outfile) {
 		
+	  if (progress!=null) {
+	    progress.DisplayBar();
+	  }
 		
 		if(other_names == null) {	
 			System.out.println("Fatal Error. Unable to calculate domain features. Global variable \"other_names\" was not initialized. Aborting.");
