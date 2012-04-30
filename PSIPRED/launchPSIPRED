@@ -1,0 +1,2 @@
+cd PSIPRED
+./runpsipred_single seq.fasta
