@@ -17,7 +17,6 @@
  */
 
 
-
 import java.awt.image.BufferedImage;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -36,16 +35,19 @@ import org.biojava.bio.seq.ProteinTools;
 import org.biojava.bio.symbol.IllegalSymbolException;
 
 import extension.DirectoryRemover;
+import extension.UniProtClient;
 import gui.SequenceLogo;
 import help.FileCopier;
 
 public class SABINE_Galaxy {
    
-	boolean silent = true;
+	boolean silent = false;
 	boolean batchMode = false;
 	
 	final String public_trainingset = "trainingsets_public/";
 	final String biobase_trainingset = "trainingsets_biobase/";
+	
+	private final String[] superclassNames = new String[] {"Other", "Basic domain", "Zinc finger", "Helix-turn helix", "Beta scaffold", "Auto-detect"};
 	
 	int tf_num_limit = 10;
 	
@@ -63,11 +65,14 @@ public class SABINE_Galaxy {
 	int mnb; 
 	double oft;
 	
-	DistributionLogo[] logoArray;
-	BufferedImage seqLogo;
-	
-	ArrayList<LabeledTF> bestMatches= new ArrayList<LabeledTF>();
-	ArrayList<Double[]> predPFM = new ArrayList<Double[]>(); 
+	// objects to save results
+	ArrayList<String> inputTFnames = new ArrayList<String>();
+	ArrayList<Boolean> predictionPossible = new ArrayList<Boolean>();
+	ArrayList<Integer> numCandidates = new ArrayList<Integer>();
+	ArrayList<ArrayList<LabeledTF>> bestMatches = new ArrayList<ArrayList<LabeledTF>>();
+	ArrayList<ArrayList<Double[]>> predPFM = new ArrayList<ArrayList<Double[]>>();
+	ArrayList<DistributionLogo[]> logoArray = new ArrayList<DistributionLogo[]>();
+	ArrayList<BufferedImage> seqLogo = new ArrayList<BufferedImage>();
 	
 	public void parseInput(String[] args) {
 		
@@ -79,21 +84,31 @@ public class SABINE_Galaxy {
 			
 			if (!batchMode && args[i].equals("-o")) {
 				organism = args[++i].toUpperCase();
-				while (! args[++i].equals("-s")) {
+				while (! args[++i].equals("-p")) {
 					organism += " " + args[i].toUpperCase();
 				}
+			}
+			
+			if (!batchMode && args[i].equals("-p")) {
+				sequence = "";
+				while (! args[++i].equals("-s")) {
+					sequence += args[i].replaceAll("X", "").toUpperCase();
+				}
+			}
+			
+			if (!batchMode && args[i].equals("-u")) {
+				String uniprot_id = args[++i].toUpperCase();
+				UniProtClient uniprot_client = new UniProtClient();
+				String fasta_seq = uniprot_client.getUniProtSequence(uniprot_id.toUpperCase(), true);
+				
+				organism = fasta_seq.substring(fasta_seq.indexOf("OS=")+3, fasta_seq.indexOf("GN=")-1);
+				sequence = fasta_seq.replaceFirst(">.*\\n", "").replaceAll("\\n", "");
+				i++;
 			}
 			
 			if (!batchMode && args[i].equals("-s")) {
 				superclass = Integer.parseInt(args[++i]);
 				i++;
-			}
-			
-			if (!batchMode && args[i].equals("-p")) {
-				sequence = "";
-				while (! args[++i].equals("-f")) {
-					sequence += args[i].replaceAll("X", "").toUpperCase();
-				}
 			}
 			
 			if (batchMode && args[i].equals("-i")) {
@@ -140,12 +155,22 @@ public class SABINE_Galaxy {
 		}
 		
 		if (! silent) {
-			System.out.println("Organism:   " + organism);
-			System.out.println("Superclass: " + superclass);
-			System.out.println("Sequence:   " + sequence);
-			if (! domains.isEmpty()) System.out.println("Domains:    " + domains.get(0));
-			for (int j=1; j<domains.size(); j++) System.out.println("            " + domains.get(j));
-			System.out.println("BMT:        " + bmt);
+			if (batchMode) {
+				System.out.println("Input File:   " + inputfile);
+				System.out.println("Output File:   " + outputfile);
+			} else {
+			
+				System.out.println("Organism:   " + organism);
+				System.out.println("Superclass: " + superclassNames[superclass]);
+				System.out.println("Sequence:   " + sequence);
+				if (! domains.isEmpty()) System.out.println("Domains:    " + domains.get(0));
+				for (int j=1; j<domains.size(); j++) System.out.println("            " + domains.get(j));
+			}
+			if (!dyn_bmt) {
+				System.out.println("BMT:        " + bmt);
+			} else {
+				System.out.println("BMT:        dynamic");
+			}
 			System.out.println("MNB:        " + mnb);
 			System.out.println("OFT:        " + oft + "\n");
 		}
@@ -322,7 +347,8 @@ public class SABINE_Galaxy {
 		else { 
 			// set parameters
 			FBPPredictor predictor = new FBPPredictor();
-			predictor.best_match_threshold = bmt;
+			predictor.dynamic_threshold = dyn_bmt;
+			if (!dyn_bmt) sabine_caller.best_match_threshold = bmt;
 			predictor.max_number_of_best_matches = mnb;
 			predictor.outlier_filter_threshold = oft;
 			predictor.silent = true;
@@ -332,63 +358,114 @@ public class SABINE_Galaxy {
 	}
 	
 	
-	public boolean readOutfile(String infile) {
-		
+	public void readOutfile(String infile) {
+
 		try {
 			BufferedReader br = new BufferedReader(new FileReader(new File(infile)));
 			
 			StringTokenizer strtok;
 			String line, name;
 			double A, C, G, T, pos, score;
-			ArrayList<DistributionLogo> logoData = new ArrayList<DistributionLogo>();
 			
-			// skip name
-			if (! silent) System.out.println("Output file:" + infile);
-			while ((line = br.readLine()).startsWith("BM")) {
-				
-				if (line.startsWith("BM  none"))
-					return false;
-				else { 
-					strtok = new StringTokenizer(line.substring(4));
-					name = strtok.nextToken();
-					score = Double.parseDouble(strtok.nextToken());
-					bestMatches.add(new LabeledTF(name, score));
-				}
-			}
-			line = br.readLine();	// XX
-			
-			while (line.startsWith("MA")) {
-				
-				strtok = new StringTokenizer(line.substring(4));
-				
-				pos = Integer.parseInt(strtok.nextToken()); 
-				A = Double.parseDouble(strtok.nextToken()) / 100;
-				C = Double.parseDouble(strtok.nextToken()) / 100;
-				G = Double.parseDouble(strtok.nextToken()) / 100;
-				T = Double.parseDouble(strtok.nextToken()) / 100;
-				
-				predPFM.add(new Double[] {pos, A, C, G, T});
-				logoData.add(SequenceLogo.getLogo(new double[] {A, C, G, T}));
+			while ((line=br.readLine()) != null) {
 
-				line = br.readLine();
+				// read name of Input TF
+				if (batchMode) {
+					if (line.startsWith("NA")) {
+						inputTFnames.add(line.replaceFirst("NA  ", "").trim());
+						line = br.readLine();	// XX
+						line = br.readLine();	// BM
+						
+					} else {
+						System.out.println("Parse Error. \"NA\" expected.");
+						System.exit(0);
+					}
+				}
+				
+				// read Best Matches
+				ArrayList<LabeledTF> currBestMatches = new ArrayList<LabeledTF>();
+				
+				while (line.startsWith("BM")) {
+					
+					if (line.startsWith("BM  none")) {
+						numCandidates.add(Integer.parseInt(line.substring(10, line.indexOf(" ", 10))));
+						predictionPossible.add(false);
+						
+					} else {
+						numCandidates.add(0);
+						predictionPossible.add(true);
+						
+						// add Best Match to list for current TF 
+						strtok = new StringTokenizer(line.substring(4));
+						name = strtok.nextToken();
+						score = Double.parseDouble(strtok.nextToken());
+						currBestMatches.add(new LabeledTF(name, score));
+					}
+					line = br.readLine();
+				}
+				bestMatches.add(currBestMatches);
+				
+				line = br.readLine();	// XX
+				
+				// read PFM
+				ArrayList<Double[]> currPFM = null;
+				ArrayList<DistributionLogo> currLogoData = null;
+				
+				if (!line.startsWith("MA  none")) {
+					currPFM = new ArrayList<Double[]>();
+					currLogoData = new ArrayList<DistributionLogo>();
+					
+					while (line.startsWith("MA")) {
+						
+						strtok = new StringTokenizer(line.substring(4));
+						
+						pos = Integer.parseInt(strtok.nextToken()); 
+						A = Double.parseDouble(strtok.nextToken()) / 100;
+						C = Double.parseDouble(strtok.nextToken()) / 100;
+						G = Double.parseDouble(strtok.nextToken()) / 100;
+						T = Double.parseDouble(strtok.nextToken()) / 100;
+						
+						currPFM.add(new Double[] {pos, A, C, G, T});
+						currLogoData.add(SequenceLogo.getLogo(new double[] {A, C, G, T}));
+		
+						line = br.readLine();
+					}
+				}
+				predPFM.add(currPFM);
+				DistributionLogo[] currLogoArray = currLogoData.toArray(new DistributionLogo[] {});
+				logoArray.add(currLogoArray);
+				seqLogo.add(SequenceLogo.drawSequenceLogo(currLogoArray, 200));
 			}
-			logoArray = logoData.toArray(new DistributionLogo[] {});
-			seqLogo = SequenceLogo.drawSequenceLogo(logoArray, 200); 
 
 		} catch (IOException e) {
 			e.printStackTrace();
 		} catch (Exception e1) {
 			e1.printStackTrace();
 		}
-		return true;
 	}
 	
-	public void writeSuccessOutput(String result_file) {
+	// write HTML header
+	public static void writeHTMLheader(BufferedWriter bw) throws IOException {
 		
-		// copy output file to galaxy database
-		System.out.println("PFM transfer was possible.");
-		//FileCopier.copy(result_file, outfile);
-		
+		bw.write("<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\"\n");
+		bw.write("     \"http://www.w3.org/TR/html4/loose.dtd\">\n");
+		bw.write("<html>\n");
+		bw.write("<head>\n");
+		bw.write("<title>SABINE Result</title>\n");
+		bw.write("<style type=\"text/css\">\n");
+		bw.write("  h1 { font-size: 150%;color: #002780; }\n");
+		bw.write("  table { width: 500px; background-color: #E6E8FA; border: 1px solid black; padding: 3px; vertical-align: middle;}\n");
+		bw.write("  tr.secRow { background-color:#FFFFFF; margin-bottom: 50px; vertical-align: middle;}\n");
+		bw.write("  th { padding-bottom: 8px; padding-top: 8px; text-align: center}\n");
+		bw.write("  td { padding-bottom: 8px; padding-top: 8px; text-align: center}\n");
+		bw.write("</style>\n");
+		bw.write("</head>\n");
+		bw.write("<body style=\"padding-left: 30px\">\n");
+	}
+
+	
+	public void writeHTMLOutput(String result_file) {
+
 		DecimalFormat fmt2 = new DecimalFormat();
 		fmt2.setMaximumFractionDigits(2);
 		fmt2.setMinimumFractionDigits(2);
@@ -400,93 +477,118 @@ public class SABINE_Galaxy {
 		// write best matches and PFM to HTML tables
 		try {
 			BufferedWriter bw = new BufferedWriter(new FileWriter(new File(outputfile)));
+		
+			writeHTMLheader(bw);
 			
-			// write HTML header
-			bw.write("<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\"\n");
-			bw.write("     \"http://www.w3.org/TR/html4/loose.dtd\">\n");
-			bw.write("<html>\n");
-			bw.write("<head>\n");
-			bw.write("<title>SABINE Result</title>\n");
-			bw.write("<style type=\"text/css\">\n");
-			bw.write("  h1 { font-size: 150%;color: #002780; }\n");
-			bw.write("  table { width: 500px; background-color: #E6E8FA; border: 1px solid black; padding: 3px; vertical-align: middle;}\n");
-			bw.write("  tr.secRow { background-color:#FFFFFF; margin-bottom: 50px; vertical-align: middle;}\n");
-			bw.write("  th { padding-bottom: 8px; padding-top: 8px; text-align: center}\n");
-			bw.write("  td { padding-bottom: 8px; padding-top: 8px; text-align: center}\n");
-			bw.write("</style>\n");
-			bw.write("</head>\n");
-			bw.write("<body style=\"padding-left: 30px\">\n");
-
+			int numInputTFs = 1;
+			if (batchMode) {
+				numInputTFs = inputTFnames.size();
+			}
 			
-			// write best matches
-			bw.write("<h1>Best Matches</h1>\n");
-			bw.write("<table>\n");
-			bw.write("  <tr><th> Transcription Factor </th><th> PFM similarity </th></tr>\n");
-			
-			double lowest_score = 0;
-			for (int i=0; i<bestMatches.size(); i++) {
-				if ((i%2) == 1) { 
-					bw.write("  <tr>");
-				}
-				else {
-					bw.write("  <tr class=\"secRow\">");
-				}
-				bw.write("<td> " + bestMatches.get(i).getName() + " </td>");
-				bw.write("<td> " + fmt4.format(bestMatches.get(i).getLabel()) + " </td></tr>\n");
+			for (int tfIndex=0; tfIndex<numInputTFs; tfIndex++) {
 				
-				lowest_score = bestMatches.get(i).getLabel();
-			}
-			bw.write("</table>\n\n");
-			bw.write("<br><br>\n\n");
-			
-			// write PFM
-			bw.write("<h1>Predicted PFM</h1>\n");
-			bw.write("<table>\n");
-			bw.write("  <tr><th> Pos. </th><th> A </th><th> C </th><th> G </th><th> T </th></tr>\n");
-			
-			for (int i=0; i<predPFM.size(); i++) {
-				if ((i%2) == 1) { 
-					bw.write("<tr>");
+				if (tfIndex > 0) {
+					bw.write("<br><hr>\n\n");
 				}
-				else {
-					bw.write("<tr class=\"secRow\">");
+			
+				// write SUCCESS output 
+				if (predictionPossible.get(tfIndex)) {
+				
+					System.out.println("PFM transfer was possible.");
+					
+					// write best matches
+					bw.write("<h1>Best Matches</h1>\n");
+					bw.write("<table>\n");
+					bw.write("  <tr><th> Transcription Factor </th><th> PFM similarity </th></tr>\n");
+					
+					double lowest_score = 0;
+					for (int i=0; i<bestMatches.get(tfIndex).size(); i++) {
+						if ((i%2) == 1) { 
+							bw.write("  <tr>");
+						}
+						else {
+							bw.write("  <tr class=\"secRow\">");
+						}
+						bw.write("<td> " + bestMatches.get(tfIndex).get(i).getName() + " </td>");
+						bw.write("<td> " + fmt4.format(bestMatches.get(tfIndex).get(i).getLabel()) + " </td></tr>\n");
+						
+						lowest_score = bestMatches.get(i).get(tfIndex).getLabel();
+					}
+					bw.write("</table>\n\n");
+					bw.write("<br><br>\n\n");
+					
+					// write PFM
+					bw.write("<h1>Predicted PFM</h1>\n");
+					bw.write("<table>\n");
+					bw.write("  <tr><th> Pos. </th><th> A </th><th> C </th><th> G </th><th> T </th></tr>\n");
+					
+					for (int i=0; i<predPFM.size(); i++) {
+						if ((i%2) == 1) { 
+							bw.write("<tr>");
+						}
+						else {
+							bw.write("<tr class=\"secRow\">");
+						}
+						bw.write("<td> " +  Math.round(predPFM.get(tfIndex).get(i)[0]) + " </td>");
+						bw.write("<td> " +  fmt2.format(predPFM.get(tfIndex).get(i)[1]) + " </td>");
+						bw.write("<td> " +  fmt2.format(predPFM.get(tfIndex).get(i)[2]) + " </td>");
+						bw.write("<td> " +  fmt2.format(predPFM.get(tfIndex).get(i)[3]) + " </td>");
+						bw.write("<td> " +  fmt2.format(predPFM.get(tfIndex).get(i)[4]) + " </td></tr>\n");
+					}
+					bw.write("</table>\n");
+					bw.write("<br>\n\n");
+					
+					// get threshold values for dynamic BMT
+					double[] thresholds = FBPPredictor.getThresholdValues();
+					double high_conf_bmt = thresholds[0];
+					double medium_conf_bmt = thresholds[1];
+					
+					// append confidence sign
+					String conf_img_path = "../../../static/images/static_code/sabine_static/";
+					
+					if (lowest_score > high_conf_bmt) {
+						conf_img_path = conf_img_path + "high_conf.png";
+					} else if (lowest_score > medium_conf_bmt) {
+						conf_img_path = conf_img_path + "medium_conf.png";
+					} else {
+						conf_img_path = conf_img_path + "low_conf.png";
+					}
+					bw.write("<img src=\"" + conf_img_path + "\" height=\"50px\">\n\n");
+					bw.write("<br><br>\n\n");
+					
+					// append sequence logo
+					String png_file = outputfile.substring(0, outputfile.length()-4) + "_files/seq_logo.png";
+					javax.imageio.ImageIO.write(SequenceLogo.drawSequenceLogo(logoArray.get(tfIndex), 100), "png", new File(png_file));
+					png_file = png_file.substring(png_file.lastIndexOf('/')+1, png_file.length());
+					
+					bw.write("<h1>Sequence logo</h1>\n");
+					bw.write("<img src=\"" + png_file + "\" height=\"100px\">\n\n");		
+					
+				// write FAILURE output 
+				} else {
+					
+					System.out.println("PFM transfer was not possible.");
+					
+					bw.write("<h1>Best Matches</h1>\n");
+					double thres = bmt;
+					if (dyn_bmt) {
+						bmt = FBPPredictor.low_conf_bmt;
+					}
+					if (numCandidates.get(tfIndex) == 0) {
+						bw.write("<h3>No candidates for PFM transfer were found.</h3>\nPlease note, that SABINE " +
+								 "can only predict a PFM for a given transcription factor if at least one " +
+								 "candidate factor is found in the training set which has a normalized domain sequence similarity score " +
+								 "of at least 0.3 with respect to the BLOSUM62 substitution matrix. As no candidate factor with sufficient domain " +
+								 "sequence similarity was found, SABINE could not predict a PFM.");
+					
+					} else {
+						bw.write("<h3>No Best Matches were found.</h3>\nSABINE compared the input transcription factor to all transcription factors with known DNA motif in the training set. " +
+								 numCandidates + " candidate factors with sufficiently high domain sequence similarity to the input factor were found. " +
+								 "Unfortunately, none of these candidate factors was predicted to have a PFM similarity greater than the best match threshold (" + thres + "). " +
+								 "Please note, that this threshold can be adjusted in the options of SABINE.");
+					}
 				}
-				bw.write("<td> " +  Math.round(predPFM.get(i)[0]) + " </td>");
-				bw.write("<td> " +  fmt2.format(predPFM.get(i)[1]) + " </td>");
-				bw.write("<td> " +  fmt2.format(predPFM.get(i)[2]) + " </td>");
-				bw.write("<td> " +  fmt2.format(predPFM.get(i)[3]) + " </td>");
-				bw.write("<td> " +  fmt2.format(predPFM.get(i)[4]) + " </td></tr>\n");
 			}
-			bw.write("</table>\n");
-			bw.write("<br>\n\n");
-			
-			// get threshold values for dynamic BMT
-			double[] thresholds = FBPPredictor.getThresholdValues();
-			double high_conf_bmt = thresholds[0];
-			double medium_conf_bmt = thresholds[1];
-			
-			// append confidence sign
-			String conf_img_path = "../../../static/images/static_code/sabine_static/";
-			
-			if (lowest_score > high_conf_bmt) {
-				conf_img_path = conf_img_path + "high_conf.png";
-			} else if (lowest_score > medium_conf_bmt) {
-				conf_img_path = conf_img_path + "medium_conf.png";
-			} else {
-				conf_img_path = conf_img_path + "low_conf.png";
-			}
-			bw.write("<img src=\"" + conf_img_path + "\" height=\"50px\">\n\n");
-			bw.write("<br><br>\n\n");
-			
-			// append sequence logo
-			String png_file = outputfile.substring(0, outputfile.length()-4) + "_files/seq_logo.png";
-			javax.imageio.ImageIO.write(SequenceLogo.drawSequenceLogo(logoArray, 100), "png", new File(png_file));
-			png_file = png_file.substring(png_file.lastIndexOf('/')+1, png_file.length());
-			
-
-			
-			bw.write("<h1>Sequence logo</h1>\n");
-			bw.write("<img src=\"" + png_file + "\" height=\"100px\">\n\n");
 			
 			// close HTML file
 			bw.write("</body>\n");
@@ -498,23 +600,56 @@ public class SABINE_Galaxy {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		
-		
 	}
 	
-	public void writeFailureOutput() {
+	public void writeFailureOutput(String result_file) {
 		
 		try {
-			BufferedWriter bw = new BufferedWriter(new FileWriter(new File(outputfile)));
 			
-			System.out.println("PFM transfer was not possible.");
-			bw.write("PFM transfer was not possible.");
+			BufferedWriter bw = new BufferedWriter(new FileWriter(new File(result_file)));
+			writeHTMLheader(bw);
+		
 
+			// close HTML file
+			bw.write("</body>\n");
+			bw.write("</html>\n");
+			
 			bw.flush();
 			bw.close();
 
 		} catch (IOException e) {
 			e.printStackTrace();
+		}
+	}
+	
+	public boolean checkBatchModeLimit() {
+		int num_factors = countTFs(inputfile);
+		
+		if (num_factors > tf_num_limit) {
+			System.out.println("Number of transcription factors in input file must not exceed " + tf_num_limit + ".");
+			
+			// generate error message for SABINE output file 
+			try {
+				BufferedWriter bw = new BufferedWriter(new FileWriter(new File(outputfile)));
+				
+				bw.write("Limit for number of transcription factors in input file exceeded\n");
+				bw.write("================================================================\n");
+				bw.write("Limit for number of transcription factors : " + tf_num_limit + "\n");
+				bw.write("Number of factors in given input file     : " + num_factors);
+				
+				bw.flush();
+				bw.close();
+				
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+			
+			// TODO: generate error message for HTML output file 
+			
+			return(true);
+			
+		} else {
+			return(false);
 		}
 	}
 	
@@ -534,25 +669,9 @@ public class SABINE_Galaxy {
 		}
 		else {
 			
-			int num_factors = starter.countTFs(starter.inputfile);
-			
-			if (num_factors > starter.tf_num_limit) {
-				System.out.println("Number of transcription factors in input file must not exceed " + starter.tf_num_limit + ".");
-				
-				try {
-					BufferedWriter bw = new BufferedWriter(new FileWriter(new File(starter.outputfile)));
-					
-					bw.write("Limit for number of transcription factors in input file exceeded\n");
-					bw.write("================================================================\n");
-					bw.write("Limit for number of transcription factors : " + starter.tf_num_limit + "\n");
-					bw.write("Number of factors in given input file     : " + num_factors);
-					
-					bw.flush();
-					bw.close();
-					
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
+			// quit if too many Input TFs are given
+			boolean tooManyInputTFs = starter.checkBatchModeLimit();
+			if (tooManyInputTFs) {
 				return;
 			}
 			
@@ -562,22 +681,17 @@ public class SABINE_Galaxy {
 		
 		starter.runSabine();
 		
+		String sabineResultFile;
 		if (starter.batchMode) {
-			
-			// copy output file to Galaxy database
-			FileCopier.copy(starter.basedir + "outfile.tmp", starter.outputfile);
+			sabineResultFile = starter.basedir + "outfile.tmp";			
 		}
 		else {
-			boolean pfm_transferred = starter.readOutfile(starter.basedir + "prediction.out");
-		
-			if (pfm_transferred) {
-				starter.writeSuccessOutput(starter.basedir + "prediction.out");
-			}
-			else {
-				starter.writeFailureOutput();
-			}
-			//starter.deleteBasedir();
+			sabineResultFile = starter.basedir + "prediction.out";
 		}
+		
+		// TODO: test HTML output for Batch Mode
+		starter.readOutfile(sabineResultFile);
+		starter.writeHTMLOutput(starter.outputfile);
 	}
 }
 

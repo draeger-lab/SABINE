@@ -21,6 +21,7 @@ public class SVMPredictor {
 	public boolean dynamic_threshold = false;
 	double sim_thres = 0.0;
 	int max_num = 0;
+	public int num_candidates = 0;
 	public boolean silent = false; 
 	public boolean gui_output_mode = false;
 	public String basedir = "";
@@ -278,7 +279,7 @@ public class SVMPredictor {
 			try {
 				BufferedWriter bw = new BufferedWriter(new FileWriter(new File(outfile)));
 		
-				bw.write("BM  none\nXX\nMA  none\nXX");
+				bw.write("BM  none (" + num_candidates + " candidate TFs)\nXX\nMA  none\nXX");
 				
 				bw.flush();
 				bw.close();

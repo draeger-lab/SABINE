@@ -63,9 +63,11 @@ public class FBPPredictor {
 	
 	boolean dynamic_threshold = true;
 	
-	private static final double high_conf_bmt = 0.95;
-	private static final double medium_conf_bmt = 0.8;
-	private static final double low_conf_bmt = 0.5;
+	public int num_candidates;
+	
+	public static final double high_conf_bmt = 0.95;
+	public static final double medium_conf_bmt = 0.8;
+	public static final double low_conf_bmt = 0.5;
 	
 	/*
 	 * parses an input file and converts it to the internally used file format
@@ -321,6 +323,15 @@ public class FBPPredictor {
 		
 		irrelevantPairs = identifier.identifyIrrelevantPairs(base_dir + "allpairs/domain_scores_BLOSUM_62.out", 0.3, irrelevantPairs.length);
 		
+		// count number of candidate TFs for PFM transfer
+		int numRelevantPairs = 0;
+		for (boolean isIrrelevant: irrelevantPairs) {
+			if (!isIrrelevant) {
+				numRelevantPairs++;
+			}
+		}
+		num_candidates = numRelevantPairs;
+		
 		/*
 		 * 
 		 * calculate 30 feature values for all relevant tf pairs
@@ -441,6 +452,7 @@ public class FBPPredictor {
 		predictor.silent = silent;
 		predictor.gui_output_mode = gui_output_mode;
 		predictor.basedir = base_dir;
+		predictor.num_candidates = num_candidates;
 		
 		predictor.dynamic_threshold = dynamic_threshold;
 		predictor.high_conf_bmt = high_conf_bmt;

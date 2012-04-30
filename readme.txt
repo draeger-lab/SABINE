@@ -144,13 +144,13 @@ ________________________________________________________________________________
 
   If you use SABINE in any published work, please cite the following article:
 
-  @UNPUBLISHED{eichner2009,
-	author = {Johannes Eichner and Adrian Schr\"oder and Andreas Dr\"ager and Jonas Eichner 
-		  and Dierk Wanke and Jochen Supper and Andreas Zell},
-	title = {{SABINE: a tool for the prediction of binding specificities of transcription
-		  factors using support vector regression}},
+  @UNPUBLISHED{eichner2012,
+	author = {Johannes Eichner and Florian Topf and Andreas Dr\"ager and Clemens Wrzodek 
+		  and Adrian Schr\"oder Jochen Supper and Dierk Wanke and Andreas Zell},
+	title = {{TFpredict and SABINE: sequence-based prediction of structural and functional characteristics 
+	          of transcription factors using supervised machine learning methods}},
 	note = {Submitted to Bioinformatics},
-	year = {2009}
+	year = {2012}
   }
 
   ____________________________________________________________________________________________________________________________

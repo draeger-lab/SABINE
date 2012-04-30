@@ -179,7 +179,7 @@ public class SABINE_GUI extends JFrame implements ActionListener, ChangeListener
 	public double medium_conf_bmt = 0.0;
 	public double low_conf_bmt = 0.0;
 	
-	public final static String appName = "SABINE 1.0";
+	public final static String appName = "SABINE 1.1";
 
 	static {
 		initLaF(appName);
@@ -527,29 +527,30 @@ public class SABINE_GUI extends JFrame implements ActionListener, ChangeListener
 		
 		LayoutHelper.addComponent(mainPanel, gbl, runPanel, 0, 4, 1, 1, 0, 0);
 		
-		
+
 		/*
 		 *  Text area for output
 		 */
-		
+
 		output = new JTextArea(25, 75);
 		output.getDocument().putProperty("name", "output");
 		output.getDocument().addDocumentListener(this);
-		
-		
+
+
 		outputScroller = new JScrollPane(output,JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
-				 								JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-		
-    progressBar = new JProgressBar();
-    
-    outputPanel = new JPanel(new BorderLayout());
+				JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+
+		progressBar = new JProgressBar();
+		//progressBar.setMinimumSize(new java.awt.Dimension(100,20));
+
+		outputPanel = new JPanel(new BorderLayout());
 		outputPanel.add(progressBar, BorderLayout.NORTH);
 		outputPanel.add(outputScroller, BorderLayout.CENTER);
 		outputPanel.setVisible(false);
-		
-		
+
+
 		//LayoutHelper.addComponent(mainPanel, (GridBagLayout) mainPanel.getLayout(), outputScroller, 0, 5, 1, 1, 0, 0);
-		
+
 		msg = new MessageProcessor(new PrintStream(new OutputStream() {
 			@Override
 			public void write(byte[] b, int off, int len) throws IOException {
@@ -1363,6 +1364,7 @@ public class SABINE_GUI extends JFrame implements ActionListener, ChangeListener
 		// create panel for sequence logo 
 		logoPanel.setBorder(BorderFactory.createTitledBorder(" Sequence Logo "));
         logoPanel.setLayout(new GridBagLayout());
+        logoPanel.setMinimumSize(new Dimension(title_width, 200));
 
         JLabel logo = new JLabel(new ImageIcon(image));
         JPanel logoHelpPanel = new JPanel(new GridLayout(1,1));
