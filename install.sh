@@ -48,6 +48,7 @@ cd gsl-1.10
 make
 make install
 cd ..
+cd ..
 
 # STAMP
 echo ================
