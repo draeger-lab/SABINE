@@ -4,51 +4,50 @@
 echo =================================
 echo installing Local Alignment Kernel
 echo =================================
-cd LAKernel/
+cd lib/LAKernel/
 make clean
 make
-cd ..
+cd ../..
 
 # Mismatch Kernel
 echo ==========================
 echo installing Mismatch Kernel
 echo ==========================
-cd MismatchKernel/src
+cd lib/MismatchKernel/src
 make clean
 make
-cd ../..
+cd ../../..
 
 # PSIPRED
 echo ==================
 echo installing PSIPRED
 echo ==================
-cd PSIPRED/src
+cd lib/PSIPRED/src
 make clean
 make
 make install
-cd ../..
+cd ../../..
 
 # MoSta
 echo ================
 echo installing MoSta
 echo ================
-cd MoSta/code
+cd lib/MoSta/code
 make clean
 make all
-cd ../..
+cd ../../..
 
 # GNU Scientific Library
 echo ==============
 echo installing GSL
 echo ==============
-cd GSL/
+cd lib/GSL/
 tar -xzvf gsl-1.10.tar.gz
 cd gsl-1.10
 ./configure --disable-shared --prefix=`pwd`
 make
 make install
-cd ..
-cd ..
+cd ../..
 
 # STAMP
 echo ================
@@ -57,4 +56,4 @@ echo ================
 export INSTALLDIR=`pwd`
 cd STAMP/code
 ./compileSTAMP $INSTALLDIR
-cd ../..
+cd ../../..
