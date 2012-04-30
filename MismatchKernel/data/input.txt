@@ -1,4 +1,0 @@
->seq1
-K R P R T T I T A K Q L E T L K N A Y N N S P K P A R H V R E Q L S S E T G L D M R V V Q V W F Q N R R A K E K R
->seq2
-R R E R T T F T R A Q L D V L E A L F A K T R Y P D I F M R E E V A L K I N L P E S R V Q V W F K N R R A K C R Q
