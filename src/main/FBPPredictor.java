@@ -25,9 +25,11 @@ import help.ModelFileObtainer;
 import help.TFNamePairsFileGenerator;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -524,6 +526,21 @@ public class FBPPredictor {
 		String species = data[2].trim();
 		
 		
+		if (class_id.equals(FormatConverter.NonTFclassID)) {
+			if (! silent) {
+				System.out.println("  The protein \"" + name + "\" will be omitted.");
+			}
+			// TODO: write prediction.out
+			try {
+				BufferedWriter bw = new BufferedWriter(new FileWriter(new File(base_dir + "prediction.out")));
+				bw.write("BM  none (Unknown protein class or Non-TF)\nXX\nMA  none\nXX");
+				bw.flush();
+				bw.close();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+			return;
+		}
 		
 		if (! silent) {
 			System.out.println("  Name    : "  + name);

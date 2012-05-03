@@ -34,6 +34,8 @@ import help.SequenceAligner;
 
 public class FormatConverter {
 	
+	public static final String NonTFclassID = "Non-TF";
+	
 	public String[] convertToInternalFormat(String infile, String outfile) {
 		
 		
@@ -580,6 +582,11 @@ public class FormatConverter {
 		// parse class, if available	
 			
 			if(line.startsWith("CL")) {
+				
+				// handle Non-TF proteins contained in TFpredict output file
+				if (line.startsWith("CL  Unknown") || line.startsWith("CL  Non-TF")) {
+					class_id = NonTFclassID;
+				}
 				
 				class_id = "class" + getTransfacClass(line.substring(2).trim()).substring(0,1);
 				line = br.readLine();
