@@ -28,6 +28,8 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.StringTokenizer;
 
+import main.FBPPredictor;
+
 
 
 /*
@@ -259,7 +261,7 @@ public class MoStaOptimizer implements Optimizer {
 		try {
 			
 			
-			String cmdString = "./MoSta/code/sstat " +
+			String cmdString = "./" + FBPPredictor.MoStaDir + "code/sstat " +
 					
 					params[0] + " "  +
 					basedir + "mosta/matrices.raw "  +

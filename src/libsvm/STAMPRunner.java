@@ -12,6 +12,8 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.StringTokenizer;
 
+import main.FBPPredictor;
+
 
 
 public class STAMPRunner {
@@ -21,7 +23,7 @@ public class STAMPRunner {
 	 * please specify the path to your STAMP executable
 	 */
 	
-	String path2STAMP = "./STAMP/";
+	String path2STAMP = "./" + FBPPredictor.StampDir;
 	public String basedir = "";
 	
 	public ArrayList<String> runSTAMP(ArrayList<ArrayList<String>> fbps) {
@@ -71,8 +73,7 @@ public class STAMPRunner {
 			File exec_file = new File(basedir + "stamp/launchSTAMP");
 			bw = new BufferedWriter(new FileWriter(exec_file));
 			bw.write("export LD_LIBRARY_PATH=" + System.getProperty("user.dir") + "/GSL/gsl-1.10/lib\n");
-			bw.write("STAMP/code/STAMP -tf " + basedir + "stamp/input.motifs -sd STAMP/ScoreDists/JaspRand_PCC_SWU.scores -cc PCC -align SWU -ma IR -printpairwise -match STAMP/jaspar.motifs -out " + basedir + "stamp/output\n");
-
+			bw.write(FBPPredictor.StampDir + "code/STAMP -tf " + basedir + "stamp/input.motifs -sd " + FBPPredictor.StampDir + "/ScoreDists/JaspRand_PCC_SWU.scores -cc PCC -align SWU -ma IR -printpairwise -match " + FBPPredictor.StampDir + "/jaspar.motifs -out " + basedir + "stamp/output\n");
 			bw.flush();
 			bw.close();
 			exec_file.setExecutable(true);

@@ -29,6 +29,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.StringTokenizer;
 
+import main.FBPPredictor;
+
 import org.biojava.bio.BioException;
 
 
@@ -420,7 +422,7 @@ public class SequenceFeatureCalculator {
 			
 			if(featuretype.equals("SecondaryStructure")) {
 				
-				aligner_dna = new SequenceAligner("DNA", "SS-matrix.dat", "NW");
+				aligner_dna = new SequenceAligner("DNA", FBPPredictor.matrix_dir + "SS-matrix.dat", "NW");
 				
 			}
 			
@@ -767,7 +769,7 @@ public class SequenceFeatureCalculator {
 			
 			if(featuretype.equals("SecondaryStructure")) {
 				
-				aligner_dna = new SequenceAligner("DNA", "SS-matrix.dat", "NW");
+				aligner_dna = new SequenceAligner("DNA", FBPPredictor.matrix_dir + "SS-matrix.dat", "NW");
 				
 			}
 			

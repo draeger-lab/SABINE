@@ -16,6 +16,7 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+package main;
 
 import java.awt.image.BufferedImage;
 import java.io.BufferedReader;
@@ -41,11 +42,8 @@ import help.FileCopier;
 
 public class SABINE_Galaxy {
    
-	boolean silent = false;
+	boolean silent = true;
 	boolean batchMode = false;
-	
-	final String public_trainingset = "trainingsets_public/";
-	final String biobase_trainingset = "trainingsets_biobase/";
 	
 	private final String[] superclassNames = new String[] {"Other", "Basic domain", "Zinc finger", "Helix-turn helix", "Beta scaffold", "Auto-detect"};
 	
@@ -59,7 +57,8 @@ public class SABINE_Galaxy {
 	String basedir;
 	String inputfile;
 	String outputfile;
-	String trainingset = public_trainingset;
+	String sabineOutputFile;
+	String trainingset = FBPPredictor.public_trainingset;
 	boolean dyn_bmt = true;
 	double bmt;
 	int mnb; 
@@ -121,6 +120,11 @@ public class SABINE_Galaxy {
 				i++;
 			}
 			
+			if (batchMode && args[i].equals("--sabine-output-file")) {
+				sabineOutputFile = args[++i];
+				i++;
+			}
+			
 			if (!batchMode && args[i].equals("-d")) {
 				curr_dom = args[i+1] + "  " + args[i+2];
 				domains.add(curr_dom);
@@ -144,7 +148,7 @@ public class SABINE_Galaxy {
 			}
 			
 			if (i < args.length && args[i].equals("--biobase-data")) {
-				trainingset = biobase_trainingset;
+				trainingset = FBPPredictor.biobase_trainingset;
 				tf_num_limit = Integer.MAX_VALUE;
 				i++;
 			}
@@ -156,15 +160,19 @@ public class SABINE_Galaxy {
 		
 		if (! silent) {
 			if (batchMode) {
-				System.out.println("Input File:   " + inputfile);
-				System.out.println("Output File:   " + outputfile);
+				System.out.println("Input File:         " + inputfile);
+				System.out.println("HTML report:        " + outputfile);
+				System.out.println("SABINE output file: " + outputfile);
+				
 			} else {
 			
 				System.out.println("Organism:   " + organism);
 				System.out.println("Superclass: " + superclassNames[superclass]);
 				System.out.println("Sequence:   " + sequence);
 				if (! domains.isEmpty()) System.out.println("Domains:    " + domains.get(0));
-				for (int j=1; j<domains.size(); j++) System.out.println("            " + domains.get(j));
+				for (int j=1; j<domains.size(); j++) {
+					System.out.println("            " + domains.get(j));
+				}
 			}
 			if (!dyn_bmt) {
 				System.out.println("BMT:        " + bmt);
@@ -340,7 +348,7 @@ public class SABINE_Galaxy {
 			if (!dyn_bmt) sabine_caller.best_match_threshold = bmt;
 			sabine_caller.max_number_of_best_matches = mnb;
 			sabine_caller.outlier_filter_threshold = oft;
-			sabine_caller.silent = true;
+			sabine_caller.silent = silent;
 			
 			sabine_caller.launch_SABINE(basedir + "infile.tmp", basedir + "outfile.tmp", "n", basedir, trainingset, null);
 		}
@@ -351,7 +359,7 @@ public class SABINE_Galaxy {
 			if (!dyn_bmt) sabine_caller.best_match_threshold = bmt;
 			predictor.max_number_of_best_matches = mnb;
 			predictor.outlier_filter_threshold = oft;
-			predictor.silent = true;
+			predictor.silent = silent;
 			
 			predictor.predictFBP(basedir + "infile.tmp", basedir, trainingset, null);
 		}
@@ -368,7 +376,11 @@ public class SABINE_Galaxy {
 			double A, C, G, T, pos, score;
 			
 			while ((line=br.readLine()) != null) {
-
+				
+				if (line.startsWith("//") || line.startsWith("XX")) {
+					continue;
+				}
+				
 				// read name of Input TF
 				if (batchMode) {
 					if (line.startsWith("NA")) {
@@ -377,7 +389,9 @@ public class SABINE_Galaxy {
 						line = br.readLine();	// BM
 						
 					} else {
+						
 						System.out.println("Parse Error. \"NA\" expected.");
+						System.out.println("Line: " + line);
 						System.exit(0);
 					}
 				}
@@ -512,7 +526,7 @@ public class SABINE_Galaxy {
 						bw.write("<td> " + bestMatches.get(tfIndex).get(i).getName() + " </td>");
 						bw.write("<td> " + fmt4.format(bestMatches.get(tfIndex).get(i).getLabel()) + " </td></tr>\n");
 						
-						lowest_score = bestMatches.get(i).get(tfIndex).getLabel();
+						lowest_score = bestMatches.get(tfIndex).get(i).getLabel();
 					}
 					bw.write("</table>\n\n");
 					bw.write("<br><br>\n\n");
@@ -522,7 +536,7 @@ public class SABINE_Galaxy {
 					bw.write("<table>\n");
 					bw.write("  <tr><th> Pos. </th><th> A </th><th> C </th><th> G </th><th> T </th></tr>\n");
 					
-					for (int i=0; i<predPFM.size(); i++) {
+					for (int i=0; i<predPFM.get(tfIndex).size(); i++) {
 						if ((i%2) == 1) { 
 							bw.write("<tr>");
 						}

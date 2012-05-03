@@ -42,7 +42,7 @@ public class DomainFeatureCalculator {
 	
 	public boolean silent = false;
 	public boolean predicted_domains = false;
-	public String basedir = "internal/";
+	public String basedir = null;
 	
 	ArrayList<ArrayList<String>> other_domains = null;
 	
@@ -239,23 +239,16 @@ public class DomainFeatureCalculator {
 						
 					for(int l=0; l<other_domains.get(j).size(); l++) {
 						
-						
 						if (featuretype.equals("SequenceIdentity"))  	score = aligner.getSequenceSimilarity (domains.get(k), other_domains.get(j).get(l) );
 						if (featuretype.equals("SMBasedIdentity"))   	score = aligner.getSMBasedIdentity    (domains.get(k), other_domains.get(j).get(l), Double.parseDouble(params[0]) );
 						if (featuretype.equals("SMBasedSimilarity")) 	score = aligner.getSMBasedSimilarity  (domains.get(k), other_domains.get(j).get(l) );
 						if (featuretype.equals("LocalAlignmentKernel"))	score = aligner.getNormalizedLAKernel (domains.get(k), other_domains.get(j).get(l), params[0]);
-						if (featuretype.equals("MismatchKernel"))		score = aligner.getNormalizedMMKernel (domains.get(k), other_domains.get(j).get(l), Integer.parseInt(params[0]), Integer.parseInt(params[1]), basedir );
-						
+						if (featuretype.equals("MismatchKernel"))		score = aligner.getNormalizedMMKernel (domains.get(k), other_domains.get(j).get(l), Integer.parseInt(params[0]), Integer.parseInt(params[1]), basedir);
 						
 						if(score > maxScore) maxScore = score;
-						
-						
 					}
-					
 				}
-					
 				bw.write(tfname + " vs. " + other_names.get(j) + " :\t" + maxScore + "\n");
-				
 			}
 				
 			

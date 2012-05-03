@@ -28,6 +28,8 @@ import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.util.StringTokenizer;
 
+import main.FBPPredictor;
+
 import org.biojava.bio.BioException;
 import org.biojava.bio.alignment.NeedlemanWunsch;
 import org.biojava.bio.alignment.SequenceAlignment;
@@ -45,8 +47,13 @@ import org.biojava.bio.symbol.Symbol;
  * Substitution Matrix Files available at ftp://ftp.ncbi.nlm.nih.gov/blast/matrices/
  */
 
+
+
 public class SequenceAligner {
  
+	
+	
+	
 	
 	/*
 	 * 
@@ -73,7 +80,7 @@ public class SequenceAligner {
 		
 		alphabet = (FiniteAlphabet) AlphabetManager.alphabetForName("PROTEIN-TERM");
 		
-		matrix = new SubstitutionMatrix(alphabet, new File("substitutionMatrices" + File.separator + matrixfile));
+		matrix = new SubstitutionMatrix(alphabet, new File(matrixfile));
 		
 		if(type.equals("NW")) {
 			alignment = new NeedlemanWunsch( 
@@ -103,7 +110,7 @@ public class SequenceAligner {
 		
 		alphabet = (FiniteAlphabet) AlphabetManager.alphabetForName("PROTEIN-TERM");
 		
-		matrix = new SubstitutionMatrix(alphabet, new File("substitutionMatrices" + File.separator + matrixfile));
+		matrix = new SubstitutionMatrix(alphabet, new File(matrixfile));
 		
 		
 		alignment = new NeedlemanWunsch( 
@@ -165,7 +172,7 @@ public class SequenceAligner {
 		
 		alphabet = (FiniteAlphabet) AlphabetManager.alphabetForName("DNA");
 		
-		matrix = new SubstitutionMatrix(alphabet, new File("substitutionMatrices" + File.separator + matrixfile));
+		matrix = new SubstitutionMatrix(alphabet, new File(matrixfile));
 		
 		
 		if(type.equals("NW")) {
@@ -793,7 +800,7 @@ public class SequenceAligner {
 		
 		if(matrix == null) matrix = "blosum62.dat";
 		
-		String cmdString = "./LAKernel/LAkernel_direct " + seq1 + " " + seq2 + " ./LAKernel/" + matrix;
+		String cmdString = "./" + FBPPredictor.LAkernelDir + "LAkernel_direct " + seq1 + " " + seq2 + " ./" + FBPPredictor.LAkernelDir + matrix;
 		double res = 0.0;
 		
 		try {
@@ -844,13 +851,14 @@ public class SequenceAligner {
 	}
 	
 	
-	public double getNormalizedMMKernel(String seq1, String seq2, int k, int m, String base_dir) {
+	public double getNormalizedMMKernel(String seq1, String seq2, int k, int m, String basedir) {
 		
 		
 		BufferedWriter bw = null;
 		
-		String mmkernel_dir = "mismatchkernel/";
-		String cmdString = base_dir + mmkernel_dir + "launchMMKernel";
+		String basedir_MMkernel = basedir + "mismatchkernel/";
+		
+		String mmExecFile = basedir_MMkernel + "/launchMMKernel";
 		
 		double res = 0.0;
 		
@@ -858,8 +866,7 @@ public class SequenceAligner {
 			
 		// write input file for kernel
 			
-			bw = new BufferedWriter(new FileWriter(new File(base_dir + mmkernel_dir + "input.txt")));
-			//bw = new BufferedWriter(new FileWriter(new File("./MismatchKernel/data/input.txt")));
+			bw = new BufferedWriter(new FileWriter(new File(basedir_MMkernel + "input.txt")));
 			
 			bw.write(">seq1\n");
 			
@@ -913,17 +920,17 @@ public class SequenceAligner {
 			bw.flush();
 			bw.close();
 			
-			File exec_file = new File(base_dir + mmkernel_dir + "launchMMKernel");
+			File exec_file = new File(mmExecFile);
 			
 			bw = new BufferedWriter(new FileWriter(exec_file));
 			
-			String rel_dir = " ../../";
-			if (base_dir.startsWith("/") || base_dir.startsWith("~")) {
+			String rel_dir = " ../../../";    // ./lib/MismatchKernel/src/
+			if (basedir.startsWith("/") || basedir.startsWith("~")) {
 				rel_dir = " ";
 			}
 			
-			bw.write("cd ./MismatchKernel/src/\n");
-			bw.write("./string-kernel -K -L " + k + " -D " + m + rel_dir + base_dir + mmkernel_dir + "input.txt\n");
+			bw.write("cd ./" + FBPPredictor.MMkernelDir + "src/\n");
+			bw.write("./string-kernel -K -L " + k + " -D " + m + rel_dir + basedir_MMkernel + "input.txt\n");
 			
 			bw.flush();
 			bw.close();
@@ -933,7 +940,7 @@ public class SequenceAligner {
 			
 		// launch kernel
 			
-			Process proc = Runtime.getRuntime().exec(cmdString);
+			Process proc = Runtime.getRuntime().exec(mmExecFile);
 		
 			proc.getOutputStream().flush();
 			proc.getOutputStream().close();
@@ -993,7 +1000,7 @@ public class SequenceAligner {
 
 	public static void main(String[] args) throws IOException, BioException {
 		
-		SequenceAligner aligner = new SequenceAligner("BLOSUM_62.dat", "SW");
+		SequenceAligner aligner = new SequenceAligner(FBPPredictor.matrix_dir + "BLOSUM_62.dat", "SW");
 		String seq1 = "CCCCCCCCMCGYTGSPEIPQCAGCNQHIVDRFILKVLDRWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW";
 		String seq2 = "WWWWWWWWWWWWWWWWMCGYTGSPEPQCACNPHDRFILKVLDRWWWWWWWWWWWWWWWWW";
 		String[] res = aligner.getMatchingRegionAndScore(seq1, seq2);

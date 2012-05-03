@@ -18,6 +18,7 @@
 
 package help;
 
+import main.FBPPredictor;
 import optimization.MatlignOptimizer;
 import optimization.MoStaOptimizer;
 import optimization.Optimizer;
@@ -30,13 +31,11 @@ public class ModelFileObtainer {
 		
 		filter.setFormat(".*.model");
 		
-		filter.setDirectory("models/" + class_id);
+		filter.setDirectory(FBPPredictor.model_dir + class_id);
 		
 		String[] files = filter.listFiles();
 		
-
-		return "models/" + class_id + "/" + files[0];
-		
+		return FBPPredictor.model_dir + class_id + "/" + files[0];
 	}
 	
 	
@@ -46,7 +45,7 @@ public class ModelFileObtainer {
 		
 		filter.setFormat(".*.model");
 		
-		filter.setDirectory("models/" + class_id);
+		filter.setDirectory(FBPPredictor.model_dir + class_id);
 		
 		String[] files = filter.listFiles();
 		
@@ -55,10 +54,6 @@ public class ModelFileObtainer {
 		if(files[0].startsWith("matlign")) return new MatlignOptimizer();
 		
 		return null;
-		
-		
 	}
-	
-	
 }
 

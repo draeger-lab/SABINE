@@ -16,6 +16,8 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+package main;
+
 import help.FeatureFileGenerator;
 import help.FormatConverter;
 import help.LibSVMFeatureScaler;
@@ -47,6 +49,16 @@ import de.zbit.util.progressbar.AbstractProgressBar;
 
 public class FBPPredictor {
 	
+	public static final String public_trainingset = "data/trainingsets_public/";
+	public static final String biobase_trainingset = "data/trainingsets_biobase/";
+	public static final String matrix_dir = "data/substitutionMatrices/";
+	public static final String model_dir = "data/models/";
+	public static final String MMkernelDir = "lib/MismatchKernel/";
+	public static final String LAkernelDir = "lib/LAKernel/";
+	public static final String PsiPredDir = "lib/PSIPRED/";
+	public static final String MoStaDir = "lib/MoSta/";
+	public static final String MatlignDir = "lib/Matlign/";
+	public static final String StampDir = "lib/STAMP/";
 	
 	double best_match_threshold = 0.95;
 	
@@ -198,7 +210,7 @@ public class FBPPredictor {
 					seqCalc.silent = true;
 					boolean [] irrelPairs = new boolean[getTrainingSetSize(all_class_ids[c], train_dir)];
 					seqCalc.parseRelevantDomainsAndSequences(irrelPairs, all_class_ids[c], train_dir);
-					SequenceAligner class_predictor = new SequenceAligner("BLOSUM_62.dat", "NW");
+					SequenceAligner class_predictor = new SequenceAligner(matrix_dir + "BLOSUM_62.dat", "NW");
 					
 					HashSet<String> all_seqs = new HashSet<String>();
 					all_seqs.addAll(seqCalc.get_other_sequences1());
@@ -267,7 +279,7 @@ public class FBPPredictor {
 				domaincalculator.predicted_domains = true;
 				sequencecalculator.predicted_domains = true;
 				
-				dom_predictor = new SequenceAligner("BLOSUM_62.dat", "SW");
+				dom_predictor = new SequenceAligner(matrix_dir + "BLOSUM_62.dat", "SW");
 
 				for(int i=0; i<domaincalculator.get_other_domains().size(); i++) {	
 					for(int j=0; j<domaincalculator.get_other_domains().get(i).size(); j++) {
@@ -316,8 +328,8 @@ public class FBPPredictor {
 			System.out.println("BioException occurred while predicting domains.");
 		}
 		
-		domaincalculator.calculateDomainFeatureFile(name, domains, "SMBasedSimilarity", null, "BLOSUM_62.dat", base_dir + "allpairs/domain_scores_BLOSUM_62.out");
-		domaincalculator.calculateDomainFeatureFile(name, domains, "SMBasedSimilarity", null, "PAM_080.dat"  , base_dir + "allpairs/domain_scores_PAM_080.out");
+		domaincalculator.calculateDomainFeatureFile(name, domains, "SMBasedSimilarity", null, matrix_dir + "BLOSUM_62.dat", base_dir + "allpairs/domain_scores_BLOSUM_62.out");
+		domaincalculator.calculateDomainFeatureFile(name, domains, "SMBasedSimilarity", null, matrix_dir + "PAM_080.dat"  , base_dir + "allpairs/domain_scores_PAM_080.out");
 		
 		IrrelevantPairIdentifier identifier = new IrrelevantPairIdentifier();
 		
@@ -356,31 +368,31 @@ public class FBPPredictor {
 		if (! silent) System.out.println("\n    Calculating substitution matrix based alignment scores.");
 		if (gui_output_mode) System.out.print("  Calculating substitution matrix based alignment scores...");
 		
-		domaincalculator.calculateDomainFeatureFile(name, domains, "SMBasedSimilarity", null, "BLOSUM_62.dat"   , base_dir + "relevantpairs/domain_scores_BLOSUM_62.out");
-		domaincalculator.calculateDomainFeatureFile(name, domains, "SMBasedSimilarity", null, "PAM_080.dat"     , base_dir + "relevantpairs/domain_scores_PAM_080.out");
+		domaincalculator.calculateDomainFeatureFile(name, domains, "SMBasedSimilarity", null, matrix_dir + "BLOSUM_62.dat"   , base_dir + "relevantpairs/domain_scores_BLOSUM_62.out");
+		domaincalculator.calculateDomainFeatureFile(name, domains, "SMBasedSimilarity", null, matrix_dir + "PAM_080.dat"     , base_dir + "relevantpairs/domain_scores_PAM_080.out");
 		
-		domaincalculator.calculateDomainFeatureFile(name, domains, "SMBasedSimilarity", null, "PAM_010.dat"     , base_dir + "relevantpairs/domain_scores_PAM_010.out");
-		domaincalculator.calculateDomainFeatureFile(name, domains, "SMBasedSimilarity", null, "WEIL970101.dat"  , base_dir + "relevantpairs/domain_scores_WEIL970101.out");
-		domaincalculator.calculateDomainFeatureFile(name, domains, "SMBasedSimilarity", null, "MEHP950101.dat"  , base_dir + "relevantpairs/domain_scores_MEHP950101.out");
-		domaincalculator.calculateDomainFeatureFile(name, domains, "SMBasedSimilarity", null, "MEHP950102.dat"  , base_dir + "relevantpairs/domain_scores_MEHP950102.out");
-		domaincalculator.calculateDomainFeatureFile(name, domains, "SMBasedSimilarity", null, "MEHP950103.dat"  , base_dir + "relevantpairs/domain_scores_MEHP950103.out");
-		domaincalculator.calculateDomainFeatureFile(name, domains, "SMBasedSimilarity", null, "LUTR910102.dat"  , base_dir + "relevantpairs/domain_scores_LUTR910102.out");
-		domaincalculator.calculateDomainFeatureFile(name, domains, "SMBasedSimilarity", null, "NIEK910102.dat"  , base_dir + "relevantpairs/domain_scores_NIEK910102.out");
-		domaincalculator.calculateDomainFeatureFile(name, domains, "SMBasedSimilarity", null, "RISJ880101.dat"  , base_dir + "relevantpairs/domain_scores_RISJ880101.out");
-		domaincalculator.calculateDomainFeatureFile(name, domains, "SMBasedSimilarity", null, "MIYS930101.dat"  , base_dir + "relevantpairs/domain_scores_MIYS930101.out");
-		domaincalculator.calculateDomainFeatureFile(name, domains, "SMBasedSimilarity", null, "MIYT790101.dat"  , base_dir + "relevantpairs/domain_scores_MIYT790101.out");
+		domaincalculator.calculateDomainFeatureFile(name, domains, "SMBasedSimilarity", null, matrix_dir + "PAM_010.dat"     , base_dir + "relevantpairs/domain_scores_PAM_010.out");
+		domaincalculator.calculateDomainFeatureFile(name, domains, "SMBasedSimilarity", null, matrix_dir + "WEIL970101.dat"  , base_dir + "relevantpairs/domain_scores_WEIL970101.out");
+		domaincalculator.calculateDomainFeatureFile(name, domains, "SMBasedSimilarity", null, matrix_dir + "MEHP950101.dat"  , base_dir + "relevantpairs/domain_scores_MEHP950101.out");
+		domaincalculator.calculateDomainFeatureFile(name, domains, "SMBasedSimilarity", null, matrix_dir + "MEHP950102.dat"  , base_dir + "relevantpairs/domain_scores_MEHP950102.out");
+		domaincalculator.calculateDomainFeatureFile(name, domains, "SMBasedSimilarity", null, matrix_dir + "MEHP950103.dat"  , base_dir + "relevantpairs/domain_scores_MEHP950103.out");
+		domaincalculator.calculateDomainFeatureFile(name, domains, "SMBasedSimilarity", null, matrix_dir + "LUTR910102.dat"  , base_dir + "relevantpairs/domain_scores_LUTR910102.out");
+		domaincalculator.calculateDomainFeatureFile(name, domains, "SMBasedSimilarity", null, matrix_dir + "NIEK910102.dat"  , base_dir + "relevantpairs/domain_scores_NIEK910102.out");
+		domaincalculator.calculateDomainFeatureFile(name, domains, "SMBasedSimilarity", null, matrix_dir + "RISJ880101.dat"  , base_dir + "relevantpairs/domain_scores_RISJ880101.out");
+		domaincalculator.calculateDomainFeatureFile(name, domains, "SMBasedSimilarity", null, matrix_dir + "MIYS930101.dat"  , base_dir + "relevantpairs/domain_scores_MIYS930101.out");
+		domaincalculator.calculateDomainFeatureFile(name, domains, "SMBasedSimilarity", null, matrix_dir + "MIYT790101.dat"  , base_dir + "relevantpairs/domain_scores_MIYT790101.out");
 		
 		if (! silent) System.out.println("    Calculating sequence identity based alignment scores.");
 		if (gui_output_mode) System.out.print("done.\n  Calculating sequence identity based alignment scores...");
 		
-		domaincalculator.calculateDomainFeatureFile(name, domains, "SequenceIdentity" , null, "BLOSUM_62.dat"   , base_dir + "relevantpairs/domain_scores_BLOSUM_62_si.out");
+		domaincalculator.calculateDomainFeatureFile(name, domains, "SequenceIdentity" , null, matrix_dir + "BLOSUM_62.dat"   , base_dir + "relevantpairs/domain_scores_BLOSUM_62_si.out");
 		
 		if (! silent) System.out.println("    Calculating sequence similarity based alignment scores.");
 		if (gui_output_mode) System.out.print("done.\n  Calculating sequence similarity based alignment scores...");
 		
-		domaincalculator.calculateDomainFeatureFile(name, domains, "SMBasedIdentity" , new String[] {"1.0"} , "BLOSUM_62.dat"   , base_dir + "relevantpairs/domain_scores_BLOSUM_62_t=1.0.out");
-		domaincalculator.calculateDomainFeatureFile(name, domains, "SMBasedIdentity" , new String[] {"3.0"} , "BLOSUM_62.dat"   , base_dir + "relevantpairs/domain_scores_BLOSUM_62_t=3.0.out");
-		domaincalculator.calculateDomainFeatureFile(name, domains, "SMBasedIdentity" , new String[] {"5.0"} , "BLOSUM_62.dat"   , base_dir + "relevantpairs/domain_scores_BLOSUM_62_t=5.0.out");
+		domaincalculator.calculateDomainFeatureFile(name, domains, "SMBasedIdentity" , new String[] {"1.0"} , matrix_dir + "BLOSUM_62.dat"   , base_dir + "relevantpairs/domain_scores_BLOSUM_62_t=1.0.out");
+		domaincalculator.calculateDomainFeatureFile(name, domains, "SMBasedIdentity" , new String[] {"3.0"} , matrix_dir + "BLOSUM_62.dat"   , base_dir + "relevantpairs/domain_scores_BLOSUM_62_t=3.0.out");
+		domaincalculator.calculateDomainFeatureFile(name, domains, "SMBasedIdentity" , new String[] {"5.0"} , matrix_dir + "BLOSUM_62.dat"   , base_dir + "relevantpairs/domain_scores_BLOSUM_62_t=5.0.out");
 		
 		if (! silent) System.out.println("    Calculating local alignment kernel scores.");
 		if (gui_output_mode) System.out.print("done.\n  Calculating local alignment kernel scores...");
@@ -401,15 +413,15 @@ public class FBPPredictor {
 		if (! silent) System.out.println("    Calculating secondary structure scores.");
 		if (gui_output_mode) System.out.print("done.\n  Calculating secondary structure scores...");
 		
-		sequencecalculator.calculateSequenceFeatureFile(name, domains, sequence1, sequence2, "SecondaryStructure", null, "BLOSUM_62.dat", base_dir + "relevantpairs/domain_scores_secstr_blo62.out");
+		sequencecalculator.calculateSequenceFeatureFile(name, domains, sequence1, sequence2, "SecondaryStructure", null, matrix_dir + "BLOSUM_62.dat", base_dir + "relevantpairs/domain_scores_secstr_blo62.out");
 		if (progress!=null) progress.DisplayBar(); // 25.
 		
 		if (! silent) System.out.println("    Calculating DNA-binding domain environment scores.");
 		if (gui_output_mode) System.out.print("done.\n  Calculating DNA-binding domain environment scores...");
 		
-		sequencecalculator.calculateSequenceFeatureFile(name, domains, sequence1, sequence2, "Environments", new String[] {"25"}, "BLOSUM_62.dat", base_dir + "relevantpairs/domain_scores_env_25_BLOSUM_62.out");
+		sequencecalculator.calculateSequenceFeatureFile(name, domains, sequence1, sequence2, "Environments", new String[] {"25"}, matrix_dir + "BLOSUM_62.dat", base_dir + "relevantpairs/domain_scores_env_25_BLOSUM_62.out");
 		if (progress!=null) progress.DisplayBar();  // 26.
-		sequencecalculator.calculateSequenceFeatureFile(name, domains, sequence1, sequence2, "Environments", new String[] {"50"}, "BLOSUM_62.dat", base_dir + "relevantpairs/domain_scores_env_50_BLOSUM_62.out");
+		sequencecalculator.calculateSequenceFeatureFile(name, domains, sequence1, sequence2, "Environments", new String[] {"50"}, matrix_dir + "BLOSUM_62.dat", base_dir + "relevantpairs/domain_scores_env_50_BLOSUM_62.out");
 		if (progress!=null) progress.DisplayBar();  // 27.
 		
 		if (! silent) System.out.println("    Calculating phylogenetic distance based scores.");

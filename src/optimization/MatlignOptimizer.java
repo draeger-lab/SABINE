@@ -27,6 +27,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.StringTokenizer;
 
+import main.FBPPredictor;
+
 
 
 /*
@@ -278,7 +280,7 @@ public class MatlignOptimizer implements Optimizer {
 		try {
 			
 			
-			String cmdString = "./Matlign/matlign " +
+			String cmdString = "./" + FBPPredictor.MatlignDir + "matlign " +
 					
 					"-input=" + basedir + "matlign/matrices.raw" +
 					

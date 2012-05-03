@@ -28,6 +28,8 @@ import java.util.ArrayList;
 import java.util.PriorityQueue;
 import java.util.StringTokenizer;
 
+import main.FBPPredictor;
+
 import core.DomainFeatureCalculator;
 import extension.PFMFormatConverter;
 import extension.TransfacParser;
@@ -47,7 +49,7 @@ import extension.TransfacParser;
  */
 public class RawDataPreprocessor {
 	
-	public String basedir = "./PSIPRED/";
+	public String basedir = "./lib/PSIPRED/";
 	
 
 	public void filterAndSortDataset(String infile, String trainingsetfactorfile, String outfile) {
@@ -625,9 +627,8 @@ public void sortFBPs(String infile, String namesfile, String outfile) {
 		
 		// set temporary base directory and input file name
 		String psidir = basedir;
-		if (! psidir.equals("./PSIPRED/")) {
+		if (! basedir.equals("./" + FBPPredictor.PsiPredDir)) {
 			psidir += "psipred/";
-			
 			infile = RandomStringGenerator.randomString(10) + ".fasta";
 		}
 		
@@ -656,12 +657,12 @@ public void sortFBPs(String infile, String namesfile, String outfile) {
 			File exec_file = new File(psidir + "launchPSIPRED");
 			bw = new BufferedWriter(new FileWriter(exec_file));
 			
-			bw.write("cd ./PSIPRED\n");
-			if (psidir.startsWith("/")) {
+			bw.write("cd ./" + FBPPredictor.PsiPredDir + "\n");
+			if (psidir.startsWith("/") || psidir.startsWith("~")) {
 				bw.write("./runpsipred_single " + psidir + infile + "\n");
 			}
 			else {
-				bw.write("./runpsipred_single ../" + psidir + infile + "\n");
+				bw.write("./runpsipred_single ../../" + psidir + infile + "\n");
 			}
 			bw.flush();
 			bw.close();
@@ -691,9 +692,9 @@ public void sortFBPs(String infile, String namesfile, String outfile) {
 			String outfilename_ss = infile.substring(0, infile.indexOf(".")) + ".ss";
 			String outfilename_ss2 = infile.substring(0, infile.indexOf(".")) + ".ss2";
 			
-			File outfile = new File("./PSIPRED/" + outfilename);
-			File outfile_ss = new File("./PSIPRED/" + outfilename_ss);
-			File outfile_ss2 = new File("./PSIPRED/" + outfilename_ss2);
+			File outfile = new File("./" + FBPPredictor.PsiPredDir + outfilename);
+			File outfile_ss = new File("./" + FBPPredictor.PsiPredDir + outfilename_ss);
+			File outfile_ss2 = new File("./" + FBPPredictor.PsiPredDir + outfilename_ss2);
 			
 			br = new BufferedReader(new FileReader(outfile));
 			
@@ -1069,10 +1070,10 @@ public void sortFBPs(String infile, String namesfile, String outfile) {
 		
 		// copy missing files to training directory
 		if (! (new File(train_dir + "Classes")).exists()) {
-			FileCopier.copy("trainingsets/Classes", train_dir + "Classes");
+			FileCopier.copy("data/trainingsets/Classes", train_dir + "Classes");
 		}
 		if (! (new File(train_dir + "new_phylogenetic_distances.out")).exists()) {
-			FileCopier.copy("trainingsets/new_phylogenetic_distances.out", train_dir + "new_phylogenetic_distances.out");
+			FileCopier.copy("data/trainingsets/new_phylogenetic_distances.out", train_dir + "new_phylogenetic_distances.out");
 		}
 		
 		// create directory for temporary files

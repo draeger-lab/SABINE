@@ -1,7 +1,3 @@
-import javax.annotation.processing.AbstractProcessor;
-
-import de.zbit.util.progressbar.AbstractProgressBar;
-
 /*
     SABINE predicts binding specificities of transcription factors.
     Copyright (C) 2009 ZBIT, University of Tübingen, Johannes Eichner
@@ -20,6 +16,9 @@ import de.zbit.util.progressbar.AbstractProgressBar;
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+package main;
+
+import de.zbit.util.progressbar.AbstractProgressBar;
 
 public class SABINE_Runner implements Runnable {
 

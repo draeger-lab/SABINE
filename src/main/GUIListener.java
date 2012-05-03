@@ -16,6 +16,8 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+package main;
+
 /**
  * @author <a href="mailto:johannes.eichner@uni-tuebingen.de">Johannes Eichner</a>
  * 
