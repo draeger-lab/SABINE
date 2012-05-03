@@ -625,7 +625,7 @@ public class SABINE_Galaxy {
 						bmt = FBPPredictor.low_conf_bmt;
 					}
 					if (numCandidates.get(tfIndex) == unknownProteinClass) {
-						bw.write("<h3>Input protein is not labeled as TF.</h3>\n" +
+						bw.write("<h3>Input protein is not labeled as Transcription Factor.</h3>\n" +
 								"The input protein was either predicted as a Non-TF or could not be classified using the" +
 								" tool TFpredict. As SABINE requires a transcription factor as input, no prediction was made for this protein.");
 						

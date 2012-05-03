@@ -530,7 +530,6 @@ public class FBPPredictor {
 			if (! silent) {
 				System.out.println("  The protein \"" + name + "\" will be omitted.");
 			}
-			// TODO: write prediction.out
 			try {
 				BufferedWriter bw = new BufferedWriter(new FileWriter(new File(base_dir + "prediction.out")));
 				bw.write("BM  none (Unknown protein class or Non-TF)\nXX\nMA  none\nXX");
