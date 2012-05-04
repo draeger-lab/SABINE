@@ -7,6 +7,9 @@ import java.io.IOException;
 
 public class SABINE_Validator {
 
+	public static final String validatorInputFile = "input/test.tf";
+	public static final String validatorOutputFile = "input/test.tf.out";
+	public static final String validatorBaseDir = "tmp/validator_tmp/";
 	
 	public void verifyInstallation() {
 		
@@ -18,23 +21,22 @@ public class SABINE_Validator {
 		predictor.outlier_filter_threshold = 0.5;
 		
 		// generate base directory and subdirectories
-		String base_dir = "tmp/validator_tmp/";
-		File base_dir_path = new File(base_dir);
+		File base_dir_path = new File(validatorBaseDir); 
 		if (!base_dir_path.exists() && !base_dir_path.mkdir()) {
 			System.out.println("\nInvalid base directory. Aborting.");
-			System.out.println("Base directory: " + base_dir + "\n");
+			System.out.println("Base directory: " + validatorBaseDir + "\n");
 			System.exit(0);
 		}
 		SABINE_Main dir_creator = new SABINE_Main();
-		dir_creator.createTempDirectories(base_dir);
+		dir_creator.createTempDirectories(validatorBaseDir);
 		
 		// run SABINE on generated input file
 		System.out.print("Checking installation of SABINE...");
 		predictor.silent = true;
-		predictor.predictFBP("input/test.tf", base_dir, "trainingsets_public/", null);
+		predictor.predictFBP(validatorInputFile, validatorBaseDir, FBPPredictor.public_trainingset, null);
 		System.out.println("done.\n");
 		// read output
-		boolean valid = compareOutfiles("input/test.tf.out", base_dir + "prediction.out");
+		boolean valid = compareOutfiles(validatorOutputFile, validatorBaseDir + "prediction.out");
 		
 		if (valid) {
 			System.out.println("The installation was successfully validated.");

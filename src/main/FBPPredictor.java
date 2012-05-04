@@ -198,7 +198,7 @@ public class FBPPredictor {
 		if (class_id == null) {
 			class_id = "class0";
 			if (!silent) System.out.println("\nSuperclass not found. Predicting superclass based on sequence homology.");
-			if (gui_output_mode) System.out.println("\nPredicting superclass based on sequence homology.");
+			if (gui_output_mode) System.out.print("\nPredicting superclass based on sequence homology.");
 			
 			String[] all_class_ids = new String[]{"class0", "class1", "class2", "class3", "class4"};
 			String[] all_class_names = new String[]{"Other", "Basic Domain", "Zinc Finger", "Helix-Turn-Helix", "Beta Scaffold"};
