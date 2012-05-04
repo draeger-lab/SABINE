@@ -526,7 +526,7 @@ public class FBPPredictor {
 		String species = data[2].trim();
 		
 		
-		if (class_id.equals(FormatConverter.NonTFclassID)) {
+		if (class_id != null && class_id.equals(FormatConverter.NonTFclassID)) {
 			if (! silent) {
 				System.out.println("  The protein \"" + name + "\" will be omitted.");
 			}

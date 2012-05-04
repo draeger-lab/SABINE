@@ -8,8 +8,13 @@
     <table border="0" style="margin: auto"><tr valign="middle"><td><img src="../img/sabine_logo.png" style="padding-right:20px;"></td></tr></table>
     <br>
     <h2>Short Description</h2>  
-    Given the organism, superclass, protein sequence and DNA-binding domains (DBD) of a transcription factor, 
+    Given the organism, superclass, protein sequence and DNA-binding domains (DBD) of a transcription factor (TF), 
     SABINE predicts the binding specificity in terms of a position frequency matrix (PFM).<br>
+	For convenience, the superclass and DNA-binding domains of a given TF can be predicted based on sequence
+	homology with TFs in the training of SABINE. Alternatively, the tool
+	<a href="http://www.ra.cs.uni-tuebingen.de/software/TFpredict/"> TFpredict</a> can be employed, which predicts structural characteristics of TFs from
+	their domain composition, which is inferred from their protein sequence using
+	<a href="http://www.ebi.ac.uk/Tools/pfa/iprscan/"> InterProScan</a>.
     The transcription factor of your interest is compared to a large set of factors with annotated PFMs and 
     the PFM similarity to these factors is estimated based on diverse sequence-based features using support vector regression. 
     As a result the factors which exhibit the highest PFM similarity to the query factor are reported as best matches.  
@@ -17,6 +22,7 @@
     factor. If the PWMs of the predicted best matches are publicly available from databases, such as TRANSFAC Public 
     or JASPAR, the transferred consensus PFM is reported along with a sequence logo illustrating the nucleotide distribution
     at each position of the predicted DNA motif.
+    
     <br><br>
     <h2>Getting started</h2>
     Use the &#8220;Demo&#8221;-Button to generate a showcase input for SABINE. By clicking the 
@@ -63,16 +69,16 @@
     Please cite one of the following articles if you are using SABINE in your work:
     <table  border="0" cellspacing="5" cellpadding="5" align="left">
       <tr>
-       	<td width="180px"><b>Applications Note:</b><br></td>
-        <td>Johannes Eichner, Adrian Schr&ouml;der, Jonas Eichner, Andreas Dr&auml;ger, Dierk Wanke, Jochen Supper, Andreas Zell<br>
-	<b>SABINE: a tool to predict binding specificities of transcription factors using support vector regression</b>
-	</td>
+       	<td width="125px" valign="top"><b>Applications Note:</b><br></td>
+	<td><b>TFpredict and SABINE: sequence-based prediction of structural and functional characteristics of transcription factors using supervised machine learning methods</b><br>
+	 Johannes Eichner, Florian Topf, Andreas Dr&auml;ger, Clemens Wrzodek, Adrian Schr&ouml;der, Jochen Supper, Dierk Wanke, Andreas Zell. <i> Submitted to Bioinformatics</i>, May 2012.</td></td>
       </tr>
-      <tr>
-      <td width="180px"><b>Method Paper:</b><br></td>
-      <td>Adrian Schr&ouml;der, Johannes Eichner, Jonas Eichner, Dierk Wanke, Jochen Supper, Carsten Henneges, Andreas Zell<br>
-      <b>Predicting DNA-binding specicities of eukaryotic transcription factors</b></td>
-      </tr>
+	<tr>
+  	  <td width="125px" valign="top"><b>Method Paper:</b></td>
+  	  <td><b> Predicting DNA-Binding Specificities of Eukaryotic Transcription Factors. </b><br>
+  	  Adrian Schr&ouml;der, Johannes Eichner, Jochen Supper, Jonas Eichner, Dierk Wanke, Carsten Henneges, and Andreas Zell. <i> PLoS ONE </i>, 5(11):e13876, November 2010.</td>
+	  </tr>
+
     </table>
 
   </body>

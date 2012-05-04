@@ -28,8 +28,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.StringTokenizer;
 
-import javax.annotation.processing.AbstractProcessor;
-
 import org.biojava.bio.BioException;
 
 import de.zbit.util.progressbar.AbstractProgressBar;

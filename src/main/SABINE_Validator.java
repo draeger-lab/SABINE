@@ -25,7 +25,7 @@ public class SABINE_Validator {
 			System.out.println("Base directory: " + base_dir + "\n");
 			System.exit(0);
 		}
-		SABINE_Caller dir_creator = new SABINE_Caller();
+		SABINE_Main dir_creator = new SABINE_Main();
 		dir_creator.createTempDirectories(base_dir);
 		
 		// run SABINE on generated input file

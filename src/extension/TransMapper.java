@@ -10,6 +10,7 @@ import resources.Resource;
 
 public class TransMapper {
 	
+	@SuppressWarnings("unchecked")
 	public String getSuperclass(String key) {
 		
 		String infile = Resource.class.getResource("txt/map.ser").getFile();

@@ -57,13 +57,11 @@ public class SABINE_Runner implements Runnable {
 		
 
 		// create directories for temporary files
-		SABINE_Caller dir_creator = new SABINE_Caller();
-		//HACK
+		SABINE_Main dir_creator = new SABINE_Main();
 		dir_creator.createTempDirectories(base_dir);
 
 		// run SABINE on generated input file
-		//HACK
-		predictor.predictFBP(base_dir + "infile.tmp", base_dir, "trainingsets_public/", null);
+		predictor.predictFBP(base_dir + "infile.tmp", base_dir, FBPPredictor.public_trainingset, null);
 		gui.done();
 	}
 

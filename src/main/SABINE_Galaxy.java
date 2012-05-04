@@ -341,7 +341,7 @@ public class SABINE_Galaxy {
 	public void runSabine() {
 		
 		// create directories for temporary files
-		SABINE_Caller sabine_caller = new SABINE_Caller();
+		SABINE_Main sabine_caller = new SABINE_Main();
 		sabine_caller.createTempDirectories(basedir);
 
 		// run SABINE on generated input file

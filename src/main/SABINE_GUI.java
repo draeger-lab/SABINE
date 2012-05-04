@@ -45,6 +45,7 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.PrintStream;
 import java.text.DecimalFormat;
@@ -180,12 +181,9 @@ public class SABINE_GUI extends JFrame implements ActionListener, ChangeListener
 	public double medium_conf_bmt = 0.0;
 	public double low_conf_bmt = 0.0;
 	
-	public final static String appName = "SABINE 1.1";
-
 	static {
-		initLaF(appName);
+		initLaF(SABINE_Main.appName);
 	}
-	
 	
   /**
    * 
@@ -267,9 +265,10 @@ public class SABINE_GUI extends JFrame implements ActionListener, ChangeListener
     }
     initLaF();
   }
+	
 
 	public SABINE_GUI() {
-		super(appName);
+		super(SABINE_Main.appName);
 
 		/*
 		 * adapt JFrame to operating system
@@ -283,7 +282,8 @@ public class SABINE_GUI extends JFrame implements ActionListener, ChangeListener
 		ArrayList<String> species_list = new ArrayList<String>();
 		
 		try {
-			BufferedReader br = new BufferedReader(new FileReader(new File("resources/txt/organism_list.txt")));
+			BufferedReader br = new BufferedReader(new InputStreamReader(Resource.class.getResourceAsStream("txt/organism_list.txt")));
+
 			String line;
 			
 			while ((line = br.readLine()) != null) {
@@ -681,9 +681,9 @@ public class SABINE_GUI extends JFrame implements ActionListener, ChangeListener
 			  // Show a message on windows
 	       boolean isWindows = (System.getProperty("os.name").toLowerCase().contains("windows"));
 	        if (isWindows) {
-	          JOptionPane.showMessageDialog(this, "Sorry, " + appName + " is using third party" +
+	          JOptionPane.showMessageDialog(this, "Sorry, " + SABINE_Main.appName + " is using third party" +
 	              " libraries that are not available for windows.\n\nPlease run this application" +
-	              " on a UNIX system.", appName, JOptionPane.WARNING_MESSAGE);
+	              " on a UNIX system.", SABINE_Main.appName, JOptionPane.WARNING_MESSAGE);
 	          return;
 	        }
 	        else if (isMacOSX()) {
@@ -705,7 +705,7 @@ public class SABINE_GUI extends JFrame implements ActionListener, ChangeListener
 					
 					// Hack: fixed base directory
 					base_dir = "tmp/" + time_stamp + "_" + randnum + "/";
-					//base_dir = "tmp/fixed_basedir_highconf/";
+					//base_dir = "tmp/04.05.2012_13.44_289/";
 					File base_dir_path = new File(base_dir);
 					try {
 					  base_dir_path.mkdirs();
@@ -747,7 +747,7 @@ public class SABINE_GUI extends JFrame implements ActionListener, ChangeListener
 				double oft = Double.parseDouble(outlierFilterThreshold.getValue().toString());
 
 				// create directories for temporary files
-				SABINE_Caller dir_creator = new SABINE_Caller();
+				SABINE_Main dir_creator = new SABINE_Main();
 				dir_creator.createTempDirectories(base_dir);
 
 				// reassign output and error stream
@@ -1378,9 +1378,9 @@ public class SABINE_GUI extends JFrame implements ActionListener, ChangeListener
         
         // increase height of JScrollPane, if scrollbar is needed
         if (image.getWidth() > title_width)
-        	logoScrollPane.setPreferredSize(new Dimension(title_width, image.getHeight() + 25));
+        	logoScrollPane.setPreferredSize(new Dimension(title_width, image.getHeight() + 45));
         else {
-        	logoScrollPane.setPreferredSize(new Dimension(title_width, image.getHeight() + 5));
+        	logoScrollPane.setPreferredSize(new Dimension(title_width, image.getHeight() + 25));
         }
         logoScrollPane.setBorder(BorderFactory.createLoweredBevelBorder());
 		

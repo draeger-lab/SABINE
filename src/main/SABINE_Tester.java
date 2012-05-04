@@ -294,14 +294,14 @@ public class SABINE_Tester {
 		 *  call SABINE
 		 */
 		System.out.println("  Predicting PWMs for Sample 1 (factors of class " + superclass + ") using model for class " + superclass);
-		SABINE_Caller.main(new String[] {basedir + "sample_pos.input", 
+		SABINE_Main.main(new String[] {basedir + "sample_pos.input", 
 	              						"-s", "" + threshold, 
 	              						"-m", "" + max_num_matches,
 	              						"-o", "" + outlier_threshold,  
 	              						"-v", "h" });
 		
 		System.out.println("\n  Predicting PWMs for Sample 2 (factors of other classes) using model for class " + superclass);
-		SABINE_Caller.main(new String[] {basedir + "sample_neg.input", 
+		SABINE_Main.main(new String[] {basedir + "sample_neg.input", 
 										"-s", "" + threshold, 
 										"-m", "" + max_num_matches,
 										"-o", "" + outlier_threshold,  
