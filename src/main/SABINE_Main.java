@@ -29,7 +29,7 @@ import java.util.Calendar;
 import java.util.StringTokenizer;
 
 
-public class SABINE_Caller {
+public class SABINE_Main {
 	
 	
 	double best_match_threshold = 0.95;
@@ -42,6 +42,9 @@ public class SABINE_Caller {
 	
 	boolean dynamic_threshold = true;
 	
+	public final static String version = "1.1";
+	public final static String appName = "SABINE " + version;
+
 	public void createTempDirectories(String base_dir) {
 		
 		String relpairs_dir, allpairs_dir, libsvm_dir, mmkernel_dir, matlign_dir, mosta_dir, psipred_dir, stamp_dir;
@@ -80,8 +83,8 @@ public class SABINE_Caller {
 		System.out.println("\n-------------------------------------------------");
 		System.out.println("SABINE - StandAlone BINding specificity Estimator");
 		System.out.println("-------------------------------------------------");
-		System.out.println("(version 1.0)\n");
-		System.out.println("Copyright (C) 2009 Center for Bioinformatics T\u00fcbingen (ZBIT),");
+		System.out.println("(version " + version + ")\n");
+		System.out.println("Copyright (C) 2009-2012 Center for Bioinformatics T\u00fcbingen (ZBIT),");
         System.out.println("University of T\u00fcbingen, Johannes Eichner.\n");
         System.out.println("This program comes with ABSOLUTELY NO WARRANTY.");
         System.out.println("This is free software, and you are welcome to redistribute it under certain conditions.");
@@ -218,75 +221,88 @@ public class SABINE_Caller {
 	
 	public static void main(String[] args) {
 		
-		SABINE_Caller caller = new SABINE_Caller();
-		SABINE_Caller.printCopyright();
+		SABINE_Main caller = new SABINE_Main();
+	
+		// run Galaxy Mode
+		if (args.length > 1 && args[0].equals("--galaxy")) {
+			String[] newArgs = new String[args.length-1];
+			for (int i=1; i<args.length; i++) {
+				newArgs[i-1] = args[i];
+			}
+			SABINE_Galaxy.main(newArgs);
 		
-		if (args.length == 1 && (args[0].equals("-check-install") || args[0].equals("--check-install"))) {
-			SABINE_Validator validator = new SABINE_Validator();
-			validator.verifyInstallation();
-			return;
-		}
+		// run Stand-Alone Mode
+		} else {
 		
-		if (args.length == 0 || args.length == 1 && (args[0].equals("-help") || args[0].equals("--help"))) {
-			caller.usage();
-		}
-		if (args.length == 1 && (args[0].equals("-gui") || args[0].equals("--gui"))) {
-			new SABINE_GUI();
-			return;
-		}
-		
-		String infile = args[0];
-		String outfile = infile + ".out";
-		String verbose_option = "y";
-		String base_dir = null;
-		String train_dir = "trainingsets_public/";
-		String model_file = null;
-		
-		if (infile.endsWith(".input")) outfile = infile.substring(0,infile.length()-5) + "output";
-		
-		
-		for(int i=1; i<args.length-1; i+=2) {
+			SABINE_Main.printCopyright();
 			
-			if(args[i].equals("-s")) { caller.best_match_threshold	  		= Double.parseDouble (args[i+1]); 	 
-									   caller.dynamic_threshold 			= false;							continue;}
-			if(args[i].equals("-m")) { caller.max_number_of_best_matches 	= Integer.parseInt   (args[i+1]); 	continue; }
-			if(args[i].equals("-o")) { caller.outlier_filter_threshold		= Double.parseDouble (args[i+1]); 	continue; }
-			if(args[i].equals("-f")) { outfile	   		   					= args[i+1]; 						continue; }
-			if(args[i].equals("-b")) { base_dir		 						= args[i+1]; 						continue; }
-			if(args[i].equals("-t")) { train_dir		 					= args[i+1]; 						continue; }
-			if(args[i].equals("-v")) { verbose_option	   					= args[i+1]; 						continue; }
-			if(args[i].equals("-c")) { model_file							= args[i+1]; 						continue; }
+			if (args.length == 1 && (args[0].equals("-check-install") || args[0].equals("--check-install"))) {
+				SABINE_Validator validator = new SABINE_Validator();
+				validator.verifyInstallation();
+				return;
+			}
 			
-			
-			if( !args[i].equals("-s") && !args[i].equals("-m") && !args[i].equals("-t") && !args[i].equals("-b") &&
-				!args[i].equals("-o") && !args[i].equals("-f") && !args[i].equals("-c") && !args[i].equals("-v")) {
-				
-				System.out.println("\n  Invalid argument: " + args[i]);
+			if (args.length == 0 || args.length == 1 && (args[0].equals("-help") || args[0].equals("--help"))) {
 				caller.usage();
 			}
+			if (args.length == 1 && (args[0].equals("-gui") || args[0].equals("--gui"))) {
+				new SABINE_GUI();
+				return;
+			}
+			
+			String infile = args[0];
+			String outfile = infile + ".out";
+			String verbose_option = "y";
+			String base_dir = null;
+			String train_dir = FBPPredictor.public_trainingset;
+			String model_file = null;
+			
+			if (infile.endsWith(".input")) outfile = infile.substring(0,infile.length()-5) + "output";
+			
+			
+			for(int i=1; i<args.length-1; i+=2) {
+				
+				if(args[i].equals("-s")) { caller.best_match_threshold	  		= Double.parseDouble (args[i+1]); 	 
+										   caller.dynamic_threshold 			= false;							continue;}
+				if(args[i].equals("-m")) { caller.max_number_of_best_matches 	= Integer.parseInt   (args[i+1]); 	continue; }
+				if(args[i].equals("-o")) { caller.outlier_filter_threshold		= Double.parseDouble (args[i+1]); 	continue; }
+				if(args[i].equals("-f")) { outfile	   		   					= args[i+1]; 						continue; }
+				if(args[i].equals("-b")) { base_dir		 						= args[i+1]; 						continue; }
+				if(args[i].equals("-t")) { train_dir		 					= args[i+1]; 						continue; }
+				if(args[i].equals("-v")) { verbose_option	   					= args[i+1]; 						continue; }
+				if(args[i].equals("-c")) { model_file							= args[i+1]; 						continue; }
+				
+				
+				if( !args[i].equals("-s") && !args[i].equals("-m") && !args[i].equals("-t") && !args[i].equals("-b") &&
+					!args[i].equals("-o") && !args[i].equals("-f") && !args[i].equals("-c") && !args[i].equals("-v")) {
+					
+					System.out.println("\n  Invalid argument: " + args[i]);
+					caller.usage();
+				}
+			}
+			
+			if (verbose_option.equals("n") || verbose_option.equals("no") || verbose_option.equals("h")) {
+				caller.silent = true;
+			}
+			
+			if (! train_dir.endsWith("/")) {
+				train_dir += "/";
+			}
+			
+			/*
+			 *  call main function
+			 */
+			
+			caller.launch_SABINE(infile, outfile, verbose_option, base_dir, train_dir, model_file);
+			
+			String curr_dir = System.getProperty("user.dir") + "/";
+			
+			if (! outfile.startsWith("/")) {
+				outfile = curr_dir + outfile;
+			}
+			
+			if (! caller.silent) System.out.println("\nOutput file: " + outfile + "\n");
 		}
-		
-		if (verbose_option.equals("n") || verbose_option.equals("no") || verbose_option.equals("h")) {
-			caller.silent = true;
-		}
-		
-		if (! train_dir.endsWith("/")) {
-			train_dir += "/";
-		}
-		
-		/*
-		 *  call main function
-		 */
-		
-		caller.launch_SABINE(infile, outfile, verbose_option, base_dir, train_dir, model_file);
-		
-		String curr_dir = System.getProperty("user.dir") + "/";
-		
-		if (! outfile.startsWith("/")) {
-			outfile = curr_dir + outfile;
-		}
-		
-		if (! caller.silent) System.out.println("\nOutput file: " + outfile + "\n");
 	}
 	
 	
