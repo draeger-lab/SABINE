@@ -47,13 +47,13 @@ cd gsl-1.10
 ./configure --disable-shared --prefix=`pwd`
 make
 make install
-cd ../..
+cd ../../..
 
 # STAMP
 echo ================
 echo installing STAMP
 echo ================
 export INSTALLDIR=`pwd`
-cd STAMP/code
+cd lib/STAMP/code
 ./compileSTAMP $INSTALLDIR
 cd ../../..
