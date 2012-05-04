@@ -47,13 +47,20 @@ cd gsl-1.10
 ./configure --disable-shared --prefix=`pwd`
 make
 make install
-cd ../../..
+cd ../..
 
 # STAMP
 echo ================
 echo installing STAMP
 echo ================
 export INSTALLDIR=`pwd`
-cd lib/STAMP/code
+cd STAMP/code
 ./compileSTAMP $INSTALLDIR
 cd ../../..
+
+# Hint: validate installation
+echo =====================
+echo Installation finished
+echo =====================
+echo You can validate your installation by using the command:
+echo sh sabine.sh --check-install   
