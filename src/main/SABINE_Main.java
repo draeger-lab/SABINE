@@ -243,7 +243,7 @@ public class SABINE_Main {
 			}
 			
 			if (args.length == 0 || args.length == 1 && (args[0].equals("-help") || args[0].equals("--help"))) {
-				caller.usage();
+				usage();
 			}
 			if (args.length == 1 && (args[0].equals("-gui") || args[0].equals("--gui"))) {
 				new SABINE_GUI();
@@ -277,7 +277,7 @@ public class SABINE_Main {
 					!args[i].equals("-o") && !args[i].equals("-f") && !args[i].equals("-c") && !args[i].equals("-v")) {
 					
 					System.out.println("\n  Invalid argument: " + args[i]);
-					caller.usage();
+					usage();
 				}
 			}
 			
@@ -306,7 +306,7 @@ public class SABINE_Main {
 	}
 	
 	
-	private void usage() {
+	public static void usage() {
 		
 		System.out.println("  Usage   : sabine <input_filename> [OPTIONS]\n");
 		System.out.println("  OPTIONS : -s <similarity_threshold> (min. FBP-similarity of best matches)     default = 0.95");

@@ -127,19 +127,31 @@ public class PFMFormatConverter {
         fmt.setMinimumFractionDigits(4);
 		
 		strtok.nextToken();
-		String line1 = "" + fmt.format(Float.parseFloat(strtok.nextToken().trim()) / 100);
-		String line2 = "" + fmt.format(Float.parseFloat(strtok.nextToken().trim()) / 100);
-		String line3 = "" + fmt.format(Float.parseFloat(strtok.nextToken().trim()) / 100);
-		String line4 = "" + fmt.format(Float.parseFloat(strtok.nextToken().trim()) / 100);
+		float a = Float.parseFloat(strtok.nextToken().trim());
+		float c = Float.parseFloat(strtok.nextToken().trim());
+		float g	= Float.parseFloat(strtok.nextToken().trim());
+		float t	= Float.parseFloat(strtok.nextToken().trim());
+		float sum = a + c + g + t;
+		
+		String line1 = "" + fmt.format(a / sum);
+		String line2 = "" + fmt.format(c / sum);
+		String line3 = "" + fmt.format(g / sum);
+		String line4 = "" + fmt.format(t / sum);
 		
 		for (int i=1; i<stamp_pfm.size(); i++) {
 			strtok = new StringTokenizer(stamp_pfm.get(i));
 			
-			strtok.nextToken();													// Index
-			line1 += "   " + fmt.format(Float.parseFloat(strtok.nextToken().trim()) / 100);	// A
-			line2 += "   " + fmt.format(Float.parseFloat(strtok.nextToken().trim()) / 100);	// C
-			line3 += "   " + fmt.format(Float.parseFloat(strtok.nextToken().trim()) / 100);	// G
-			line4 += "   " + fmt.format(Float.parseFloat(strtok.nextToken().trim()) / 100);	// T
+			strtok.nextToken();                    			  // Index
+			a = Float.parseFloat(strtok.nextToken().trim());  // A
+			c = Float.parseFloat(strtok.nextToken().trim());  // C
+			g = Float.parseFloat(strtok.nextToken().trim());  // G
+			t = Float.parseFloat(strtok.nextToken().trim());  // T
+			sum = a + c + g + t;
+			
+			line1 += "   " + fmt.format(a / sum);
+			line2 += "   " + fmt.format(c / sum);
+			line3 += "   " + fmt.format(g / sum);
+			line4 += "   " + fmt.format(t / sum);
 			
 		}
 	    return new String[] {line1, line2, line3, line4};

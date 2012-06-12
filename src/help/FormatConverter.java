@@ -27,6 +27,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.StringTokenizer;
 
+import main.FBPPredictor;
+
 import org.biojava.bio.BioException;
 
 import help.SequenceAligner;
@@ -746,7 +748,8 @@ public class FormatConverter {
 			
 		}
 		
-		if(class_token.length() > 3 && class_token.substring(0,4).matches(CLASS_FORMAT)) {
+		if((class_token.length() > 3 && class_token.substring(0,4).matches(CLASS_FORMAT))
+		   || (class_token.length() > 4 && class_token.substring(0,5).matches(CLASS_FORMAT))) {
 			
 			return class_token;
 			
@@ -774,7 +777,7 @@ public class FormatConverter {
 		
 		try {
 			
-			br = new BufferedReader(new FileReader(new File("trainingsets" + File.separator + "Classes")));
+			br = new BufferedReader(new FileReader(new File(FBPPredictor.classMappingFile)));
 			
 			
 			while((line = br.readLine()) != null) {

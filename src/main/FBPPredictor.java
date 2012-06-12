@@ -53,6 +53,8 @@ public class FBPPredictor {
 	
 	public static final String public_trainingset = "data/trainingsets_public/";
 	public static final String biobase_trainingset = "data/trainingsets_biobase/";
+	public static final String classMappingFile = public_trainingset + "Classes";
+	
 	public static final String matrix_dir = "data/substitutionMatrices/";
 	public static final String model_dir = "data/models/";
 	public static final String MMkernelDir = "lib/MismatchKernel/";
@@ -594,7 +596,7 @@ public class FBPPredictor {
 
 		if(args.length == 0) {
 			
-			predictor.usage();
+			SABINE_Main.usage();
 			
 		}
 
@@ -621,7 +623,7 @@ public class FBPPredictor {
 			
 			if( !args[i].equals("-s") && !args[i].equals("-m") && !args[i].equals("-o") && !args[i].equals("-v") && !args[i].equals("-c") && !args[i].equals("-t") && !args[i].equals("-b") && !args[i].equals("-d")) {	
 				System.out.println("  Illegal argument: " + args[i] + "\n");
-				predictor.usage();
+				SABINE_Main.usage();
 			}
 		}
 		
@@ -632,10 +634,7 @@ public class FBPPredictor {
 		
 		if (! predictor.silent) {
 			
-			System.out.println("\n  -------------------------------------------------");
-			System.out.println("  SABINE - StandAlone BINding specificity Estimator");
-			System.out.println("  -------------------------------------------------");
-			System.out.println("  (version 1.0)\n\n");
+			System.out.println("");
 			System.out.println("  Min. best match similarity  :  " + predictor.best_match_threshold);
 			System.out.println("  Max. number best matches    :  " + predictor.max_number_of_best_matches);
 			System.out.println("  Max. outlier-FBP deviation  :  " + predictor.outlier_filter_threshold + "\n\n");
@@ -643,25 +642,6 @@ public class FBPPredictor {
 		
 		predictor.predictFBP(args[0], base_dir, train_dir, model_file);
 		
-		
-	}
-	
-	private void usage() {
-		System.out.println("\n  -------------------------------------------------");
-		System.out.println("  SABINE - StandAlone BINding specificity Estimator");
-		System.out.println("  -------------------------------------------------");
-		System.out.println("  (version 1.0)\n\n");
-		System.out.println("  Usage   : FBPPredictor <input_filename> [OPTIONS]\n");
-		System.out.println("  OPTIONS : -s <similarity_threshold> (min. FBP-similarity of best matches)      default = 0.95");
-		System.out.println("            -m <max_num_best_matches> (max. number of best matches)              default = 5");		
-		System.out.println("            -o <outlier_filter_param> (max. deviation of a single best match)    default = 0.5");
-		System.out.println("            -t <training_set_dir>  	  (directory that contains training sets)    default = /trainingsets");
-		System.out.println("            -b <base_dir>  	  		  (directory that contains temporary files)  ");
-		System.out.println("            -c <model_file>  	      (custom-built model file)  ");
-		System.out.println("            -v <verbose_mode>         (write status to standard output)          default = y (yes)\n\n");
-		
-		
-		System.exit(0);
 		
 	}
 }

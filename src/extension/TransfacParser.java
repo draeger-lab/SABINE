@@ -28,6 +28,7 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.StringTokenizer;
 
 public class TransfacParser {
@@ -42,7 +43,7 @@ public class TransfacParser {
 	ArrayList<ArrayList<String>> domains = new ArrayList<ArrayList<String>>();
 	ArrayList<ArrayList<String>> pfm_names = new ArrayList<ArrayList<String>>();
 	ArrayList<ArrayList<String[]>> pfms = new ArrayList<ArrayList<String[]>>();
-	
+
 	ArrayList<ArrayList<String>> pfam_IDs = new ArrayList<ArrayList<String>>();
 	ArrayList<ArrayList<String>> smarts_IDs = new ArrayList<ArrayList<String>>();
 	ArrayList<ArrayList<String>> prosite_IDs = new ArrayList<ArrayList<String>>();
@@ -56,7 +57,7 @@ public class TransfacParser {
 	ArrayList<String> factor_names = new ArrayList<String>();
 	ArrayList<String> factor_synonyms = new ArrayList<String>();
 	
-	public boolean silent = true;
+	public boolean silent = false;
 	
 	
 	public ArrayList<String> get_tf_names() {
@@ -169,12 +170,15 @@ public class TransfacParser {
 					curr_domains.add(line.substring(4).trim());
 					line = br.readLine();
 				}
+				if (curr_domains.size() > 0) {
+					line = br.readLine();
+				}
 				
 				// parse PFMs
 				curr_pfm_names = new ArrayList<String>();
 				curr_pfms = new ArrayList<String[]>();
 				
-				while((line = br.readLine()).startsWith("MN")) {
+				while(line.startsWith("MN")) {
 					
 					strtok = new StringTokenizer(line.substring(4));	   // parse matrix name
 					curr_pfm_names.add(strtok.nextToken().trim());
@@ -189,6 +193,7 @@ public class TransfacParser {
 					curr_pfms.add(curr_pfm);
 					
 					line = br.readLine();                                         // XX
+					line = br.readLine();                                         // MN
 				}
 				
 				if (line.startsWith("//")) {
@@ -704,6 +709,10 @@ public class TransfacParser {
 		}
 	}
 	
+	public void parseSequencesAndDomains(String infile) {
+		parseSequencesAndDomains(infile, null);
+	}
+	
 	public void parseSequencesAndDomains(String infile, String species_name) {
 		
 		String line;
@@ -715,8 +724,10 @@ public class TransfacParser {
 		String[] split;
 		StringTokenizer strtok;
 		
-		int entry_counter, line_counter, human_counter;
-		entry_counter = line_counter = human_counter = 0;
+		int entry_counter, line_counter;
+		entry_counter = line_counter = 0;
+		
+		ArrayList<String> curr_pfm_IDs = 			new ArrayList<String>();
 		
 		ArrayList<String> curr_pfam_domains = 		new ArrayList<String>();
 		ArrayList<String> curr_smarts_domains = 	new ArrayList<String>();
@@ -744,6 +755,7 @@ public class TransfacParser {
 			boolean[] seq_parsed = 		new boolean[entry_counter];
 			boolean[] ref_parsed = 		new boolean[entry_counter];
 			boolean[] dom_parsed = 		new boolean[entry_counter];
+			boolean[] pfm_parsed = 		new boolean[entry_counter];
 			
 			
 			/*
@@ -801,16 +813,22 @@ public class TransfacParser {
 				
 				// parse reference to UniProt
 				if (line.startsWith("SC")) {
-					strtok = new StringTokenizer(line);
+					strtok = new StringTokenizer(line.substring(4).replace("#", " "));
 					while (strtok.hasMoreTokens()) {
-						if (strtok.nextToken().trim().equals("SwissProt")) {
+						if (strtok.nextToken().trim().equals("Swiss-Prot")) {
 							if (strtok.hasMoreTokens()) {
-								curr_ref = strtok.nextToken().substring(1).trim();
+								curr_ref = strtok.nextToken().trim();
 								ref_parsed[entry_counter] = true;
 							}
 							break;
 						}
 					}
+				}
+				
+				if (!ref_parsed[entry_counter] && line.startsWith("DR  SWISSPROT")) {
+					
+					curr_ref = line.replace("DR  SWISSPROT: ", "").substring(0,6);
+					ref_parsed[entry_counter] = true;
 				}
 				
 				// parse domains
@@ -855,31 +873,58 @@ public class TransfacParser {
 						line_counter++;
 					}
 				}
-				
 					
+				if (line.startsWith("MX")) {
+					pfm_parsed[entry_counter] = true;
+					curr_pfm_IDs = new ArrayList<String>();
+					while (line.startsWith("MX")) {
+						curr_pfm_IDs.add(line.substring(4, 10));
+						line = br.readLine();
+					}
+				}
 				
 				// check parsed information
 				if (line.startsWith("//")) {
 					
-					if (species_parsed[entry_counter] && curr_spec.equals(species_name)) human_counter++;
+					if (species_name != null && !curr_spec.equals(species_name)) {
+						continue;
+					}
 					
 					if (acc_parsed[entry_counter] 
-					    && species_parsed[entry_counter] && curr_spec.equals(species_name)
-					    && seq_parsed[entry_counter]  
-					    && dom_parsed[entry_counter]) {
+					    && species_parsed[entry_counter]
+					    && seq_parsed[entry_counter]) {
 						
 						tf_names.add(curr_acc);
 						species.add(curr_spec);
 						crossrefs.add(curr_ref);
 						classes.add(curr_class);
 						sequences1.add(curr_seq);
-						pfam_IDs.add(curr_pfam_IDs);
-						smarts_IDs.add(curr_smarts_IDs);
-						prosite_IDs.add(curr_prosite_IDs);
-						pfam_domains.add(curr_pfam_domains);
-						smarts_domains.add(curr_smarts_domains);
-						prosite_domains.add(curr_smarts_domains);
-											
+						sequences2.add(null);
+						
+						// add domain (if available)
+						if (dom_parsed[entry_counter]) {
+							pfam_IDs.add(curr_pfam_IDs);
+							smarts_IDs.add(curr_smarts_IDs);
+							prosite_IDs.add(curr_prosite_IDs);
+							pfam_domains.add(curr_pfam_domains);
+							smarts_domains.add(curr_smarts_domains);
+							prosite_domains.add(curr_smarts_domains);
+							
+						} else {
+							pfam_IDs.add(null);
+							smarts_IDs.add(null);
+							prosite_IDs.add(null);
+							pfam_domains.add(null);
+							smarts_domains.add(null);
+							prosite_domains.add(null);
+						}
+
+						// add PFM (if available)
+						if (pfm_parsed[entry_counter]) {
+							pfm_names.add(curr_pfm_IDs);
+						} else {
+							pfm_names.add(null);
+						}
 					}
 					entry_counter++;
 					curr_ref = "NA";
@@ -894,8 +939,8 @@ public class TransfacParser {
 			
 			if (!silent) {
 			
-				int acc_counter, spec_counter, class_counter, seq_counter, ref_counter, dom_counter;
-				acc_counter = spec_counter = class_counter = seq_counter = ref_counter = dom_counter = 0;
+				int acc_counter, spec_counter, class_counter, seq_counter, ref_counter, dom_counter, pfm_counter;
+				acc_counter = spec_counter = class_counter = seq_counter = ref_counter = dom_counter = pfm_counter = 0;
 			
 				for(int i=0; i<entry_counter; i++) if (acc_parsed[i]) acc_counter++;
 				for(int i=0; i<entry_counter; i++) if (species_parsed[i]) spec_counter++;
@@ -903,17 +948,18 @@ public class TransfacParser {
 				for(int i=0; i<entry_counter; i++) if (seq_parsed[i]) seq_counter++;
 				for(int i=0; i<entry_counter; i++) if (ref_parsed[i]) ref_counter++;
 				for(int i=0; i<entry_counter; i++) if (dom_parsed[i]) dom_counter++;
+				for(int i=0; i<entry_counter; i++) if (pfm_parsed[i]) pfm_counter++;
 			
 				System.out.println("Number of transcription factors: " + entry_counter);
 				System.out.println("Number of parsed factors:        " + tf_names.size() + "\n");
 			
 				System.out.println("Accession numbers:  " + acc_counter);
 				System.out.println("Species:            " + spec_counter);
-				System.out.println("Species is Human:   " + human_counter);
 				System.out.println("TRANSFAC class:     " + class_counter);
 				System.out.println("Sequences:          " + seq_counter);
 				System.out.println("UniProt References: " + ref_counter);
 				System.out.println("Domains:            " + dom_counter);
+				System.out.println("Matrices:           " + pfm_counter);
 				
 			}
 		}
@@ -924,6 +970,8 @@ public class TransfacParser {
 	}
 		
 
+	
+	
 	
 	public void filterDomains(String interpro_infile, String mapping_infile) {
 
@@ -1048,99 +1096,100 @@ public class TransfacParser {
 		return new int[] {pfam_counter , prosite_counter , smarts_counter};
 	}
 	
-		
-		
+
 	public void writeFactorsToFile(String outfile) {
 		
 		int SEQLINELENGTH = 60;
 		String curr_seq;
-		
+	
 		try {
 			BufferedWriter bw = new BufferedWriter(new FileWriter(new File(outfile)));
-			
+	
 			for (int i=0; i<tf_names.size(); i++) {
-				
+	
 				bw.write("NA  " + tf_names.get(i) + "\n" +
-						 "XX\n" + 
-						 "SP  " + species.get(i) + "\n" + 
-						 "XX\n" + 
-						 "RF  " + crossrefs.get(i) + "\n" + 
-						 "XX\n" + 
-						 "CL  " + classes.get(i) + "\n" + 
-						 "XX\n");
-				
+						"XX\n" + 
+						"SP  " + species.get(i) + "\n" + 
+						"XX\n" + 
+						"RF  " + crossrefs.get(i) + "\n" + 
+						"XX\n" + 
+						"CL  " + classes.get(i) + "\n" + 
+						"XX\n");
+	
 				curr_seq = sequences1.get(i);
-				
+	
 				if (curr_seq != null) { 		
-				for(int j=0; j<(curr_seq.length()/SEQLINELENGTH); j++) {
-					
-					bw.write("S1  "); 
-					bw.write(curr_seq.toUpperCase(), j*SEQLINELENGTH, SEQLINELENGTH);
-					bw.write("\n");	
+					for(int j=0; j<(curr_seq.length()/SEQLINELENGTH); j++) {
+	
+						bw.write("S1  "); 
+						bw.write(curr_seq.toUpperCase(), j*SEQLINELENGTH, SEQLINELENGTH);
+						bw.write("\n");	
+					}
+	
+					if(curr_seq.length()-(curr_seq.length()/SEQLINELENGTH)*SEQLINELENGTH > 0) {						
+	
+						bw.write("S1  "); 
+						bw.write(curr_seq.toUpperCase(), (curr_seq.length()/SEQLINELENGTH)*SEQLINELENGTH, curr_seq.length()-(curr_seq.length()/SEQLINELENGTH)*SEQLINELENGTH);
+						bw.write("\n");	
+					}
+					bw.write("XX\n");
 				}
-					
-				if(curr_seq.length()-(curr_seq.length()/SEQLINELENGTH)*SEQLINELENGTH > 0) {						
-						
-					bw.write("S1  "); 
-					bw.write(curr_seq.toUpperCase(), (curr_seq.length()/SEQLINELENGTH)*SEQLINELENGTH, curr_seq.length()-(curr_seq.length()/SEQLINELENGTH)*SEQLINELENGTH);
-					bw.write("\n");	
-				}
-				bw.write("XX\n");
-				}
-				
+	
 				curr_seq = sequences2.get(i);
-				
+	
 				if (curr_seq != null) { 
-				for(int j=0; j<(curr_seq.length()/SEQLINELENGTH); j++) {
-					
-					bw.write("S2  "); 
-					bw.write(curr_seq.toUpperCase(), j*SEQLINELENGTH, SEQLINELENGTH);
-					bw.write("\n");	
+					for(int j=0; j<(curr_seq.length()/SEQLINELENGTH); j++) {
+	
+						bw.write("S2  "); 
+						bw.write(curr_seq.toUpperCase(), j*SEQLINELENGTH, SEQLINELENGTH);
+						bw.write("\n");	
+					}
+	
+					if(curr_seq.length()-(curr_seq.length()/SEQLINELENGTH)*SEQLINELENGTH > 0) {
+	
+						bw.write("S2  "); 
+						bw.write(curr_seq.toUpperCase(), (curr_seq.length()/SEQLINELENGTH)*SEQLINELENGTH, curr_seq.length()-(curr_seq.length()/SEQLINELENGTH)*SEQLINELENGTH);
+						bw.write("\n");	
+					}
+					bw.write("XX\n");
 				}
-					
-				if(curr_seq.length()-(curr_seq.length()/SEQLINELENGTH)*SEQLINELENGTH > 0) {
-						
-					bw.write("S2  "); 
-					bw.write(curr_seq.toUpperCase(), (curr_seq.length()/SEQLINELENGTH)*SEQLINELENGTH, curr_seq.length()-(curr_seq.length()/SEQLINELENGTH)*SEQLINELENGTH);
-					bw.write("\n");	
+	
+				// write domains 
+				if (domains.size() > 0) {
+					for (int j=0; j<domains.get(i).size(); j++) {
+						bw.write("FT  " + domains.get(i).get(j) + "\n");
+					}
+					bw.write("XX\n");
 				}
-				bw.write("XX\n");
-				}
-			
-			    // write domains 
-				for (int j=0; j<domains.get(i).size(); j++) {
-					bw.write("FT  " + domains.get(i).get(j) + "\n");
-				}
-				
-				bw.write("XX\n");
-				
+	
+	
 				// write PFMs
-				for (int j=0; j<pfm_names.get(i).size(); j++) {
-					bw.write("MN  " + pfm_names.get(i).get(j) + "\n");
-					bw.write("XX\n");
-					
-
-					bw.write("MA  " + pfms.get(i).get(j)[0] + "\n");
-					bw.write("MA  " + pfms.get(i).get(j)[1] + "\n");
-					bw.write("MA  " + pfms.get(i).get(j)[2] + "\n");
-					bw.write("MA  " + pfms.get(i).get(j)[3] + "\n");
-					bw.write("XX\n");
+				ArrayList<String> curr_pfm_names = pfm_names.get(i);
+				if (curr_pfm_names != null) {
+					for (int j=0; j<curr_pfm_names.size(); j++) {
+						bw.write("MN  " + pfm_names.get(i).get(j) + "\n");
+						bw.write("XX\n");
+	
+						bw.write("MA  " + pfms.get(i).get(j)[0] + "\n");
+						bw.write("MA  " + pfms.get(i).get(j)[1] + "\n");
+						bw.write("MA  " + pfms.get(i).get(j)[2] + "\n");
+						bw.write("MA  " + pfms.get(i).get(j)[3] + "\n");
+						bw.write("XX\n");
+					}
 				}
 				bw.write("//\n" +
-						 "XX\n");
+						"XX\n");
 			}
-			
+	
 			bw.flush();
 			bw.close();
 		}
-		
+	
 		catch(IOException ioe) {
 			System.out.println(ioe.getMessage());
 			System.out.println("IOException occurred while parsing transcription factors .");
 		}
 	}
-	
-	
 	
 	public void writeLabelFile(String outfile) {
 		
@@ -1188,11 +1237,9 @@ public class TransfacParser {
 		}
 	}
 	
-	
-	
 	public static void main(String[] args) {
 		
-		TransfacParser tf_parser = new TransfacParser();
+		//TransfacParser tf_parser = new TransfacParser();
 		//tf_parser.parseFactors("data/transfac/transpall_interleaved_classes.out");
 		//tf_parser.writeFactorsToFile("data/transfac/my_file");
 		
@@ -1219,8 +1266,14 @@ public class TransfacParser {
 		tf_parser.write_IDs_and_names("/rahome/eichner/Desktop/A_thaliana_TFs.txt", idx_map);
 		*/
 		
-		tf_parser.getNumTFsWithPFM("/rahome/eichner/data/transfac_2010.1/dat/factor.dat");
+		// tf_parser.getNumTFsWithPFM("/rahome/eichner/data/transfac_2010.1/dat/factor.dat");
+		
+		/*
+		TransfacParser newDataParser = new TransfacParser();
+		newDataParser.parseSequencesAndDomains("/rahome/eichner/data/biobase/transfac_2011.4/dat/factor.dat");
+		newDataParser.parseMatrices("/rahome/eichner/data/biobase/transfac_2011.4/dat/matrix.dat");
+		newDataParser.writeFactorsToFile("/rahome/eichner/projects/tfpredict/data/tf_pred/sabine_files/transfac_2011.4_flatfile.txt");
+		*/
 	}
-
 }
 
