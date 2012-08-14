@@ -37,6 +37,8 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.StringTokenizer;
 
+import main.FBPPredictor;
+
 import core.DomainFeatureCalculator;
 import core.FeatureRepairer;
 import core.SVMPairwiseFeatureCalculator;
@@ -97,7 +99,7 @@ public class ModelGenerator {
 	     *  find TF pairs with BLOSUM score > 0.3
 	     */
 	    
-	    domaincalculator.calculateAllDomainFeatures("SMBasedSimilarity", null, "BLOSUM_62.dat"   , feature_dir + "all_pairs_BLOSUM62_score.out", relevant_pairs);
+	    domaincalculator.calculateAllDomainFeatures("SMBasedSimilarity", null, FBPPredictor.matrix_dir + "BLOSUM_62.dat"   , feature_dir + "all_pairs_BLOSUM62_score.out", relevant_pairs);
 	    relevant_pairs = findRelevantPairs(relevant_pairs, feature_dir + "all_pairs_BLOSUM62_score.out", false);
 	    System.out.println("    " + relevant_pairs.size() + " / " + num_TFpairs + " factor pairs have sufficient domain sequence similarity.");
 	    num_TFpairs = relevant_pairs.size();
@@ -118,26 +120,26 @@ public class ModelGenerator {
 	    
 	    System.out.println("  Computing features.\n" +
 	    				   "     (directory: " + feature_dir + ")\n");
-	    
-	    domaincalculator.calculateAllDomainFeatures("SMBasedSimilarity", null, "BLOSUM_62.dat"   , feature_dir + "domain_scores_BLOSUM_62.out", relevant_pairs);
-	    domaincalculator.calculateAllDomainFeatures("SMBasedSimilarity", null, "PAM_080.dat"     , feature_dir + "domain_scores_PAM_080.out", relevant_pairs);
+	    /*
+	    domaincalculator.calculateAllDomainFeatures("SMBasedSimilarity", null, FBPPredictor.matrix_dir + "BLOSUM_62.dat"   , feature_dir + "domain_scores_BLOSUM_62.out", relevant_pairs);
+	    domaincalculator.calculateAllDomainFeatures("SMBasedSimilarity", null, FBPPredictor.matrix_dir + "PAM_080.dat"     , feature_dir + "domain_scores_PAM_080.out", relevant_pairs);
 		
-	    domaincalculator.calculateAllDomainFeatures("SMBasedSimilarity", null, "PAM_010.dat"     , feature_dir + "domain_scores_PAM_010.out", relevant_pairs);
-		domaincalculator.calculateAllDomainFeatures("SMBasedSimilarity", null, "WEIL970101.dat"  , feature_dir + "domain_scores_WEIL970101.out", relevant_pairs);
-		domaincalculator.calculateAllDomainFeatures("SMBasedSimilarity", null, "MEHP950101.dat"  , feature_dir + "domain_scores_MEHP950101.out", relevant_pairs);
-		domaincalculator.calculateAllDomainFeatures("SMBasedSimilarity", null, "MEHP950102.dat"  , feature_dir + "domain_scores_MEHP950102.out", relevant_pairs);
-		domaincalculator.calculateAllDomainFeatures("SMBasedSimilarity", null, "MEHP950103.dat"  , feature_dir + "domain_scores_MEHP950103.out", relevant_pairs);
-		domaincalculator.calculateAllDomainFeatures("SMBasedSimilarity", null, "LUTR910102.dat"  , feature_dir + "domain_scores_LUTR910102.out", relevant_pairs);
-		domaincalculator.calculateAllDomainFeatures("SMBasedSimilarity", null, "NIEK910102.dat"  , feature_dir + "domain_scores_NIEK910102.out", relevant_pairs);
-		domaincalculator.calculateAllDomainFeatures("SMBasedSimilarity", null, "RISJ880101.dat"  , feature_dir + "domain_scores_RISJ880101.out", relevant_pairs);
-		domaincalculator.calculateAllDomainFeatures("SMBasedSimilarity", null, "MIYS930101.dat"  , feature_dir + "domain_scores_MIYS930101.out", relevant_pairs);
-		domaincalculator.calculateAllDomainFeatures("SMBasedSimilarity", null, "MIYT790101.dat"  , feature_dir + "domain_scores_MIYT790101.out", relevant_pairs);
+	    domaincalculator.calculateAllDomainFeatures("SMBasedSimilarity", null, FBPPredictor.matrix_dir + "PAM_010.dat"     , feature_dir + "domain_scores_PAM_010.out", relevant_pairs);
+		domaincalculator.calculateAllDomainFeatures("SMBasedSimilarity", null, FBPPredictor.matrix_dir + "WEIL970101.dat"  , feature_dir + "domain_scores_WEIL970101.out", relevant_pairs);
+		domaincalculator.calculateAllDomainFeatures("SMBasedSimilarity", null, FBPPredictor.matrix_dir + "MEHP950101.dat"  , feature_dir + "domain_scores_MEHP950101.out", relevant_pairs);
+		domaincalculator.calculateAllDomainFeatures("SMBasedSimilarity", null, FBPPredictor.matrix_dir + "MEHP950102.dat"  , feature_dir + "domain_scores_MEHP950102.out", relevant_pairs);
+		domaincalculator.calculateAllDomainFeatures("SMBasedSimilarity", null, FBPPredictor.matrix_dir + "MEHP950103.dat"  , feature_dir + "domain_scores_MEHP950103.out", relevant_pairs);
+		domaincalculator.calculateAllDomainFeatures("SMBasedSimilarity", null, FBPPredictor.matrix_dir + "LUTR910102.dat"  , feature_dir + "domain_scores_LUTR910102.out", relevant_pairs);
+		domaincalculator.calculateAllDomainFeatures("SMBasedSimilarity", null, FBPPredictor.matrix_dir + "NIEK910102.dat"  , feature_dir + "domain_scores_NIEK910102.out", relevant_pairs);
+		domaincalculator.calculateAllDomainFeatures("SMBasedSimilarity", null, FBPPredictor.matrix_dir + "RISJ880101.dat"  , feature_dir + "domain_scores_RISJ880101.out", relevant_pairs);
+		domaincalculator.calculateAllDomainFeatures("SMBasedSimilarity", null, FBPPredictor.matrix_dir + "MIYS930101.dat"  , feature_dir + "domain_scores_MIYS930101.out", relevant_pairs);
+		domaincalculator.calculateAllDomainFeatures("SMBasedSimilarity", null, FBPPredictor.matrix_dir + "MIYT790101.dat"  , feature_dir + "domain_scores_MIYT790101.out", relevant_pairs);
 		
-		domaincalculator.calculateAllDomainFeatures("SequenceIdentity" , null, "BLOSUM_62.dat"   , feature_dir + "domain_scores_BLOSUM_62_si.out", relevant_pairs);
+		domaincalculator.calculateAllDomainFeatures("SequenceIdentity" , null, FBPPredictor.matrix_dir + "BLOSUM_62.dat"   , feature_dir + "domain_scores_BLOSUM_62_si.out", relevant_pairs);
 	    
-		domaincalculator.calculateAllDomainFeatures("SMBasedIdentity" , new String[] {"1.0"} , "BLOSUM_62.dat"   , feature_dir + "domain_scores_BLOSUM_62_t=1.0.out", relevant_pairs);
-		domaincalculator.calculateAllDomainFeatures("SMBasedIdentity" , new String[] {"3.0"} , "BLOSUM_62.dat"   , feature_dir + "domain_scores_BLOSUM_62_t=3.0.out", relevant_pairs);
-		domaincalculator.calculateAllDomainFeatures("SMBasedIdentity" , new String[] {"5.0"} , "BLOSUM_62.dat"   , feature_dir + "domain_scores_BLOSUM_62_t=5.0.out", relevant_pairs);
+		domaincalculator.calculateAllDomainFeatures("SMBasedIdentity" , new String[] {"1.0"} , FBPPredictor.matrix_dir + "BLOSUM_62.dat"   , feature_dir + "domain_scores_BLOSUM_62_t=1.0.out", relevant_pairs);
+		domaincalculator.calculateAllDomainFeatures("SMBasedIdentity" , new String[] {"3.0"} , FBPPredictor.matrix_dir + "BLOSUM_62.dat"   , feature_dir + "domain_scores_BLOSUM_62_t=3.0.out", relevant_pairs);
+		domaincalculator.calculateAllDomainFeatures("SMBasedIdentity" , new String[] {"5.0"} , FBPPredictor.matrix_dir + "BLOSUM_62.dat"   , feature_dir + "domain_scores_BLOSUM_62_t=5.0.out", relevant_pairs);
 		
 		domaincalculator.calculateAllDomainFeatures("LocalAlignmentKernel", new String[] {"GCBopt.dat"} 		, null, feature_dir + "domain_scores_lak_GCBopt.out", relevant_pairs);
 		domaincalculator.calculateAllDomainFeatures("LocalAlignmentKernel", new String[] {"JTTopt.dat"} 		, null, feature_dir + "domain_scores_lak_JTTopt.out", relevant_pairs);
@@ -149,11 +151,11 @@ public class ModelGenerator {
 		domaincalculator.calculateAllDomainFeatures("MismatchKernel", new String[] {"5", "1"}, null, feature_dir + "domain_scores_mmk_5_1.out", relevant_pairs);
 		domaincalculator.calculateAllDomainFeatures("MismatchKernel", new String[] {"6", "1"}, null, feature_dir + "domain_scores_mmk_6_1.out", relevant_pairs);
 		
-		sequencecalculator.calculateAllSequenceFeatures("SecondaryStructure", null, "BLOSUM_62.dat", feature_dir + "domain_scores_secstr_blo62.out", relevant_pairs);
+		sequencecalculator.calculateAllSequenceFeatures("SecondaryStructure", null, FBPPredictor.matrix_dir + "BLOSUM_62.dat", feature_dir + "domain_scores_secstr_blo62.out", relevant_pairs);
 
-		sequencecalculator.calculateAllSequenceFeatures("Environments", new String[] {"25"}, "BLOSUM_62.dat", feature_dir + "domain_scores_env_25_BLOSUM_62.out", relevant_pairs);
-		sequencecalculator.calculateAllSequenceFeatures("Environments", new String[] {"50"}, "BLOSUM_62.dat", feature_dir + "domain_scores_env_50_BLOSUM_62.out", relevant_pairs);
-		
+		sequencecalculator.calculateAllSequenceFeatures("Environments", new String[] {"25"}, FBPPredictor.matrix_dir + "BLOSUM_62.dat", feature_dir + "domain_scores_env_25_BLOSUM_62.out", relevant_pairs);
+		sequencecalculator.calculateAllSequenceFeatures("Environments", new String[] {"50"}, FBPPredictor.matrix_dir + "BLOSUM_62.dat", feature_dir + "domain_scores_env_50_BLOSUM_62.out", relevant_pairs);
+		*/
 		speciescalculator.calculateAllPhylogeneticDistances(class_id, irrelevantPairs, train_dir + "new_phylogenetic_distances.out", feature_dir + "domain_scores_phyl_dist.out", relevant_pairs, train_dir);
 		
 		svmpairwisecalculator.calculateAllSVMPairwiseScores(train_dir + "trainingset_" + class_id + ".blo62", feature_dir + "domain_scores_svm_pairwise_BLOSUM_62.out", relevant_pairs);
@@ -637,7 +639,7 @@ public class ModelGenerator {
 			System.out.println("Base directory: " + base_dir + "\n");
 			System.exit(0);
 		}
-		
+
 		
 		/*
 		 *  compute feature files

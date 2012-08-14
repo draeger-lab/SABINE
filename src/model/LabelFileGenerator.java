@@ -145,7 +145,7 @@ public class LabelFileGenerator {
 					curr_score_jj = optimizer.compareMatrices(fbps.get(j), fbps.get(j), null);
 					
 					curr_score = curr_score_ij / Math.sqrt(curr_score_ii * curr_score_jj);
-				
+					
 					bw.write(tfnames.get(i) + " vs. " + tfnames.get(j) + " : " + curr_score + "\n");
 				}
 			}

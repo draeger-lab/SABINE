@@ -1070,10 +1070,10 @@ public void sortFBPs(String infile, String namesfile, String outfile) {
 		
 		// copy missing files to training directory
 		if (! (new File(train_dir + "Classes")).exists()) {
-			FileCopier.copy("data/trainingsets/Classes", train_dir + "Classes");
+			FileCopier.copy("data/trainingsets_public/Classes", train_dir + "Classes");
 		}
 		if (! (new File(train_dir + "new_phylogenetic_distances.out")).exists()) {
-			FileCopier.copy("data/trainingsets/new_phylogenetic_distances.out", train_dir + "new_phylogenetic_distances.out");
+			FileCopier.copy("data/trainingsets_public/new_phylogenetic_distances.out", train_dir + "new_phylogenetic_distances.out");
 		}
 		
 		// create directory for temporary files
@@ -1138,14 +1138,13 @@ public void sortFBPs(String infile, String namesfile, String outfile) {
 		
 		preprocessor.lookUpAllSpecies(train_dir + "/trainingset_" + class_id + ".tfnames", input_file, train_dir + "trainingset_" + class_id + ".species");
 	
-		preprocessor.computeDomainScores(class_id, train_dir, "BLOSUM_62.dat", train_dir + "trainingset_" + class_id + ".tfnames", train_dir + "domain_scores_BLOSUM_62_" + class_id + ".out");
-		preprocessor.computeDomainScores(class_id, train_dir, "PAM_080.dat", train_dir + "trainingset_" + class_id + ".tfnames", train_dir + "domain_scores_PAM_080_" + class_id + ".out");
+		preprocessor.computeDomainScores(class_id, train_dir, FBPPredictor.matrix_dir + "BLOSUM_62.dat", train_dir + "trainingset_" + class_id + ".tfnames", train_dir + "domain_scores_BLOSUM_62_" + class_id + ".out");
+		preprocessor.computeDomainScores(class_id, train_dir, FBPPredictor.matrix_dir + "PAM_080.dat", train_dir + "trainingset_" + class_id + ".tfnames", train_dir + "domain_scores_PAM_080_" + class_id + ".out");
 		
 		preprocessor.precalculateSVMPairwiseHelpFiles(train_dir + "domain_scores_BLOSUM_62_" + class_id + ".out", train_dir + "trainingset_" + class_id + ".tfnames", train_dir + "trainingset_" + class_id + ".blo62");
 		preprocessor.precalculateSVMPairwiseHelpFiles(train_dir + "domain_scores_PAM_080_" + class_id + ".out", train_dir + "trainingset_" + class_id + ".tfnames", train_dir + "trainingset_" + class_id + ".pam80");
 		
-		System.out.println();
-		// preprocessor.adjustTrainingSet(train_dir + "mosta_30features_" + class_id + ".out", train_dir + "feature_scaling_orientation_" + class_id + ".out");
+		//preprocessor.adjustTrainingSet(train_dir + "mosta_30features_" + class_id + ".out", train_dir + "feature_scaling_orientation_" + class_id + ".out");
 		
 	}
 	/*

@@ -35,6 +35,7 @@ import optimization.MoStaOptimizer;
 public class PFMFormatConverter {
 	
 	public String basedir = "";
+	public boolean silent = false;
 	
 	
 	public ArrayList<ArrayList<String>> convertAllTransfacToSTAMP(ArrayList<String[]> transfac_pfms) {
@@ -183,7 +184,7 @@ public class PFMFormatConverter {
 		
 		// filter outlier PWMs according to MoSta score
 		PWMOutlierFilter filter = new PWMOutlierFilter();
-		filter.silent = false;
+		filter.silent = silent;
 		
 		MoStaOptimizer  opt = new MoStaOptimizer();
 		opt.basedir = basedir;

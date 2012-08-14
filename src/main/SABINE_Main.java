@@ -28,6 +28,8 @@ import java.text.DecimalFormat;
 import java.util.Calendar;
 import java.util.StringTokenizer;
 
+import model.ModelGenerator;
+
 
 public class SABINE_Main {
 	
@@ -45,7 +47,35 @@ public class SABINE_Main {
 	public final static String version = "1.1";
 	public final static String appName = "SABINE " + version;
 
-	public void createTempDirectories(String base_dir) {
+	
+	public static String createBaseDir() {
+		
+		String curr_dir = System.getProperty("user.dir") + "/";
+		
+		DecimalFormat fmt = new DecimalFormat();
+		fmt.setMaximumIntegerDigits(2);
+		fmt.setMinimumIntegerDigits(2);
+	
+		// get current time and date
+		Calendar cal = Calendar.getInstance ();
+		String curr_date = (fmt.format(cal.get(Calendar.DAY_OF_MONTH)) + "." + 
+							fmt.format((cal.get(Calendar.MONTH) + 1)) + "." + 
+							cal.get(Calendar.YEAR));
+		String curr_time = (fmt.format(cal.get(Calendar.HOUR_OF_DAY)) + ":" +
+							fmt.format(cal.get(Calendar.MINUTE)) + "_" +
+							fmt.format(cal.get(Calendar.MILLISECOND)));
+	
+		String base_dir = curr_dir + "internal/" + curr_date + "_" + curr_time + "/";
+		
+		if (! new File(base_dir).mkdir()) {
+			System.out.println("\nInvalid base directory. Aborting.");
+			System.out.println("Base directory: " + base_dir + "\n");
+			System.exit(0);
+		}
+		return(base_dir);
+	}
+	
+	public static void createTempDirectories(String base_dir) {
 		
 		String relpairs_dir, allpairs_dir, libsvm_dir, mmkernel_dir, matlign_dir, mosta_dir, psipred_dir, stamp_dir;
 		
@@ -101,36 +131,15 @@ public class SABINE_Main {
         System.out.println();  
 	}
 
-	
-	
+		
 	public void launch_SABINE(String infile, String outfile, String verbose_option, String base_dir, String train_dir, String model_file) {
 		
 		/*
 		 *  set base directory
 		 */
 		
-		String curr_dir = System.getProperty("user.dir") + "/";
 		if (base_dir == null) {
-		
-			DecimalFormat fmt = new DecimalFormat();
-			fmt.setMaximumIntegerDigits(2);
-			fmt.setMinimumIntegerDigits(2);
-		
-			// get current time and date
-			Calendar cal = Calendar.getInstance ();
-			String curr_date = (fmt.format(cal.get(Calendar.DAY_OF_MONTH)) + "." + 
-								fmt.format((cal.get(Calendar.MONTH) + 1)) + "." + 
-								cal.get(Calendar.YEAR));
-			String curr_time = (fmt.format(cal.get(Calendar.HOUR_OF_DAY)) + ":" +
-								fmt.format(cal.get(Calendar.MINUTE)));
-		
-			base_dir = curr_dir + "internal/" + curr_date + "_" + curr_time + "/";
-			
-			if (! new File(base_dir).mkdir()) {
-				System.out.println("\nInvalid base directory. Aborting.");
-				System.out.println("Base directory: " + base_dir + "\n");
-				System.exit(0);
-			}
+			base_dir = createBaseDir();	
 		}	
 		if (! base_dir.endsWith("/"))
 			base_dir += "/";
@@ -231,6 +240,13 @@ public class SABINE_Main {
 			}
 			SABINE_Galaxy.main(newArgs);
 		
+		} else if (args.length >= 1 && args[0].equals("--train")) {
+			String[] newArgs = new String[args.length-1];
+			for (int i=1; i<args.length; i++) {
+				newArgs[i-1] = args[i];
+			}
+			ModelGenerator.main(newArgs);
+			
 		// run Stand-Alone Mode
 		} else {
 		

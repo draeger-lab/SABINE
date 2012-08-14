@@ -500,7 +500,24 @@ public class TransfacParser {
 		System.out.println("Number of TFs: " + tf_names.size());
 	}
 	
-	
+	public void removeTFs(boolean[] removeFlags) {
+		
+		for (int i=tf_names.size()-1; i>=0; i--) {
+			
+			if (removeFlags[i]) {
+				tf_names.remove(i);
+				species.remove(i);
+				crossrefs.remove(i);
+				classes.remove(i);
+				sequences1.remove(i);
+				sequences2.remove(i);
+				domains.remove(i);
+				pfm_names.remove(i);
+				pfms.remove(i);
+			}
+		}
+	}
+		
 	public void getNumFactorsPerClass() {
 		
 		FormatConverter converter = new FormatConverter();
@@ -609,13 +626,6 @@ public class TransfacParser {
 					// domain entry comes from Entrez !
 						
 						else {
-							if(!domain_id.matches(REGEX2)) {
-								
-								if(!domain_id.equals("AAH36092") && !domain_id.matches(REGEX3) && !species.get(i).equals("Drosophila melanogaster")) {
-									System.out.println("Fatal Error. Domain ID " + domain_id + " does not match regular expressions.");
-									System.exit(1);
-								}	
-							}
 					
 					// sequences from Entrez and Transfac were different --> take S2	
 

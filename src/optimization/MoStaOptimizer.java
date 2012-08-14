@@ -267,7 +267,6 @@ public class MoStaOptimizer implements Optimizer {
 					basedir + "mosta/matrices.raw "  +
 					params[1]  + " " +
 					params[2];
-				
 
 			Process proc = Runtime.getRuntime().exec(cmdString);
 			
