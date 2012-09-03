@@ -42,7 +42,7 @@
 #CFLAGS= -g -O3 
 
 CC=gcc
-CFLAGS= -lm -O2 -Wall -Wshadow
+CFLAGS= -O2 -Wall -Wshadow -v
 
 PROGS= LAkernel_direct LAkernel_1_vs_all LAkernel_all_vs_all
 #PROGS= LAkernel_direct LAkernel_1_vs_all LAkernel_all_vs_all LAkernel_MPI
@@ -54,13 +54,13 @@ clean:
 	rm -f *.o $(PROGS)
 
 LAkernel_direct: LAkernel_direct.o LAkernel.o
-	$(CC) $(CFLAGS) -o LAkernel_direct LAkernel_direct.o LAkernel.o
+	$(CC) $(CFLAGS) -o LAkernel_direct LAkernel_direct.o LAkernel.o -lm
 
 LAkernel_1_vs_all: LAkernel_1_vs_all.o LAkernel.o seqio.o
-	$(CC) $(CFLAGS) -o LAkernel_1_vs_all  LAkernel_1_vs_all.o LAkernel.o seqio.o
+	$(CC) $(CFLAGS) -o LAkernel_1_vs_all  LAkernel_1_vs_all.o LAkernel.o seqio.o -lm
 
 LAkernel_all_vs_all: LAkernel_all_vs_all.o LAkernel.o seqio.o
-	$(CC) $(CFLAGS) -o LAkernel_all_vs_all  LAkernel_all_vs_all.o LAkernel.o seqio.o
+	$(CC) $(CFLAGS) -o LAkernel_all_vs_all  LAkernel_all_vs_all.o LAkernel.o seqio.o -lm
 
 #sgi cluster
 #LAkernel_MPI: LAkernel_MPI.o LAkernel.o seqio.o

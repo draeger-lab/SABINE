@@ -30,20 +30,20 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.StringTokenizer;
 
+import libsvm.svm_train;
 import main.FBPPredictor;
-
 import core.DomainFeatureCalculator;
 import core.FeatureRepairer;
 import core.SVMPairwiseFeatureCalculator;
 import core.SequenceFeatureCalculator;
 import core.SpeciesFeatureCalculator;
+import cv.CVToolRunner;
 
 public class ModelGenerator {
 	
@@ -108,19 +108,19 @@ public class ModelGenerator {
 	     *  find TF pairs with MoSta score < 1
 	     */
 	    
-	    /*
+	    
 	    LabelFileGenerator labelgenerator = new LabelFileGenerator();
 		labelgenerator.calculateLabelFile("trainingsets/trainingset_" + class_id + ".fbps", feature_dir + "similar_pairs_MoSta_score.out", relevant_pairs);
 	    relevant_pairs = findRelevantPairs(relevant_pairs, feature_dir + "similar_pairs_MoSta_score.out", true);
 	    System.out.println("    " + relevant_pairs.size() + " / " + num_TFpairs + " factor pairs with different matrices found (MoSta score < 1).\n");
-	    */
+	    
 	    
 	    relevant_pairs = removeRedundantFactors(relevant_pairs, train_dir + "trainingset_" + class_id + ".fbps");
 	    System.out.println("    " + relevant_pairs.size() + " / " + num_TFpairs + " factor pairs have different PFMs.\n");
 	    
 	    System.out.println("  Computing features.\n" +
 	    				   "     (directory: " + feature_dir + ")\n");
-	    /*
+	    
 	    domaincalculator.calculateAllDomainFeatures("SMBasedSimilarity", null, FBPPredictor.matrix_dir + "BLOSUM_62.dat"   , feature_dir + "domain_scores_BLOSUM_62.out", relevant_pairs);
 	    domaincalculator.calculateAllDomainFeatures("SMBasedSimilarity", null, FBPPredictor.matrix_dir + "PAM_080.dat"     , feature_dir + "domain_scores_PAM_080.out", relevant_pairs);
 		
@@ -155,7 +155,7 @@ public class ModelGenerator {
 
 		sequencecalculator.calculateAllSequenceFeatures("Environments", new String[] {"25"}, FBPPredictor.matrix_dir + "BLOSUM_62.dat", feature_dir + "domain_scores_env_25_BLOSUM_62.out", relevant_pairs);
 		sequencecalculator.calculateAllSequenceFeatures("Environments", new String[] {"50"}, FBPPredictor.matrix_dir + "BLOSUM_62.dat", feature_dir + "domain_scores_env_50_BLOSUM_62.out", relevant_pairs);
-		*/
+		
 		speciescalculator.calculateAllPhylogeneticDistances(class_id, irrelevantPairs, train_dir + "new_phylogenetic_distances.out", feature_dir + "domain_scores_phyl_dist.out", relevant_pairs, train_dir);
 		
 		svmpairwisecalculator.calculateAllSVMPairwiseScores(train_dir + "trainingset_" + class_id + ".blo62", feature_dir + "domain_scores_svm_pairwise_BLOSUM_62.out", relevant_pairs);
@@ -194,109 +194,54 @@ public class ModelGenerator {
 								libsvm_dir + "trainingset_unscaled.lp." + class_id + ".att",
 								libsvm_dir + "trainingset.lp." + class_id + ".att");
 	}
-	
+
 	public void runCrossvalidation(String infile) {
-						
-					
-			/*
-			 *  write shell script
-			 */
-		
-			// grid range and stepping for svm-param c
-				  
-				int c_start = -2;
-				int c_stop  =  6;
-				int c_incr  =  2;
-					
-					
-			// grid range and stepping for kernel-param gamma
-					  
-				int g_start = -10;
-				int g_stop  =  2;
-				int g_incr  =  2;	
-					
-					
-			// grid range and stepping for svm-param epsilon
-					
-				int e_start = -8;
-				int e_stop  = -6;
-				int e_incr  =  2;
-					
-					
-			// number of folds for cross-validation
-					
-				int folds   =  5;
-					
-	
-			// number of multiruns for smoothing of cv-results
-					
-				int runs 	=  1;
-				
-				String sabdir = System.getProperty("user.dir");
-				sabdir = sabdir.substring(sabdir.lastIndexOf("/") + 1) + "/";
-				
-				String cmdString =	  //"/usr/lib/jvm/java-1.5.0-sun-1.5.0.14/bin/"
-									  "java -cp libsvm.jar:"
-					          	 	+ "lib/cli/commons-cli-1.1.jar:"
-					          	 	+ "lib/math/commons-math-1.2.jar "
-					          	 	+ "main/CVToolRunner -g "
-									+ "-f ../" + sabdir + infile + " "
-									+ "-cs " + c_start + " "
-									+ "-ce " + c_stop  + " "
-									+ "-ci " + c_incr  + " "
-									+ "-gs " + g_start + " "
-									+ "-ge " + g_stop  + " "
-									+ "-gi " + g_incr  + " "
-									+ "-es " + e_start + " "
-									+ "-ee " + e_stop  + " "
-									+ "-ei " + e_incr  + " "
-									+ "-k "  + folds   + " "
-									+ "-r "  + runs;
-				
-				
-				try {
-				
-					String line = null;
-				
-					BufferedWriter bw = new BufferedWriter(new FileWriter(new File("runCV.sh")));
-					
-					// write script
-					bw.write("#!/bin/bash\n\n" +
-							"cd ../CVTool/\n" + 
-							cmdString + "\n" +
-							"mv " + infile.substring(infile.lastIndexOf("/")+1) + ".dat ../" + sabdir + infile + ".dat\n" +
-							"cd ../"+ sabdir + "\n");
-					
-					
-					bw.flush();
-					bw.close();
-				
-				/*
-				 *  run shell script
-				 */	
-				
-					Process proc = Runtime.getRuntime().exec("sh runCV.sh");
-					
-					BufferedReader input = new BufferedReader(new InputStreamReader(proc.getErrorStream()));
-				     
-					while ((line = input.readLine()) != null) {
-						
-				        System.out.println(line);
-				    
-					}
-					
-					input.close();
-					proc.waitFor();
-					
-				}
-				catch(IOException e) {
-					System.out.println("IOException while executing Script!");
-					e.printStackTrace();
-				} 
-				catch (InterruptedException e) {
-					System.out.println("InterruptedException while executing Shell Script!");
-				}
-		}
+
+		// grid range and stepping for svm-param c
+		int c_start =  0;  //-2;
+		int c_stop  =  2;  //6;
+		int c_incr  =  2;
+
+
+		// grid range and stepping for kernel-param gamma
+		int g_start =  -2;   //-10;
+		int g_stop  =  0;   // 2;
+		int g_incr  =  2;	
+
+
+		// grid range and stepping for svm-param epsilon
+		int e_start = -8;
+		int e_stop  = -8;   //-6;
+		int e_incr  =  2;
+
+
+		// number of folds for cross-validation
+		int folds   =  5;
+
+
+		// number of multiruns for smoothing of cv-results
+		int runs 	=  1;
+
+		String[] cvArgs = new String[] {
+				"-g", 
+				"-f", infile,
+				"-cs", c_start + "",
+				"-ce", c_stop + "",
+				"-ci", c_incr + "",
+				"-gs", g_start + "",
+				"-ge", g_stop + "",
+				"-gi", g_incr + "", 
+				"-es", e_start + "",
+				"-ee", e_stop + "",
+				"-ei", e_incr + "",
+				"-k", folds + "",
+				"-r", runs + ""};
+
+		CVToolRunner.main(cvArgs);
+		String resultFile = new File(infile).getName() + ".dat";
+		FileCopier.copy(resultFile, infile + ".dat");
+		new File(resultFile).delete();
+	}
 	
 	
 	/*
@@ -502,7 +447,7 @@ public class ModelGenerator {
 		args[11] = outfile;
 		
 		try {
-			libsvm.svm_train.main(args);
+			svm_train.main(args);
 		}
 		catch(IOException ioe) {
 			System.out.println(ioe.getMessage());
@@ -644,20 +589,25 @@ public class ModelGenerator {
 		/*
 		 *  compute feature files
 		 */
+		
+	
 		ArrayList<String> relevant_pairs = computeFeatures(feature_dir, temp_dir);
 		repairFeatures(feature_dir);
-		
+	
 		/*
 		 *  compute label file containing normalized MoSta scores of all TF pairs
 		 */
+		
+	
 		System.out.	println("  Computing labels.\n" + 
 				   		   "     (directory: " + label_dir + ")\n");
 		computeLabels(label_dir, temp_dir, relevant_pairs);
 		
 		System.out.println("  Writing LibSVM input file.\n" + 
 		   		   		   "     (file: " + libsvm_dir + "trainingset.lp." + class_id + ".att" + ")\n");
+	
 		generateSVMinput(feature_dir, label_dir, libsvm_dir);
-		
+	
 		System.out.println("  Performing cross-validation.\n");
 		
 		String pwd = System.getProperty("user.dir");
@@ -680,7 +630,6 @@ public class ModelGenerator {
 				 base_dir + "mosta.lp." + class_id + ".model", params);
 		
 		System.out.print("\r");
-		
 	}
 	
 	public static void main(String[] args) {
@@ -725,8 +674,8 @@ public class ModelGenerator {
 		}
 		
 		svr_model.class_id = "class" + superclass;
-		//svr_model.generateTrainingSet(input_file);
-		svr_model.generateModelFile();
+		svr_model.generateTrainingSet(input_file);
+		//svr_model.generateModelFile();
 	}
 	
 	private void usage() {

@@ -1,5 +1,8 @@
 
 #include "pfm_helper.h"
+#include <algorithm>
+#include <stdio.h>
+#include <stdlib.h>
 
 using namespace std;
 

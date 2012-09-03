@@ -194,7 +194,13 @@ public class LibSVMFeatureScaler {
 				
 				for(int i=0; i<feature_matrix.length; i++) {
 				
-					feature_matrix[i][j] = Double.parseDouble(orientation_features.get(i).get(j+1));
+					// multiple points (1.200.23) --> remove thousand separator point
+					String currScore = orientation_features.get(i).get(j+1);
+					if (currScore.matches("[0-9]+\\.[0-9]+\\.[0-9]+")) {
+						System.out.println("Corrected invalid score: " + currScore + " --> " + currScore.replaceFirst("\\.", ""));
+						currScore = currScore.replaceFirst("\\.", "");
+					}
+					feature_matrix[i][j] = Double.parseDouble(currScore);
 					
 					if(feature_matrix[i][j] < min[j]) min[j] = feature_matrix[i][j];
 					if(feature_matrix[i][j] > max[j]) max[j] = feature_matrix[i][j];
@@ -258,6 +264,7 @@ public class LibSVMFeatureScaler {
 						
 					split = strtok.nextToken().split(":");
 					
+					
 					if(!split[0].equals((i+1) + "")) {
 							
 						System.out.println("Error while parsing features of infile. " + (i+1) + " expected. Aborting.");
@@ -265,8 +272,13 @@ public class LibSVMFeatureScaler {
 						System.exit(0);
 							
 					}
+					String currScore = split[1];
+					if (currScore.matches("[0-9]+\\.[0-9]+\\.[0-9]+")) {
+						System.out.println("Corrected invalid score: " + currScore + " --> " + currScore.replaceFirst("\\.", ""));
+						currScore = currScore.replaceFirst("\\.", "");
+					}
 						
-					bw.write( " " + (i+1) + ":" + ( ( Double.parseDouble(split[1]) + add[i] ) * multiply[i]  - 1.0));
+					bw.write( " " + (i+1) + ":" + ( ( Double.parseDouble(currScore) + add[i] ) * multiply[i]  - 1.0));
 						
 				}
 				

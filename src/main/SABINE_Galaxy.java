@@ -151,7 +151,7 @@ public class SABINE_Galaxy {
 			}
 			
 			if (i < args.length && args[i].equals("--biobase-data")) {
-				trainingset = FBPPredictor.biobase_trainingset;
+				trainingset = FBPPredictor.private_trainingset;
 				tf_num_limit = Integer.MAX_VALUE;
 				i++;
 			}

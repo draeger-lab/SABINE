@@ -52,7 +52,7 @@ import de.zbit.util.progressbar.AbstractProgressBar;
 public class FBPPredictor {
 	
 	public static final String public_trainingset = "data/trainingsets_public/";
-	public static final String biobase_trainingset = "data/trainingsets_biobase/";
+	public static final String private_trainingset = "data/trainingsets_private/";
 	public static final String classMappingFile = public_trainingset + "Classes";
 	
 	public static final String matrix_dir = "data/substitutionMatrices/";

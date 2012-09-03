@@ -44,7 +44,7 @@ public class SABINE_Main {
 	
 	boolean dynamic_threshold = true;
 	
-	public final static String version = "1.1";
+	public final static String version = "1.2";
 	public final static String appName = "SABINE " + version;
 
 	

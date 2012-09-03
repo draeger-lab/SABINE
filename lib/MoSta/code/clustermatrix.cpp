@@ -1,4 +1,7 @@
 #include "clustermatrix.h"
+#include <algorithm>
+#include <stdio.h>
+#include <stdlib.h>
 
 using namespace std;
 

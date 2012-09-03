@@ -1,4 +1,4 @@
-
+#include <cstdlib>
 #include "cstat.h"
 
 using namespace std;

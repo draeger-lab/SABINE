@@ -1,4 +1,4 @@
-
+#include <cstdlib>
 #include "bsanno.h"
 
 using namespace std;

@@ -1,5 +1,6 @@
-
+#include <cstdlib>
 #include "pfm.h"
+#include <cstring> 
 
 using namespace std;
 
