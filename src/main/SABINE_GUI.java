@@ -678,20 +678,20 @@ public class SABINE_GUI extends JFrame implements ActionListener, ChangeListener
 
 			if (b.getName().equals("run")) {
 
-			  // Show a message on windows
-	       boolean isWindows = (System.getProperty("os.name").toLowerCase().contains("windows"));
-	        if (isWindows) {
-	          JOptionPane.showMessageDialog(this, "Sorry, " + SABINE_Main.appName + " is using third party" +
-	              " libraries that are not available for windows.\n\nPlease run this application" +
-	              " on a UNIX system.", SABINE_Main.appName, JOptionPane.WARNING_MESSAGE);
-	          return;
-	        }
-	        else if (isMacOSX()) {
-	          // TODO: Show something?
-            //JOptionPane.showMessageDialog(this, appName + " has been designed for LINUX." +
-              //" You are using a MAC", appName, JOptionPane.INFORMATION_MESSAGE);
-	        }
-	        
+				// Show a message on windows
+				boolean isWindows = (System.getProperty("os.name").toLowerCase().contains("windows"));
+		        if (isWindows) {
+		          JOptionPane.showMessageDialog(this, "Sorry, " + SABINE_Main.appName + " is using third party" +
+		              " libraries that are not available for windows.\n\nPlease run this application" +
+		              " on a UNIX system.", SABINE_Main.appName, JOptionPane.WARNING_MESSAGE);
+		          return;
+		        }
+		        else if (isMacOSX()) {
+		          // TODO: Show something?
+	            //JOptionPane.showMessageDialog(this, appName + " has been designed for LINUX." +
+	              //" You are using a MAC", appName, JOptionPane.INFORMATION_MESSAGE);
+		        }
+		        
 	        
 				/*
 				 * generate temporary base directory and write input file
@@ -704,8 +704,8 @@ public class SABINE_GUI extends JFrame implements ActionListener, ChangeListener
 					String time_stamp = time_gen.getTimeStamp().replace(':', '.');
 					
 					// Hack: fixed base directory
-					base_dir = "tmp/" + time_stamp + "_" + randnum + "/";
-					//base_dir = "tmp/04.05.2012_13.44_289/";
+					base_dir = SABINE_Main.createBaseDir();
+					//base_dir = "tmp/11.09.2012_10:11_13/";
 					File base_dir_path = new File(base_dir);
 					try {
 					  base_dir_path.mkdirs();
@@ -747,8 +747,7 @@ public class SABINE_GUI extends JFrame implements ActionListener, ChangeListener
 				double oft = Double.parseDouble(outlierFilterThreshold.getValue().toString());
 
 				// create directories for temporary files
-				SABINE_Main dir_creator = new SABINE_Main();
-				dir_creator.createTempDirectories(base_dir);
+				SABINE_Main.createTempDirectories(base_dir);
 
 				// reassign output and error stream
 				System.setOut(msg.getOutStream());
@@ -1265,8 +1264,8 @@ public class SABINE_GUI extends JFrame implements ActionListener, ChangeListener
 		
 		if (pfm_transferred) {
 		  this.getContentPane().remove(outputPanel);
-			this.getContentPane().remove(mainPanel);
-			showResults();	
+		  this.getContentPane().remove(mainPanel);
+		  showResults();	
 		}
 	}
 

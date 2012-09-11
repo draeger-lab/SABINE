@@ -65,7 +65,7 @@ public class SABINE_Main {
 							fmt.format(cal.get(Calendar.MINUTE)) + "_" +
 							fmt.format(cal.get(Calendar.MILLISECOND)));
 	
-		String base_dir = curr_dir + "internal/" + curr_date + "_" + curr_time + "/";
+		String base_dir = curr_dir + "tmp/" + curr_date + "_" + curr_time + "/";
 		
 		if (! new File(base_dir).mkdir()) {
 			System.out.println("\nInvalid base directory. Aborting.");
