@@ -1106,17 +1106,32 @@ public class TransfacParser {
 		return new int[] {pfam_counter , prosite_counter , smarts_counter};
 	}
 	
-
 	public void writeFactorsToFile(String outfile) {
+		writeFactorsToFile(outfile, -1);
+	}
+
+	public void writeFactorsToFile(String outfile, int class_id) {
 		
 		int SEQLINELENGTH = 60;
 		String curr_seq;
+		FormatConverter converter = new FormatConverter();
 	
 		try {
 			BufferedWriter bw = new BufferedWriter(new FileWriter(new File(outfile)));
 	
 			for (int i=0; i<tf_names.size(); i++) {
 	
+				// only write TFs of certain superclass
+				if (class_id != -1) {
+					if (classes.get(i).equals("NA")) {
+						continue;
+					}
+					int currClass = Integer.parseInt(converter.getTransfacClass(classes.get(i)).substring(0,1));
+					if (currClass != class_id) {
+						continue;
+					}
+				}
+				
 				bw.write("NA  " + tf_names.get(i) + "\n" +
 						"XX\n" + 
 						"SP  " + species.get(i) + "\n" + 

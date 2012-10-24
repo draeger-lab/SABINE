@@ -27,6 +27,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 
+import main.FBPPredictor;
+
 
 public class FeatureFileGenerator {
 	
@@ -123,7 +125,7 @@ public class FeatureFileGenerator {
 				
 				Collections.sort(features);
 				
-				String featurenamesfile = traindir + class_id + ".30featurenames";
+				String featurenamesfile = traindir + class_id + FBPPredictor.featureNamesFileSuffix;
 				BufferedWriter bw = new BufferedWriter(new FileWriter(new File(featurenamesfile)));
 				
 				for (int i=0; i<features.size(); i++) {

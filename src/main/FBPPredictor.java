@@ -54,6 +54,17 @@ public class FBPPredictor {
 	public static final String public_trainingset = "data/trainingsets_public/";
 	public static final String private_trainingset = "data/trainingsets_private/";
 	public static final String classMappingFile = public_trainingset + "Classes";
+	public static final String featureNamesFileSuffix = ".30featurenames";
+	
+	public static final String[] matrixAlignmentScores = new String[] {"BLOSUM_62", "PAM_080", "PAM_010", "WEIL970101", "MEHP950101", "MEHP950102", "MEHP950103", "LUTR910102", "NIEK910102", "RISJ880101", "MIYS930101", "MIYT790101"};
+	public static final String[] seqIdAlignmentScores = new String[] {"BLOSUM_62_si"};
+	public static final String[] seqSimAlignmentScores = new String[] {"BLOSUM_62_t=1.0", "BLOSUM_62_t=3.0", "BLOSUM_62_t=5.0"};
+	public static final String[] LAKernelScores = new String[] {"lak_GCBopt", "lak_JTTopt", "lak_BLOSUM_62opt", "lak_PAM_250opt", "lak_blosum62"};
+	public static final String[] MMKernelScores = new String[] {"mmk_4_1", "mmk_5_1", "mmk_6_1"};
+	public static final String[] secStructScores = new String[] {"secstr_blo62"};
+	public static final String[] envirScores = new String[] {"env_25_BLOSUM_62", "env_50_BLOSUM_62"};
+	public static final String[] phylScores = new String[] {"phyl_dist"};
+	public static final String[] svmPairScores = new String[] {"svm_pairwise_BLOSUM_62", "svm_pairwise_PAM_080"};
 	
 	public static final String matrix_dir = "data/substitutionMatrices/";
 	public static final String model_dir = "data/models/";
@@ -364,83 +375,115 @@ public class FBPPredictor {
 		sequencecalculator.parseRelevantSecondaryStructures(irrelevantPairs, class_id, train_dir);
 		
 		// Configure the progress bar
-    if (progress!=null) {
-      progress.setNumberOfTotalCalls(30);
-      progress.setEstimateTime(false);
-      domaincalculator.setProgressBar(progress);
-    }
+	    if (progress!=null) {
+	      progress.setNumberOfTotalCalls(30);
+	      progress.setEstimateTime(false);
+	      domaincalculator.setProgressBar(progress);
+	    }
 		
-		if (! silent) System.out.println("\n    Calculating substitution matrix based alignment scores.");
-		if (gui_output_mode) System.out.print("  Calculating substitution matrix based alignment scores...");
+	    // read feature names from training set
+	    ArrayList<String> feature_names = new ArrayList<String>();
+		try {
+			BufferedReader br = new BufferedReader(new FileReader(new File(train_dir + class_id + featureNamesFileSuffix)));
+
+			String line;
+			while ((line = br.readLine()) != null) {
+				feature_names.add(line);
+			}
+		}
+		catch(IOException ioe) {
+			ioe.printStackTrace();
+		}
+	    
+		if (useFeature(feature_names, matrixAlignmentScores)) {
+			if (! silent) System.out.println("\n    Calculating substitution matrix based alignment scores.");
+			if (gui_output_mode) System.out.print("  Calculating substitution matrix based alignment scores...");
+		}
 		
-		domaincalculator.calculateDomainFeatureFile(name, domains, "SMBasedSimilarity", null, matrix_dir + "BLOSUM_62.dat"   , base_dir + "relevantpairs/domain_scores_BLOSUM_62.out");
-		domaincalculator.calculateDomainFeatureFile(name, domains, "SMBasedSimilarity", null, matrix_dir + "PAM_080.dat"     , base_dir + "relevantpairs/domain_scores_PAM_080.out");
+		if (feature_names.contains("BLOSUM_62")) domaincalculator.calculateDomainFeatureFile(name, domains, "SMBasedSimilarity", null, matrix_dir + "BLOSUM_62.dat"   , base_dir + "relevantpairs/domain_scores_BLOSUM_62.out");
+		if (feature_names.contains("PAM_080")) domaincalculator.calculateDomainFeatureFile(name, domains, "SMBasedSimilarity", null, matrix_dir + "PAM_080.dat"     , base_dir + "relevantpairs/domain_scores_PAM_080.out");
+
+		if (feature_names.contains("PAM_010")) domaincalculator.calculateDomainFeatureFile(name, domains, "SMBasedSimilarity", null, matrix_dir + "PAM_010.dat"     , base_dir + "relevantpairs/domain_scores_PAM_010.out");
+		if (feature_names.contains("WEIL970101")) domaincalculator.calculateDomainFeatureFile(name, domains, "SMBasedSimilarity", null, matrix_dir + "WEIL970101.dat"  , base_dir + "relevantpairs/domain_scores_WEIL970101.out");
+		if (feature_names.contains("MEHP950101")) domaincalculator.calculateDomainFeatureFile(name, domains, "SMBasedSimilarity", null, matrix_dir + "MEHP950101.dat"  , base_dir + "relevantpairs/domain_scores_MEHP950101.out");
+		if (feature_names.contains("MEHP950102")) domaincalculator.calculateDomainFeatureFile(name, domains, "SMBasedSimilarity", null, matrix_dir + "MEHP950102.dat"  , base_dir + "relevantpairs/domain_scores_MEHP950102.out");
+		if (feature_names.contains("MEHP950103")) domaincalculator.calculateDomainFeatureFile(name, domains, "SMBasedSimilarity", null, matrix_dir + "MEHP950103.dat"  , base_dir + "relevantpairs/domain_scores_MEHP950103.out");
+		if (feature_names.contains("LUTR910102")) domaincalculator.calculateDomainFeatureFile(name, domains, "SMBasedSimilarity", null, matrix_dir + "LUTR910102.dat"  , base_dir + "relevantpairs/domain_scores_LUTR910102.out");
+		if (feature_names.contains("NIEK910102")) domaincalculator.calculateDomainFeatureFile(name, domains, "SMBasedSimilarity", null, matrix_dir + "NIEK910102.dat"  , base_dir + "relevantpairs/domain_scores_NIEK910102.out");
+		if (feature_names.contains("RISJ880101")) domaincalculator.calculateDomainFeatureFile(name, domains, "SMBasedSimilarity", null, matrix_dir + "RISJ880101.dat"  , base_dir + "relevantpairs/domain_scores_RISJ880101.out");
+		if (feature_names.contains("MIYS930101")) domaincalculator.calculateDomainFeatureFile(name, domains, "SMBasedSimilarity", null, matrix_dir + "MIYS930101.dat"  , base_dir + "relevantpairs/domain_scores_MIYS930101.out");
+		if (feature_names.contains("MIYT790101")) domaincalculator.calculateDomainFeatureFile(name, domains, "SMBasedSimilarity", null, matrix_dir + "MIYT790101.dat"  , base_dir + "relevantpairs/domain_scores_MIYT790101.out");
+
+		if (useFeature(feature_names, seqIdAlignmentScores)) {
+			if (! silent) System.out.println("    Calculating sequence identity based alignment scores.");
+			if (gui_output_mode) System.out.print("done.\n  Calculating sequence identity based alignment scores...");
+		}
 		
-		domaincalculator.calculateDomainFeatureFile(name, domains, "SMBasedSimilarity", null, matrix_dir + "PAM_010.dat"     , base_dir + "relevantpairs/domain_scores_PAM_010.out");
-		domaincalculator.calculateDomainFeatureFile(name, domains, "SMBasedSimilarity", null, matrix_dir + "WEIL970101.dat"  , base_dir + "relevantpairs/domain_scores_WEIL970101.out");
-		domaincalculator.calculateDomainFeatureFile(name, domains, "SMBasedSimilarity", null, matrix_dir + "MEHP950101.dat"  , base_dir + "relevantpairs/domain_scores_MEHP950101.out");
-		domaincalculator.calculateDomainFeatureFile(name, domains, "SMBasedSimilarity", null, matrix_dir + "MEHP950102.dat"  , base_dir + "relevantpairs/domain_scores_MEHP950102.out");
-		domaincalculator.calculateDomainFeatureFile(name, domains, "SMBasedSimilarity", null, matrix_dir + "MEHP950103.dat"  , base_dir + "relevantpairs/domain_scores_MEHP950103.out");
-		domaincalculator.calculateDomainFeatureFile(name, domains, "SMBasedSimilarity", null, matrix_dir + "LUTR910102.dat"  , base_dir + "relevantpairs/domain_scores_LUTR910102.out");
-		domaincalculator.calculateDomainFeatureFile(name, domains, "SMBasedSimilarity", null, matrix_dir + "NIEK910102.dat"  , base_dir + "relevantpairs/domain_scores_NIEK910102.out");
-		domaincalculator.calculateDomainFeatureFile(name, domains, "SMBasedSimilarity", null, matrix_dir + "RISJ880101.dat"  , base_dir + "relevantpairs/domain_scores_RISJ880101.out");
-		domaincalculator.calculateDomainFeatureFile(name, domains, "SMBasedSimilarity", null, matrix_dir + "MIYS930101.dat"  , base_dir + "relevantpairs/domain_scores_MIYS930101.out");
-		domaincalculator.calculateDomainFeatureFile(name, domains, "SMBasedSimilarity", null, matrix_dir + "MIYT790101.dat"  , base_dir + "relevantpairs/domain_scores_MIYT790101.out");
+		if (feature_names.contains("BLOSUM_62_si")) domaincalculator.calculateDomainFeatureFile(name, domains, "SequenceIdentity" , null, matrix_dir + "BLOSUM_62.dat"   , base_dir + "relevantpairs/domain_scores_BLOSUM_62_si.out");
 		
-		if (! silent) System.out.println("    Calculating sequence identity based alignment scores.");
-		if (gui_output_mode) System.out.print("done.\n  Calculating sequence identity based alignment scores...");
+		if (useFeature(feature_names, seqSimAlignmentScores)) {
+			if (! silent) System.out.println("    Calculating sequence similarity based alignment scores.");
+			if (gui_output_mode) System.out.print("done.\n  Calculating sequence similarity based alignment scores...");
+		}
 		
-		domaincalculator.calculateDomainFeatureFile(name, domains, "SequenceIdentity" , null, matrix_dir + "BLOSUM_62.dat"   , base_dir + "relevantpairs/domain_scores_BLOSUM_62_si.out");
+		if (feature_names.contains("BLOSUM_62_t=1.0")) domaincalculator.calculateDomainFeatureFile(name, domains, "SMBasedIdentity" , new String[] {"1.0"} , matrix_dir + "BLOSUM_62.dat"   , base_dir + "relevantpairs/domain_scores_BLOSUM_62_t=1.0.out");
+		if (feature_names.contains("BLOSUM_62_t=3.0")) domaincalculator.calculateDomainFeatureFile(name, domains, "SMBasedIdentity" , new String[] {"3.0"} , matrix_dir + "BLOSUM_62.dat"   , base_dir + "relevantpairs/domain_scores_BLOSUM_62_t=3.0.out");
+		if (feature_names.contains("BLOSUM_62_t=5.0")) domaincalculator.calculateDomainFeatureFile(name, domains, "SMBasedIdentity" , new String[] {"5.0"} , matrix_dir + "BLOSUM_62.dat"   , base_dir + "relevantpairs/domain_scores_BLOSUM_62_t=5.0.out");
 		
-		if (! silent) System.out.println("    Calculating sequence similarity based alignment scores.");
-		if (gui_output_mode) System.out.print("done.\n  Calculating sequence similarity based alignment scores...");
+		if (useFeature(feature_names, LAKernelScores)) {
+			if (! silent) System.out.println("    Calculating local alignment kernel scores.");
+			if (gui_output_mode) System.out.print("done.\n  Calculating local alignment kernel scores...");
+		}
 		
-		domaincalculator.calculateDomainFeatureFile(name, domains, "SMBasedIdentity" , new String[] {"1.0"} , matrix_dir + "BLOSUM_62.dat"   , base_dir + "relevantpairs/domain_scores_BLOSUM_62_t=1.0.out");
-		domaincalculator.calculateDomainFeatureFile(name, domains, "SMBasedIdentity" , new String[] {"3.0"} , matrix_dir + "BLOSUM_62.dat"   , base_dir + "relevantpairs/domain_scores_BLOSUM_62_t=3.0.out");
-		domaincalculator.calculateDomainFeatureFile(name, domains, "SMBasedIdentity" , new String[] {"5.0"} , matrix_dir + "BLOSUM_62.dat"   , base_dir + "relevantpairs/domain_scores_BLOSUM_62_t=5.0.out");
+		if (feature_names.contains("lak_GCBopt")) domaincalculator.calculateDomainFeatureFile(name, domains, "LocalAlignmentKernel", new String[] {"GCBopt.dat"} 		, null, base_dir + "relevantpairs/domain_scores_lak_GCBopt.out");
+		if (feature_names.contains("lak_JTTopt")) domaincalculator.calculateDomainFeatureFile(name, domains, "LocalAlignmentKernel", new String[] {"JTTopt.dat"} 		, null, base_dir + "relevantpairs/domain_scores_lak_JTTopt.out");
+		if (feature_names.contains("lak_BLOSUM_62opt")) domaincalculator.calculateDomainFeatureFile(name, domains, "LocalAlignmentKernel", new String[] {"BLOSUM_62opt.dat"} 	, null, base_dir + "relevantpairs/domain_scores_lak_BLOSUM_62opt.out");
+		if (feature_names.contains("lak_PAM_250opt")) domaincalculator.calculateDomainFeatureFile(name, domains, "LocalAlignmentKernel", new String[] {"PAM_250opt.dat"} 	, null, base_dir + "relevantpairs/domain_scores_lak_PAM_250opt.out");
+		if (feature_names.contains("lak_blosum62")) domaincalculator.calculateDomainFeatureFile(name, domains, "LocalAlignmentKernel", new String[] {"blosum62.dat"} 		, null, base_dir + "relevantpairs/domain_scores_lak_blosum62.out");
 		
-		if (! silent) System.out.println("    Calculating local alignment kernel scores.");
-		if (gui_output_mode) System.out.print("done.\n  Calculating local alignment kernel scores...");
+		if (useFeature(feature_names, MMKernelScores)) {
+			if (! silent) System.out.println("    Calculating mismatch kernel scores.");
+			if (gui_output_mode) System.out.print("done.\n  Calculating mismatch kernel scores...");
+		}
 		
-		domaincalculator.calculateDomainFeatureFile(name, domains, "LocalAlignmentKernel", new String[] {"GCBopt.dat"} 		, null, base_dir + "relevantpairs/domain_scores_lak_GCBopt.out");
-		domaincalculator.calculateDomainFeatureFile(name, domains, "LocalAlignmentKernel", new String[] {"JTTopt.dat"} 		, null, base_dir + "relevantpairs/domain_scores_lak_JTTopt.out");
-		domaincalculator.calculateDomainFeatureFile(name, domains, "LocalAlignmentKernel", new String[] {"BLOSUM_62opt.dat"} 	, null, base_dir + "relevantpairs/domain_scores_lak_BLOSUM_62opt.out");
-		domaincalculator.calculateDomainFeatureFile(name, domains, "LocalAlignmentKernel", new String[] {"PAM_250opt.dat"} 	, null, base_dir + "relevantpairs/domain_scores_lak_PAM_250opt.out");
-		domaincalculator.calculateDomainFeatureFile(name, domains, "LocalAlignmentKernel", new String[] {"blosum62.dat"} 		, null, base_dir + "relevantpairs/domain_scores_lak_blosum62.out");
+		if (feature_names.contains("mmk_4_1")) domaincalculator.calculateDomainFeatureFile(name, domains, "MismatchKernel", new String[] {"4", "1"}, null, base_dir + "relevantpairs/domain_scores_mmk_4_1.out");
+		if (feature_names.contains("mmk_5_1")) domaincalculator.calculateDomainFeatureFile(name, domains, "MismatchKernel", new String[] {"5", "1"}, null, base_dir + "relevantpairs/domain_scores_mmk_5_1.out");
+		if (feature_names.contains("mmk_6_1")) domaincalculator.calculateDomainFeatureFile(name, domains, "MismatchKernel", new String[] {"6", "1"}, null, base_dir + "relevantpairs/domain_scores_mmk_6_1.out");
 		
-		if (! silent) System.out.println("    Calculating mismatch kernel scores.");
-		if (gui_output_mode) System.out.print("done.\n  Calculating mismatch kernel scores...");
+		if (useFeature(feature_names, secStructScores)) {
+			if (! silent) System.out.println("    Calculating secondary structure scores.");
+			if (gui_output_mode) System.out.print("done.\n  Calculating secondary structure scores...");
+		}
 		
-		domaincalculator.calculateDomainFeatureFile(name, domains, "MismatchKernel", new String[] {"4", "1"}, null, base_dir + "relevantpairs/domain_scores_mmk_4_1.out");
-		domaincalculator.calculateDomainFeatureFile(name, domains, "MismatchKernel", new String[] {"5", "1"}, null, base_dir + "relevantpairs/domain_scores_mmk_5_1.out");
-		domaincalculator.calculateDomainFeatureFile(name, domains, "MismatchKernel", new String[] {"6", "1"}, null, base_dir + "relevantpairs/domain_scores_mmk_6_1.out");
-		
-		if (! silent) System.out.println("    Calculating secondary structure scores.");
-		if (gui_output_mode) System.out.print("done.\n  Calculating secondary structure scores...");
-		
-		sequencecalculator.calculateSequenceFeatureFile(name, domains, sequence1, sequence2, "SecondaryStructure", null, matrix_dir + "BLOSUM_62.dat", base_dir + "relevantpairs/domain_scores_secstr_blo62.out");
+		if (feature_names.contains("secstr_blo62")) sequencecalculator.calculateSequenceFeatureFile(name, domains, sequence1, sequence2, "SecondaryStructure", null, matrix_dir + "BLOSUM_62.dat", base_dir + "relevantpairs/domain_scores_secstr_blo62.out");
 		if (progress!=null) progress.DisplayBar(); // 25.
 		
-		if (! silent) System.out.println("    Calculating DNA-binding domain environment scores.");
-		if (gui_output_mode) System.out.print("done.\n  Calculating DNA-binding domain environment scores...");
+		if (useFeature(feature_names, envirScores)) {
+			if (! silent) System.out.println("    Calculating DNA-binding domain environment scores.");
+			if (gui_output_mode) System.out.print("done.\n  Calculating DNA-binding domain environment scores...");
+		}
 		
-		sequencecalculator.calculateSequenceFeatureFile(name, domains, sequence1, sequence2, "Environments", new String[] {"25"}, matrix_dir + "BLOSUM_62.dat", base_dir + "relevantpairs/domain_scores_env_25_BLOSUM_62.out");
+		if (feature_names.contains("env_25_BLOSUM_62")) sequencecalculator.calculateSequenceFeatureFile(name, domains, sequence1, sequence2, "Environments", new String[] {"25"}, matrix_dir + "BLOSUM_62.dat", base_dir + "relevantpairs/domain_scores_env_25_BLOSUM_62.out");
 		if (progress!=null) progress.DisplayBar();  // 26.
-		sequencecalculator.calculateSequenceFeatureFile(name, domains, sequence1, sequence2, "Environments", new String[] {"50"}, matrix_dir + "BLOSUM_62.dat", base_dir + "relevantpairs/domain_scores_env_50_BLOSUM_62.out");
+		if (feature_names.contains("env_50_BLOSUM_62")) sequencecalculator.calculateSequenceFeatureFile(name, domains, sequence1, sequence2, "Environments", new String[] {"50"}, matrix_dir + "BLOSUM_62.dat", base_dir + "relevantpairs/domain_scores_env_50_BLOSUM_62.out");
 		if (progress!=null) progress.DisplayBar();  // 27.
 		
-		if (! silent) System.out.println("    Calculating phylogenetic distance based scores.");
-		if (gui_output_mode) System.out.print("done.\n  Calculating phylogenetic distance based scores...");
+		if (useFeature(feature_names, phylScores)) {
+			if (! silent) System.out.println("    Calculating phylogenetic distance based scores.");
+			if (gui_output_mode) System.out.print("done.\n  Calculating phylogenetic distance based scores...");
+		}
 		
-		speciescalculator.calculatePhylogeneticDistances(name, species, class_id, irrelevantPairs, train_dir + "new_phylogenetic_distances.out", base_dir + "relevantpairs/domain_scores_phyl_dist.out", train_dir);
+		if (feature_names.contains("phyl_dist")) speciescalculator.calculatePhylogeneticDistances(name, species, class_id, irrelevantPairs, train_dir + "new_phylogenetic_distances.out", base_dir + "relevantpairs/domain_scores_phyl_dist.out", train_dir);
 		if (progress!=null) progress.DisplayBar();  // 28.
 		
-		if (! silent) System.out.println("    Calculating SVM pairwise scores.");
-		if (gui_output_mode) System.out.print("done.\n  Calculating SVM pairwise scores...");
+		if (useFeature(feature_names, svmPairScores)) {
+			if (! silent) System.out.println("    Calculating SVM pairwise scores.");
+			if (gui_output_mode) System.out.print("done.\n  Calculating SVM pairwise scores...");
+		}
 		
-		svmpairwisecalculator.calculateSVMPairwiseScores(name, base_dir + "relevantpairs/domain_scores_BLOSUM_62.out", base_dir + "allpairs/domain_scores_BLOSUM_62.out", train_dir + "trainingset_" + class_id + ".blo62", base_dir + "relevantpairs/domain_scores_svm_pairwise_BLOSUM_62.out");
+		if (feature_names.contains("svm_pairwise_BLOSUM_62")) svmpairwisecalculator.calculateSVMPairwiseScores(name, base_dir + "relevantpairs/domain_scores_BLOSUM_62.out", base_dir + "allpairs/domain_scores_BLOSUM_62.out", train_dir + "trainingset_" + class_id + ".blo62", base_dir + "relevantpairs/domain_scores_svm_pairwise_BLOSUM_62.out");
 		if (progress!=null) progress.DisplayBar();  // 29.
-		svmpairwisecalculator.calculateSVMPairwiseScores(name, base_dir + "relevantpairs/domain_scores_PAM_080.out", base_dir + "allpairs/domain_scores_PAM_080.out", train_dir + "trainingset_" + class_id + ".pam80", base_dir + "relevantpairs/domain_scores_svm_pairwise_PAM_080.out");
+		if (feature_names.contains("svm_pairwise_PAM_080")) svmpairwisecalculator.calculateSVMPairwiseScores(name, base_dir + "relevantpairs/domain_scores_PAM_080.out", base_dir + "allpairs/domain_scores_PAM_080.out", train_dir + "trainingset_" + class_id + ".pam80", base_dir + "relevantpairs/domain_scores_svm_pairwise_PAM_080.out");
 		if (progress!=null) {
 		  progress.DisplayBar();  // 30.
 		  progress.finished();
@@ -458,7 +501,7 @@ public class FBPPredictor {
 		
 	// generate libsvm-file with all features	
 		libsvmfilegenerator.silent = silent;
-		libsvmfilegenerator.generateOverallFeatureFile(base_dir + "relevantpairs", train_dir + class_id + ".30featurenames", base_dir + "libsvmfiles/unlabeled_testset.out");
+		libsvmfilegenerator.generateOverallFeatureFile(base_dir + "relevantpairs", train_dir + class_id + FBPPredictor.featureNamesFileSuffix, base_dir + "libsvmfiles/unlabeled_testset.out");
 		
 	// scale features in this file	
 		
@@ -500,10 +543,7 @@ public class FBPPredictor {
 		
 	}
 	
-	
-	
-	
-	
+
 	public void predictFBP(String inputfile, String base_dir, String train_dir, String model_file) {
 		
 		/*
@@ -641,8 +681,18 @@ public class FBPPredictor {
 		}
 		
 		predictor.predictFBP(args[0], base_dir, train_dir, model_file);
+	}
+	
+	private static boolean useFeature(ArrayList<String> featureNames, String[] featureType) {
 		
-		
+		boolean featureIsUsed = false; 
+		for (int i=0; i<featureType.length; i++) {
+			if (featureNames.contains(featureType[i])) {
+				featureIsUsed = true;
+				break;
+			}
+		}
+		return featureIsUsed;
 	}
 }
 

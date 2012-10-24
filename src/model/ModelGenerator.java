@@ -48,9 +48,12 @@ import cv.CVToolRunner;
 public class ModelGenerator {
 	
 	String class_id = "";
-	String train_dir = "/trainingsets";
+	String train_dir = "";
 	String base_dir = null;
 	boolean silent = false;
+	boolean includeMMK = true;
+	boolean includeLAK = true;
+	boolean includePhylo = true;
 	
 	public ModelGenerator(String id) {
 	  	class_id = id;
@@ -110,7 +113,8 @@ public class ModelGenerator {
 	    
 	    
 	    LabelFileGenerator labelgenerator = new LabelFileGenerator();
-		labelgenerator.calculateLabelFile("trainingsets/trainingset_" + class_id + ".fbps", feature_dir + "similar_pairs_MoSta_score.out", relevant_pairs);
+	    labelgenerator.basedir = temp_dir;
+		labelgenerator.calculateLabelFile(train_dir + "trainingset_" + class_id + ".fbps", feature_dir + "similar_pairs_MoSta_score.out", relevant_pairs);
 	    relevant_pairs = findRelevantPairs(relevant_pairs, feature_dir + "similar_pairs_MoSta_score.out", true);
 	    System.out.println("    " + relevant_pairs.size() + " / " + num_TFpairs + " factor pairs with different matrices found (MoSta score < 1).\n");
 	    
@@ -141,22 +145,28 @@ public class ModelGenerator {
 		domaincalculator.calculateAllDomainFeatures("SMBasedIdentity" , new String[] {"3.0"} , FBPPredictor.matrix_dir + "BLOSUM_62.dat"   , feature_dir + "domain_scores_BLOSUM_62_t=3.0.out", relevant_pairs);
 		domaincalculator.calculateAllDomainFeatures("SMBasedIdentity" , new String[] {"5.0"} , FBPPredictor.matrix_dir + "BLOSUM_62.dat"   , feature_dir + "domain_scores_BLOSUM_62_t=5.0.out", relevant_pairs);
 		
-		domaincalculator.calculateAllDomainFeatures("LocalAlignmentKernel", new String[] {"GCBopt.dat"} 		, null, feature_dir + "domain_scores_lak_GCBopt.out", relevant_pairs);
-		domaincalculator.calculateAllDomainFeatures("LocalAlignmentKernel", new String[] {"JTTopt.dat"} 		, null, feature_dir + "domain_scores_lak_JTTopt.out", relevant_pairs);
-		domaincalculator.calculateAllDomainFeatures("LocalAlignmentKernel", new String[] {"BLOSUM_62opt.dat"} 	, null, feature_dir + "domain_scores_lak_BLOSUM_62opt.out", relevant_pairs);
-		domaincalculator.calculateAllDomainFeatures("LocalAlignmentKernel", new String[] {"PAM_250opt.dat"} 	, null, feature_dir + "domain_scores_lak_PAM_250opt.out", relevant_pairs);
-		domaincalculator.calculateAllDomainFeatures("LocalAlignmentKernel", new String[] {"blosum62.dat"} 		, null, feature_dir + "domain_scores_lak_blosum62.out", relevant_pairs);
+		if (includeLAK) {
+			domaincalculator.calculateAllDomainFeatures("LocalAlignmentKernel", new String[] {"GCBopt.dat"} 		, null, feature_dir + "domain_scores_lak_GCBopt.out", relevant_pairs);
+			domaincalculator.calculateAllDomainFeatures("LocalAlignmentKernel", new String[] {"JTTopt.dat"} 		, null, feature_dir + "domain_scores_lak_JTTopt.out", relevant_pairs);
+			domaincalculator.calculateAllDomainFeatures("LocalAlignmentKernel", new String[] {"BLOSUM_62opt.dat"} 	, null, feature_dir + "domain_scores_lak_BLOSUM_62opt.out", relevant_pairs);
+			domaincalculator.calculateAllDomainFeatures("LocalAlignmentKernel", new String[] {"PAM_250opt.dat"} 	, null, feature_dir + "domain_scores_lak_PAM_250opt.out", relevant_pairs);
+			domaincalculator.calculateAllDomainFeatures("LocalAlignmentKernel", new String[] {"blosum62.dat"} 		, null, feature_dir + "domain_scores_lak_blosum62.out", relevant_pairs);
+		}
 		
-		domaincalculator.calculateAllDomainFeatures("MismatchKernel", new String[] {"4", "1"}, null, feature_dir + "domain_scores_mmk_4_1.out", relevant_pairs);
-		domaincalculator.calculateAllDomainFeatures("MismatchKernel", new String[] {"5", "1"}, null, feature_dir + "domain_scores_mmk_5_1.out", relevant_pairs);
-		domaincalculator.calculateAllDomainFeatures("MismatchKernel", new String[] {"6", "1"}, null, feature_dir + "domain_scores_mmk_6_1.out", relevant_pairs);
+		if (includeMMK) {
+			domaincalculator.calculateAllDomainFeatures("MismatchKernel", new String[] {"4", "1"}, null, feature_dir + "domain_scores_mmk_4_1.out", relevant_pairs);
+			domaincalculator.calculateAllDomainFeatures("MismatchKernel", new String[] {"5", "1"}, null, feature_dir + "domain_scores_mmk_5_1.out", relevant_pairs);
+			domaincalculator.calculateAllDomainFeatures("MismatchKernel", new String[] {"6", "1"}, null, feature_dir + "domain_scores_mmk_6_1.out", relevant_pairs);
+		}
 		
 		sequencecalculator.calculateAllSequenceFeatures("SecondaryStructure", null, FBPPredictor.matrix_dir + "BLOSUM_62.dat", feature_dir + "domain_scores_secstr_blo62.out", relevant_pairs);
 
 		sequencecalculator.calculateAllSequenceFeatures("Environments", new String[] {"25"}, FBPPredictor.matrix_dir + "BLOSUM_62.dat", feature_dir + "domain_scores_env_25_BLOSUM_62.out", relevant_pairs);
 		sequencecalculator.calculateAllSequenceFeatures("Environments", new String[] {"50"}, FBPPredictor.matrix_dir + "BLOSUM_62.dat", feature_dir + "domain_scores_env_50_BLOSUM_62.out", relevant_pairs);
 		
-		speciescalculator.calculateAllPhylogeneticDistances(class_id, irrelevantPairs, train_dir + "new_phylogenetic_distances.out", feature_dir + "domain_scores_phyl_dist.out", relevant_pairs, train_dir);
+		if (includePhylo) {
+			speciescalculator.calculateAllPhylogeneticDistances(class_id, irrelevantPairs, train_dir + "new_phylogenetic_distances.out", feature_dir + "domain_scores_phyl_dist.out", relevant_pairs, train_dir);
+		}
 		
 		svmpairwisecalculator.calculateAllSVMPairwiseScores(train_dir + "trainingset_" + class_id + ".blo62", feature_dir + "domain_scores_svm_pairwise_BLOSUM_62.out", relevant_pairs);
 		svmpairwisecalculator.calculateAllSVMPairwiseScores(train_dir + "trainingset_" + class_id + ".pam80", feature_dir + "domain_scores_svm_pairwise_PAM_080.out", relevant_pairs);
@@ -652,6 +662,10 @@ public class ModelGenerator {
 			if(args[i].equals("-s")) { superclass		   	= Integer.parseInt(args[i+1]); 	continue; }
 			if(args[i].equals("-m")) { svr_model.base_dir	= args[i+1]; 					continue; }
 			if(args[i].equals("-t")) { svr_model.train_dir 	= args[i+1]; 					continue; }
+			if(args[i].equals("--includeMMK")) { if (args[i+1].toLowerCase().equals("no")) svr_model.includeMMK = false; }
+			if(args[i].equals("--includeLAK")) { if (args[i+1].toLowerCase().equals("no")) svr_model.includeLAK = false; }
+			if(args[i].equals("--includePhylo")) { if (args[i+1].toLowerCase().equals("no")) svr_model.includePhylo = false; }
+			
 			
 			if( !args[i].equals("-s") && !args[i].equals("-t") && !args[i].equals("-m") ) {	
 				System.out.println("\n  Invalid argument: " + args[i]);
@@ -675,7 +689,7 @@ public class ModelGenerator {
 		
 		svr_model.class_id = "class" + superclass;
 		svr_model.generateTrainingSet(input_file);
-		//svr_model.generateModelFile();
+		svr_model.generateModelFile();
 	}
 	
 	private void usage() {
@@ -687,6 +701,9 @@ public class ModelGenerator {
 		System.out.println("\n");
 		System.out.println("  Usage   : modelgen <input_file> [OPTIONS]\n");
 		System.out.println("  OPTIONS : -s <superclass>       (TRANSFAC superclass)                    default = 0");
+		System.out.println("            --includePhylo <yes|no>");
+		System.out.println("            --includeMMK <yes|no> ");
+		System.out.println("            --includeLAK <yes|no>");
 		System.out.println("            -t <train_directory>  (directory to save the training set)");
 		System.out.println("            -m <model_directory>  (directory to save the model file) \n\n");
 		

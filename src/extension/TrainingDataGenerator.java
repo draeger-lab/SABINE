@@ -1,5 +1,7 @@
 package extension;
 
+import help.FormatConverter;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
@@ -199,6 +201,26 @@ public class TrainingDataGenerator {
 		return(fileContent);
 	}
 	
+	// merges PFMs in given SABINE training set file
+	private static void splitTrainingsetIntoInputfiles(String trainingFile, String outputDir) {
+		
+		// parse SABINE training set
+		TransfacParser tf_parser = new TransfacParser();
+		tf_parser.parseFactors(trainingFile);
+		
+		// delete PFMs
+		for (int i=0; i<tf_parser.pfm_names.size(); i++) {
+			tf_parser.pfm_names.set(i, null);
+			tf_parser.pfms.set(i, null);
+		}
+		
+		// write SABINE training set file
+		for (int c=0; c<5; c++) {
+			String outputFile = outputDir + "trainingFactorsClass" + c + ".txt";
+			tf_parser.writeFactorsToFile(outputFile, c);
+		}
+	}
+	
 	public static void main(String[] args) {
 		
 		String flatfileDir = "/rahome/eichner/projects/tfpredict/data/tf_pred/sabine_files/latest/";
@@ -207,10 +229,15 @@ public class TrainingDataGenerator {
 		String mergedFlatfileDBDsFBPsValidSpecies = flatfileDir + "transfac2012.2_matbase8.2_flatfile_with_dbd_and_mergedPFM_validSpecies.txt";
 		String supportedSpeciesList = "/rahome/eichner/workspace/SABINE/src/resources/txt/organism_list.txt";
 		
+		String privateTrainingSet = "/rahome/eichner/workspace/SABINE/data/trainingsets_private/trainingset_private.txt";
+		String outputDir = "/rahome/eichner/projects/sabine/data/trainingsets/trainingset_private/";
+		splitTrainingsetIntoInputfiles(privateTrainingSet, outputDir);
 		// merge PFMs using STAMP
 		//mergePFMsInFlatfile(mergedFlatfileDBDs, mergedFlatfileDBDsFBPs);
 		//truncatePFMnames(mergedFlatfileDBDsFBPs, mergedFlatfileDBDsFBPsNew);
 		
-		filterBySpecies(mergedFlatfileDBDsFBPs, supportedSpeciesList, mergedFlatfileDBDsFBPsValidSpecies);
+		//filterBySpecies(mergedFlatfileDBDsFBPs, supportedSpeciesList, mergedFlatfileDBDsFBPsValidSpecies);
+		
+		
 	}
 }

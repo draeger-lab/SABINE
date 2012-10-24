@@ -28,6 +28,8 @@ import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.util.ArrayList;
 
+import main.FBPPredictor;
+
 public class SingleFeatureEvaluator {
 	
 	String base_dir = "";
@@ -45,7 +47,7 @@ public class SingleFeatureEvaluator {
 			ArrayList<String> features = new ArrayList<String>();
 			String line;
 			
-			String featurenamesfile = train_dir + "class" + class_id + ".30featurenames";
+			String featurenamesfile = train_dir + "class" + class_id + FBPPredictor.featureNamesFileSuffix;
 			
 			BufferedReader br = new BufferedReader(new FileReader(new File(featurenamesfile)));
 			

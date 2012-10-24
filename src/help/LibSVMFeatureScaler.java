@@ -37,6 +37,7 @@ import java.util.StringTokenizer;
  */
 public class LibSVMFeatureScaler {
 	
+	public boolean silent = true;
 	
 	/*
 	 * removes "TF i vs. TF j : " - labeling of LibSVM-formatted files
@@ -197,7 +198,7 @@ public class LibSVMFeatureScaler {
 					// multiple points (1.200.23) --> remove thousand separator point
 					String currScore = orientation_features.get(i).get(j+1);
 					if (currScore.matches("[0-9]+\\.[0-9]+\\.[0-9]+")) {
-						System.out.println("Corrected invalid score: " + currScore + " --> " + currScore.replaceFirst("\\.", ""));
+						if (! silent) System.out.println("Corrected invalid score: " + currScore + " --> " + currScore.replaceFirst("\\.", ""));
 						currScore = currScore.replaceFirst("\\.", "");
 					}
 					feature_matrix[i][j] = Double.parseDouble(currScore);
@@ -274,7 +275,7 @@ public class LibSVMFeatureScaler {
 					}
 					String currScore = split[1];
 					if (currScore.matches("[0-9]+\\.[0-9]+\\.[0-9]+")) {
-						System.out.println("Corrected invalid score: " + currScore + " --> " + currScore.replaceFirst("\\.", ""));
+						if (! silent) System.out.println("Corrected invalid score: " + currScore + " --> " + currScore.replaceFirst("\\.", ""));
 						currScore = currScore.replaceFirst("\\.", "");
 					}
 						
