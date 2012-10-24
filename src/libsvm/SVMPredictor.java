@@ -10,6 +10,10 @@ import java.util.ArrayList;
 import java.util.PriorityQueue;
 import java.util.StringTokenizer;
 
+import main.FBPPredictor;
+
+import extension.PFMFormatConverter;
+
 
 import optimization.MatlignOptimizer;
 import optimization.MoStaOptimizer;
@@ -107,7 +111,7 @@ public class SVMPredictor {
 				train_tf = strtok.nextToken();
 				
 				
-				predicted_label = Double.parseDouble(line2);
+				predicted_label = Math.min(Double.parseDouble(line2), FBPPredictor.maxPFMsimilarity);
 				
 				
 				
