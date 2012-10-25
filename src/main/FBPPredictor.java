@@ -55,7 +55,7 @@ public class FBPPredictor {
 	public static final String private_trainingset = "data/trainingsets_private/";
 	public static final String classMappingFile = public_trainingset + "Classes";
 	public static final String featureNamesFileSuffix = ".30featurenames";
-	public static final double maxPFMsimilarity = 1.0;
+
 	
 	public static final String[] matrixAlignmentScores = new String[] {"BLOSUM_62", "PAM_080", "PAM_010", "WEIL970101", "MEHP950101", "MEHP950102", "MEHP950103", "LUTR910102", "NIEK910102", "RISJ880101", "MIYS930101", "MIYT790101"};
 	public static final String[] seqIdAlignmentScores = new String[] {"BLOSUM_62_si"};
@@ -82,6 +82,7 @@ public class FBPPredictor {
 	
 	double outlier_filter_threshold = 0.5;
 	
+	public static double maxPFMsimilarity = 1.0;
 	
 	boolean silent = false;
 	

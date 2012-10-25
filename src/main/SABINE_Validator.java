@@ -15,11 +15,13 @@ public class SABINE_Validator {
 	public void verifyInstallation() {
 		
 		// set parameters
+		FBPPredictor.maxPFMsimilarity = Double.MAX_VALUE;
 		FBPPredictor predictor = new FBPPredictor();
 		predictor.dynamic_threshold = true;
 		predictor.best_match_threshold = 0.95;
 		predictor.max_number_of_best_matches = 5;
 		predictor.outlier_filter_threshold = 0.5;
+		
 		
 		// generate base directory and subdirectories
 		File base_dir_path = new File(validatorBaseDir); 
