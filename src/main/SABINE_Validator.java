@@ -9,6 +9,7 @@ public class SABINE_Validator {
 
 	public static final String validatorInputFile = "input/test.tf";
 	public static final String validatorOutputFile = "input/test.tf.out";
+	public static final String validatorOutputFile64 = "input/test.tf.out64";
 	public static final String validatorBaseDir = "tmp/validator_tmp/";
 	
 	public void verifyInstallation() {
@@ -37,8 +38,10 @@ public class SABINE_Validator {
 		System.out.println("done.\n");
 		// read output
 		boolean valid = compareOutfiles(validatorOutputFile, validatorBaseDir + "prediction.out");
+		boolean valid64 = compareOutfiles(validatorOutputFile64, validatorBaseDir + "prediction.out");
 		
-		if (valid) {
+		
+		if (valid || valid64) {
 			System.out.println("The installation was successfully validated.");
 			System.out.println("Type \"sabine.sh --gui\" to start the graphical interface or use the " +
 							   "command \"sabine.sh --help\" to view a list of the provided command line options.");
@@ -68,8 +71,6 @@ public class SABINE_Validator {
 				
 				// computed output file differs from reference output file
 				if (line2 == null || !line1.equals(line2)) {
-					System.out.println("Reference: " + line1);
-					System.out.println("Result:    " + line2);
 					return false;
 				}
 				line1 = br1.readLine();
