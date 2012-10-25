@@ -11,7 +11,6 @@
   - Installation
   - Manual
   - Format specification
-  - Citation
   - Website and questions
 ____________________________________________________________________________________________________________________________  
 
