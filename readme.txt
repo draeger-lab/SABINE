@@ -2,7 +2,7 @@
   -------------------------------------------------
   SABINE - StandAlone BINding specificity Estimator
   -------------------------------------------------
-  (version 1.0, Copyright (C) 2009 Johannes Eichner)
+  (version 1.2, Copyright (C) 2012 Johannes Eichner)
 
 
   Contents:
@@ -76,24 +76,24 @@ ________________________________________________________________________________
 		The maximal number of PFMs that shall be merged can be specified by the user (see OPTIONS: -m). 
 
   INPUT:  	SABINE input file 
-  		contains the query factors in the SABINE input file format (see SABINE Format Specification)
+  			contains the query factors in the SABINE input file format (see SABINE Format Specification)
   		
   OUTPUT:	SABINE output file
-  	  	contains the predicted best matches and PFMs
-		the output filename can be specified by the user (see OPTIONS: -f)
+  	  		contains the predicted best matches and PFMs
+			the output filename can be specified by the user (see OPTIONS: -f)
   
   USAGE:	sabine.sh <input_filename> [OPTIONS]
 
   OPTIONS : 	-s <similarity_threshold> (min. FBP-similarity of best matches)      default = 0.95
             	-m <max_num_best_matches> (max. number of best matches)              default = 5
             	-o <outlier_filter_param> (max. deviation of a single best match)    default = 0.5
-		-b <base_dir>             (directory that contains temporary files)  
+				-b <base_dir>             (directory that contains temporary files)  
             	-f <output_filename>      (file to save the results)                 default = <input_filename>.out
             	-v <verbose_mode>         (write status to standard output)          default = y (yes)
 
 
   A full documentation including a tutorial is available at the supplementary website of SABINE:
-  http://www.ra.cs.uni-tuebingen.de/software/SABINE/ 
+  http://www.cogsys.cs.uni-tuebingen.de/software/SABINE/ 
 
 ____________________________________________________________________________________________________________________________
 
@@ -128,30 +128,13 @@ ________________________________________________________________________________
   XX
   BM  Best match (transcription factor ID   PFM similarity score) 
   XX
-  MA  A   C   G   T   rows:	  positions within the aligned sequences
-  MA		    first column: position index
-  MA                  columns: 	  relative frequencies of A, C, G, T residues
-  MA                  last column:  consensus sequence in IUPAC code
+  MA  A   C   G   T   rows:	positions within the aligned sequences
+  MA		  first column: position index
+  MA               columns: relative frequencies of A, C, G, T residues
+  MA           last column: consensus sequence in IUPAC code
   XX
   //
   XX
-
-  ____________________________________________________________________________________________________________________________
-
-  --------
-  Citation
-  --------
-
-  If you use SABINE in any published work, please cite the following article:
-
-  @UNPUBLISHED{eichner2012,
-	author = {Johannes Eichner and Florian Topf and Andreas Dr\"ager and Clemens Wrzodek 
-		  and Adrian Schr\"oder Jochen Supper and Dierk Wanke and Andreas Zell},
-	title = {{TFpredict and SABINE: sequence-based prediction of structural and functional characteristics 
-	          of transcription factors using supervised machine learning methods}},
-	note = {Submitted to Bioinformatics},
-	year = {2012}
-  }
 
   ____________________________________________________________________________________________________________________________
 
@@ -159,6 +142,6 @@ ________________________________________________________________________________
   Website and questions
   ---------------------
 
-  To obtain more detailed information about SABINE, see the website: http://www.ra.cs.uni-tuebingen.de/software/SABINE/ 
+  To obtain more detailed information about SABINE, see the website: http://www.cogsys.cs.uni-tuebingen.de/software/SABINE/ 
   If you have any further questions, please contact me by e-mail:    johannes.eichner@uni-tuebingen.de
 
