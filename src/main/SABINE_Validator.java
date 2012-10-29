@@ -4,6 +4,7 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.StringTokenizer;
 
 public class SABINE_Validator {
 
@@ -52,7 +53,7 @@ public class SABINE_Validator {
 			System.out.println("The installation of the tool is invalid.");
 			System.out.println("Please use the webservice version of SABINE (http://webservices.cs.uni-tuebingen.de/?tool=sabine).");
 		}
-		System.out.println("See the \"readme.txt\" or visit the SABINE website (http://www.ra.cs.uni-tuebingen.de/software/SABINE/) for a " +
+		System.out.println("See the \"readme.txt\" or visit the SABINE website (http://www.cogsys.cs.uni-tuebingen.de/software/SABINE/) for a " +
 		                   "comprehensive documentation of the tool.");
 	}
 	
@@ -65,15 +66,33 @@ public class SABINE_Validator {
 			br1.readLine(); 	// NA
 			br1.readLine();		// XX
 			
+			StringTokenizer strtok1 = null;
+			StringTokenizer strtok2 = null;
+			
 			String line1 = br1.readLine();
 			String line2 = br2.readLine();
 			
 			// compare computed matrix to reference matrix
 			while (line1 != null && !line1.startsWith("//")) {
 				
-				// computed output file differs from reference output file
-				if (line2 == null || !line1.equals(line2)) {
+				if (line2 == null) {
 					return false;
+				}
+				
+				// line in computed output file differs from reference output file
+				if (!line1.equals(line2)) {
+					
+					// test if tokens are equal
+					boolean equalLine = true;
+					strtok1 = new StringTokenizer(line1);
+					strtok2 = new StringTokenizer(line2);
+					while(strtok1.hasMoreTokens() || strtok2.hasMoreTokens()) {
+						if (!strtok1.nextToken().equals(strtok2.nextToken())) {
+							equalLine = false;
+							break;
+						}
+					}
+					return equalLine;
 				}
 				line1 = br1.readLine();
 				line2 = br2.readLine();
