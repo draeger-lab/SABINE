@@ -53,7 +53,8 @@ public class FBPPredictor {
 	
 	public static final String public_trainingset = "data/trainingsets_public/";
 	public static final String private_trainingset = "data/trainingsets_private/";
-	public static final String classMappingFile = public_trainingset + "Classes";
+	public static final String classMappingFile = "txt/Classes";
+	public static final String phyloDistFile = "txt/new_phylogenetic_distances.out";
 	public static final String featureNamesFileSuffix = ".30featurenames";
 
 	

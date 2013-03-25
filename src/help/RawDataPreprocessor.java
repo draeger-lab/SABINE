@@ -1070,10 +1070,10 @@ public void sortFBPs(String infile, String namesfile, String outfile) {
 		
 		// copy missing files to training directory
 		if (! (new File(train_dir + "Classes")).exists()) {
-			FileCopier.copy("data/trainingsets_public/Classes", train_dir + "Classes");
+			FileCopier.copy(FBPPredictor.classMappingFile, train_dir + "Classes", true);
 		}
 		if (! (new File(train_dir + "new_phylogenetic_distances.out")).exists()) {
-			FileCopier.copy("data/trainingsets_public/new_phylogenetic_distances.out", train_dir + "new_phylogenetic_distances.out");
+			FileCopier.copy(FBPPredictor.phyloDistFile, train_dir + "new_phylogenetic_distances.out", true);
 		}
 		
 		// create directory for temporary files

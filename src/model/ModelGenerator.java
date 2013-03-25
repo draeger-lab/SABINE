@@ -667,7 +667,8 @@ public class ModelGenerator {
 			if(args[i].equals("--includePhylo")) { if (args[i+1].toLowerCase().equals("no")) svr_model.includePhylo = false; }
 			
 			
-			if( !args[i].equals("-s") && !args[i].equals("-t") && !args[i].equals("-m") ) {	
+			if(!args[i].equals("-s") && !args[i].equals("-t") && !args[i].equals("-m") 
+					&& !args[i].equals("--includePhylo") && !args[i].equals("--includeLAK") && !args[i].equals("--includeMMK")) {	
 				System.out.println("\n  Invalid argument: " + args[i]);
 				svr_model.usage();
 			}

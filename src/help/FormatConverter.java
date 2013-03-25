@@ -24,6 +24,7 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.StringTokenizer;
 
@@ -31,7 +32,7 @@ import main.FBPPredictor;
 
 import org.biojava.bio.BioException;
 
-import help.SequenceAligner;
+import resources.Resource;
 
 
 public class FormatConverter {
@@ -777,7 +778,7 @@ public class FormatConverter {
 		
 		try {
 			
-			br = new BufferedReader(new FileReader(new File(FBPPredictor.classMappingFile)));
+			br = new BufferedReader(new InputStreamReader(Resource.class.getResourceAsStream(FBPPredictor.classMappingFile)));
 			
 			
 			while((line = br.readLine()) != null) {
