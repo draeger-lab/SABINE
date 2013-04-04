@@ -18,6 +18,8 @@
 
 package help;
 
+import java.io.File;
+
 import main.FBPPredictor;
 import optimization.MatlignOptimizer;
 import optimization.MoStaOptimizer;
@@ -27,33 +29,24 @@ public class ModelFileObtainer {
 	
 	public String obtainModelFile(String class_id) {
 		
-		FileFilter filter = new FileFilter();
-		
-		filter.setFormat(".*.model");
-		
-		filter.setDirectory(FBPPredictor.model_dir + class_id);
-		
-		String[] files = filter.listFiles();
-		
-		return FBPPredictor.model_dir + class_id + "/" + files[0];
+		return obtainModelFile(FBPPredictor.defaultModelDir, class_id);
 	}
 	
-	
-	public Optimizer obtainOptimizer(String class_id) {
+	public String obtainModelFile(String model_dir, String class_id) {
+		
+		if (!model_dir.endsWith(File.separator)) {
+			model_dir += File.separator;
+		}
 		
 		FileFilter filter = new FileFilter();
 		
 		filter.setFormat(".*.model");
 		
-		filter.setDirectory(FBPPredictor.model_dir + class_id);
+		filter.setDirectory(model_dir + class_id);
 		
 		String[] files = filter.listFiles();
 		
-		if(files[0].startsWith("mosta")) return new MoStaOptimizer();
-		
-		if(files[0].startsWith("matlign")) return new MatlignOptimizer();
-		
-		return null;
+		return model_dir + class_id + "/" + files[0];
 	}
 }
 

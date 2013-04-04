@@ -37,6 +37,8 @@ import java.util.HashSet;
 import libsvm.LabeledTF;
 import libsvm.SVMPredictor;
 
+import optimization.MoStaOptimizer;
+
 import org.biojava.bio.BioException;
 
 import core.DomainFeatureCalculator;
@@ -53,10 +55,10 @@ public class FBPPredictor {
 	
 	public static final String public_trainingset = "data/trainingsets_public/";
 	public static final String private_trainingset = "data/trainingsets_private/";
+	public static final String defaultModelDir = "data/models/";
 	public static final String classMappingFile = "txt/Classes";
 	public static final String phyloDistFile = "txt/new_phylogenetic_distances.out";
 	public static final String featureNamesFileSuffix = ".30featurenames";
-
 	
 	public static final String[] matrixAlignmentScores = new String[] {"BLOSUM_62", "PAM_080", "PAM_010", "WEIL970101", "MEHP950101", "MEHP950102", "MEHP950103", "LUTR910102", "NIEK910102", "RISJ880101", "MIYS930101", "MIYT790101"};
 	public static final String[] seqIdAlignmentScores = new String[] {"BLOSUM_62_si"};
@@ -69,7 +71,6 @@ public class FBPPredictor {
 	public static final String[] svmPairScores = new String[] {"svm_pairwise_BLOSUM_62", "svm_pairwise_PAM_080"};
 	
 	public static final String matrix_dir = "data/substitutionMatrices/";
-	public static final String model_dir = "data/models/";
 	public static final String MMkernelDir = "lib/MismatchKernel/";
 	public static final String LAkernelDir = "lib/LAKernel/";
 	public static final String PsiPredDir = "lib/PSIPRED/";
@@ -205,7 +206,7 @@ public class FBPPredictor {
 	}	
 	
 	
-	public void calculateFBP(String name, String class_id, String species, String sequence1, String sequence2, ArrayList<String> domains, String base_dir, String train_dir, String model_file) {
+	public void calculateFBP(String name, String class_id, String species, String sequence1, String sequence2, ArrayList<String> domains, String base_dir, String train_dir, String model_dir) {
 
 		/*
 		 *  predict superclass if necessary
@@ -522,10 +523,8 @@ public class FBPPredictor {
 		predictor.medium_conf_bmt = medium_conf_bmt;
 		predictor.low_conf_bmt = low_conf_bmt;
 
+		String model_file = obtainer.obtainModelFile(model_dir, class_id);
 		
-		if (model_file == null) {
-			model_file = obtainer.obtainModelFile(class_id);
-		}
 		
 		predictor.predictLabels(model_file, base_dir + "libsvmfiles/scaled_unlabeled_testset.out", base_dir + "libsvmfiles/predicted_labels.out");
 		
@@ -541,13 +540,13 @@ public class FBPPredictor {
 		
 	// construct and transfer FBP to input tf
 		
-		predictor.performPFMTransfer(best_matches, train_dir + "FBPs_" + class_id + ".out", obtainer.obtainOptimizer(class_id), outlier_filter_threshold, base_dir + "prediction.out");
+		predictor.performPFMTransfer(best_matches, train_dir + "FBPs_" + class_id + ".out", new MoStaOptimizer(), outlier_filter_threshold, base_dir + "prediction.out");
 		
 		
 	}
 	
 
-	public void predictFBP(String inputfile, String base_dir, String train_dir, String model_file) {
+	public void predictFBP(String inputfile, String base_dir, String train_dir, String model_dir) {
 		
 		/*
 		 * 
@@ -627,7 +626,7 @@ public class FBPPredictor {
 		 * 
 		 */
 		
-		calculateFBP(name, class_id, species, sequence1, sequence2, domains, base_dir, train_dir, model_file);
+		calculateFBP(name, class_id, species, sequence1, sequence2, domains, base_dir, train_dir, model_dir);
 		
 		
 	}
@@ -649,9 +648,9 @@ public class FBPPredictor {
 		 *
 		 */
 		String verbose_option = "y";
-		String train_dir = "trainingsets_public/";  // directory that contains training factors (= candidates for PWM transfer)
+		String train_dir = FBPPredictor.public_trainingset;
+		String model_dir = FBPPredictor.defaultModelDir;
 		String base_dir = null;
-		String model_file = null;
 		
 		for(int i=1; i<args.length-1; i+=2) {
 			
@@ -661,7 +660,7 @@ public class FBPPredictor {
 			if(args[i].equals("-v")) { verbose_option	 						= args[i+1]; 						continue; }
 			if(args[i].equals("-b")) { base_dir		 							= args[i+1]; 						continue; }
 			if(args[i].equals("-t")) { train_dir		 						= args[i+1]; 						continue; }
-			if(args[i].equals("-c")) { model_file		 						= args[i+1]; 						continue; }
+			if(args[i].equals("-c")) { model_dir		 						= args[i+1]; 						continue; }
 			if(args[i].equals("-d")) { predictor.dynamic_threshold				= Boolean.parseBoolean(args[i+1]); 	continue; }
 			
 			if( !args[i].equals("-s") && !args[i].equals("-m") && !args[i].equals("-o") && !args[i].equals("-v") && !args[i].equals("-c") && !args[i].equals("-t") && !args[i].equals("-b") && !args[i].equals("-d")) {	
@@ -683,7 +682,7 @@ public class FBPPredictor {
 			System.out.println("  Max. outlier-FBP deviation  :  " + predictor.outlier_filter_threshold + "\n\n");
 		}
 		
-		predictor.predictFBP(args[0], base_dir, train_dir, model_file);
+		predictor.predictFBP(args[0], base_dir, train_dir, model_dir);
 	}
 	
 	private static boolean useFeature(ArrayList<String> featureNames, String[] featureType) {

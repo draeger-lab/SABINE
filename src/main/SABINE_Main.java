@@ -132,7 +132,7 @@ public class SABINE_Main {
 	}
 
 		
-	public void launch_SABINE(String infile, String outfile, String verbose_option, String base_dir, String train_dir, String model_file) {
+	public void launch_SABINE(String infile, String outfile, String verbose_option, String base_dir, String train_dir, String model_dir) {
 		
 		/*
 		 *  set base directory
@@ -196,7 +196,7 @@ public class SABINE_Main {
 									  "-v", verbose_option, 
 									  "-b", base_dir, 
 									  "-t", train_dir,
-									  "-c", model_file,
+									  "-c", model_dir,
 									  "-d", "" + dynamic_threshold};
 				
 				FBPPredictor.main(arguments);
@@ -271,7 +271,7 @@ public class SABINE_Main {
 			String verbose_option = "y";
 			String base_dir = null;
 			String train_dir = FBPPredictor.public_trainingset;
-			String model_file = null;
+			String model_dir = FBPPredictor.defaultModelDir;
 			
 			if (infile.endsWith(".input")) outfile = infile.substring(0,infile.length()-5) + "output";
 			
@@ -286,7 +286,7 @@ public class SABINE_Main {
 				if(args[i].equals("-b")) { base_dir		 						= args[i+1]; 						continue; }
 				if(args[i].equals("-t")) { train_dir		 					= args[i+1]; 						continue; }
 				if(args[i].equals("-v")) { verbose_option	   					= args[i+1]; 						continue; }
-				if(args[i].equals("-c")) { model_file							= args[i+1]; 						continue; }
+				if(args[i].equals("-c")) { model_dir							= args[i+1]; 						continue; }
 				
 				
 				if( !args[i].equals("-s") && !args[i].equals("-m") && !args[i].equals("-t") && !args[i].equals("-b") &&
@@ -309,7 +309,7 @@ public class SABINE_Main {
 			 *  call main function
 			 */
 			
-			caller.launch_SABINE(infile, outfile, verbose_option, base_dir, train_dir, model_file);
+			caller.launch_SABINE(infile, outfile, verbose_option, base_dir, train_dir, model_dir);
 			
 			String curr_dir = System.getProperty("user.dir") + "/";
 			
@@ -328,9 +328,9 @@ public class SABINE_Main {
 		System.out.println("  OPTIONS : -s <similarity_threshold> (min. FBP-similarity of best matches)     default = 0.95");
 		System.out.println("            -m <max_num_best_matches> (max. number of best matches)             default = 5");		
 		System.out.println("            -o <outlier_filter_param> (max. deviation of a single best match)   default = 0.5");
-		//System.out.println("            -t <training_set_dir>  	  (directory that contains training sets)   default = /trainingsets");
-		System.out.println("            -b <base_dir>             (directory that contains temporary files)  ");
-		//System.out.println("            -c <model_file>  	      (custom-built model file)  ");
+		System.out.println("            -b <base_dir>             (directory that contains temporary files)");
+		//System.out.println("            -t <training_set_dir>  	(directory that contains training sets)        default = data/trainingsets");
+		//System.out.println("            -c <model_dir>  	        (directory that contains custom-built models)  default = data/models");
 		System.out.println("            -f <output_filename>      (file to save the results)                default = <input_filename>.out");
 		System.out.println("            -v <verbose_mode>         (write status to standard output)         default = y (yes)\n\n");
 		System.exit(0);

@@ -353,7 +353,7 @@ public class SABINE_Galaxy {
 			sabine_caller.outlier_filter_threshold = oft;
 			sabine_caller.silent = silent;
 			
-			sabine_caller.launch_SABINE(sabineInputFile, basedir + "outfile.tmp", "n", basedir, trainingset, null);
+			sabine_caller.launch_SABINE(sabineInputFile, basedir + "outfile.tmp", "n", basedir, trainingset, FBPPredictor.defaultModelDir);
 		}
 		else { 
 			// set parameters
@@ -364,7 +364,7 @@ public class SABINE_Galaxy {
 			predictor.outlier_filter_threshold = oft;
 			predictor.silent = silent;
 			
-			predictor.predictFBP(sabineInputFile, basedir, trainingset, null);
+			predictor.predictFBP(sabineInputFile, basedir, trainingset, FBPPredictor.defaultModelDir);
 		}
 	}
 	
