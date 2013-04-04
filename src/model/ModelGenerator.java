@@ -600,10 +600,11 @@ public class ModelGenerator {
 		 *  compute feature files
 		 */
 		
-	
-		ArrayList<String> relevant_pairs = computeFeatures(feature_dir, temp_dir);
-		repairFeatures(feature_dir);
-	
+		
+		// ArrayList<String> relevant_pairs = computeFeatures(feature_dir, temp_dir);
+		// repairFeatures(feature_dir);
+		
+		
 		/*
 		 *  compute label file containing normalized MoSta scores of all TF pairs
 		 */
@@ -611,7 +612,7 @@ public class ModelGenerator {
 	
 		System.out.	println("  Computing labels.\n" + 
 				   		   "     (directory: " + label_dir + ")\n");
-		computeLabels(label_dir, temp_dir, relevant_pairs);
+		// computeLabels(label_dir, temp_dir, relevant_pairs);
 		
 		System.out.println("  Writing LibSVM input file.\n" + 
 		   		   		   "     (file: " + libsvm_dir + "trainingset.lp." + class_id + ".att" + ")\n");
@@ -689,7 +690,7 @@ public class ModelGenerator {
 		}
 		
 		svr_model.class_id = "class" + superclass;
-		svr_model.generateTrainingSet(input_file);
+		//svr_model.generateTrainingSet(input_file);
 		svr_model.generateModelFile();
 	}
 	
@@ -711,7 +712,6 @@ public class ModelGenerator {
 		System.exit(0);
 		
 	}
-
 }
 
 

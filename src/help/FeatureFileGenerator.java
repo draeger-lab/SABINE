@@ -99,8 +99,6 @@ public class FeatureFileGenerator {
 		
 		public void generateLibSVMTrainingSet(String featuredir, String traindir, String class_id, String labelfile, String outfile) {
 			
-			LibSVMFileGenerator generator = new LibSVMFileGenerator();
-			
 			ArrayList<String> features = new ArrayList<String>();
 
 			try {
@@ -141,7 +139,7 @@ public class FeatureFileGenerator {
 			}
 			
 			
-			
+			LibSVMFileGenerator generator = new LibSVMFileGenerator();
 			for(int i=0; i<features.size(); i++) {
 				
 				if(i == 0) {

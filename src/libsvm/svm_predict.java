@@ -3,7 +3,7 @@ import libsvmcore.*;
 import java.io.*;
 import java.util.*;
 
-class svm_predict {
+public class svm_predict {
 	private static double atof(String s)
 	{
 		return Double.valueOf(s).doubleValue();
