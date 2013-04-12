@@ -27,10 +27,16 @@ import java.io.IOException;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.StringTokenizer;
 
 import libsvm.LabeledTF;
-
+import main.FBPPredictor;
+import main.SABINE_Main;
 import optimization.MoStaOptimizer;
 import plot.PlotGenerator;
 
@@ -42,8 +48,20 @@ public class PredictionEvaluator {
 	public ArrayList<String> tf_names = new ArrayList<String>();
 	public ArrayList<ArrayList<LabeledTF>> best_matches = new ArrayList<ArrayList<LabeledTF>>();
 
+	private boolean splitSetMode = false;
+	private static String  trainTF_file = "";
+	private static String testTF_file = "";
+	private Set<String> training_tfs = null;
+	private Set<String> test_tfs = null;
+	
+	private String basedir = "";
 	double[] mosta_scores;
 	boolean plot_hist = false;
+	
+	private static final String matrixfile = FBPPredictor.private_trainingset + "trainingset_allClasses.fbps";
+	
+	// TODO: - generate cross-validation splits and evaluate predictions from different models
+	// TODO: - implement naive method
 	
 	public void parse_predictions(String infile) {
 		
@@ -52,28 +70,47 @@ public class PredictionEvaluator {
 		ArrayList<String> curr_matrix;
 		StringTokenizer strtok;
 		
+		// read names of training and test TFs (if given)
+		if (!trainTF_file.isEmpty() && !testTF_file.isEmpty()) {
+			training_tfs = new HashSet<String>(BasicTools.readFile2List(trainTF_file, false));
+			test_tfs = new HashSet<String>(BasicTools.readFile2List(testTF_file, false));
+			splitSetMode = true;
+		}
+		
 		try {
 			BufferedReader br = new BufferedReader(new FileReader(new File(infile)));
- 			
-
+			
 			while ((line = br.readLine()) != null) {
 
 				// parse factor name
 				if (line.startsWith("NA  ")) {
-					tf_names.add(line.substring(4).trim());
+					String currTF = line.substring(4).trim();
+					
+					// only consider test TFs in split set evaluation mode
+					if (!splitSetMode || test_tfs.contains(currTF)) {
+						tf_names.add(currTF);
+					} else {
+						while((line= br.readLine()) != null && !line.startsWith("//"));
+					}
 				}
 				
 				// parse best matches
 				if (line.startsWith("BM  ")) {
-					curr_best_matches = new ArrayList<LabeledTF>();
 					
+					curr_best_matches = null;
 					if (! line.startsWith("BM  none")) {
-					
+						
+						curr_best_matches = new ArrayList<LabeledTF>();
 						while (line.startsWith("BM  ")) {
 								
 							strtok = new StringTokenizer(line.substring(4));
-							curr_best_matches.add(new LabeledTF(strtok.nextToken().trim(), 
-																Double.parseDouble(strtok.nextToken().trim())));
+							String currTFname = strtok.nextToken().trim();
+							double currTFlabel = Double.parseDouble(strtok.nextToken().trim());
+							
+							// skip best matches which are contained in test set
+							if (!splitSetMode || !test_tfs.contains(currTFname)) {
+								curr_best_matches.add(new LabeledTF(currTFname, currTFlabel));
+							}
 							line = br.readLine();
 						}
 					}
@@ -83,10 +120,10 @@ public class PredictionEvaluator {
 				// parse predicted matrix
 				if (line.startsWith("MA  ")) {
 					
-					curr_matrix = new ArrayList<String>();
-					
-					if (! line.substring(3).trim().equals("none")) {
-										
+					curr_matrix = null;
+					if (! line.startsWith("MA  none")) {
+						
+						curr_matrix = new ArrayList<String>();
 						while (line.startsWith("MA  ")) {
 							curr_matrix.add(line.substring(4).trim());
 							line = br.readLine();
@@ -106,7 +143,6 @@ public class PredictionEvaluator {
 	public void parse_labels(String infile) {
 		
 		String line;
-		annotated_matrices = new ArrayList<ArrayList<String>>();
 		
 		try {
 			BufferedReader br = new BufferedReader(new FileReader(new File(infile)));
@@ -117,6 +153,16 @@ public class PredictionEvaluator {
 			
 			while ((line = br.readLine()) != null) {
 				
+				// parse factor name
+				if (line.startsWith("NA  ")) {
+					String currTF = line.substring(4).trim();
+					
+					// only consider test TFs in split set evaluation mode
+					if (splitSetMode && !test_tfs.contains(currTF)) {
+						while((line= br.readLine()) != null && !line.startsWith("//"));
+					}
+				}
+
 				if (line.startsWith("MA  ")) {
 					ArrayList<String> curr_matrix = new ArrayList<String>();
 					
@@ -142,6 +188,7 @@ public class PredictionEvaluator {
 		}
 		
 		MoStaOptimizer optimizer = new MoStaOptimizer();
+		optimizer.basedir = basedir;
 		double mosta_score_xx, mosta_score_yy, mosta_score_xy;
 		mosta_scores = new double[annotated_matrices.size()];
 		double sum_score = 0;
@@ -149,7 +196,7 @@ public class PredictionEvaluator {
 		
 		for (int i=0; i<annotated_matrices.size(); i++) {
 			
-			if (! predicted_matrices.get(i).isEmpty()) {
+			if (predicted_matrices.get(i) != null) {
 				mosta_score_xy = optimizer.compareMatrices(predicted_matrices.get(i), annotated_matrices.get(i), null);
 				mosta_score_xx = optimizer.compareMatrices(predicted_matrices.get(i), predicted_matrices.get(i), null);
 				mosta_score_yy = optimizer.compareMatrices(annotated_matrices.get(i), annotated_matrices.get(i), null);
@@ -200,21 +247,23 @@ public class PredictionEvaluator {
 	 */
 	
 	public void varyBestMatchThreshold(double bmt, double init, double incr, double term, int max_num_matches, String inputfile) {
-		
+				
 		ArrayList<ArrayList<LabeledTF>> all_best_matches;
 		ArrayList<LabeledTF> curr_best_matches;
+		Map<String, Double> mostaScoreMap = new HashMap<String, Double>();
 		
 		ArrayList<ArrayList<String>> best_match_matrices;
 		ArrayList<ArrayList<String>> all_merged_matrices = new ArrayList<ArrayList<String>>();
 		ArrayList<String> merged_matrix = new ArrayList<String>();
 		
 		MatrixFileParser matrixfile_parser = new MatrixFileParser();
-		//String matrixfile = "trainingsets/trainingset_all_classes.fbps";
-		String matrixfile = "trainingsets_procaryotes/trainingset_class0.fbps";
 		matrixfile_parser.readMatrices(matrixfile);
 		
 		PFMFormatConverter pfm_converter = new PFMFormatConverter();
+		pfm_converter.basedir = basedir;
+		pfm_converter.silent = true;
 		MoStaOptimizer optimizer = new MoStaOptimizer();
+		optimizer.basedir = basedir;
 		
 		double[] all_mosta_scores, filtered_mosta_scores, mean_mosta_scores, prediction_rates;
 		int curr_matrix_counter;
@@ -271,7 +320,6 @@ public class PredictionEvaluator {
 				for (int k=0; k<best_matches.get(j).size(); k++) {
 					
 					if (best_matches.get(j).get(k).getLabel() > bmt_grid[i]) {
-						
 						curr_best_matches.add(best_matches.get(j).get(k));
 					}
 				}
@@ -301,13 +349,14 @@ public class PredictionEvaluator {
 			}
 			
 			curr_matrix_counter = 0;
-			filtered_mosta_scores = new double[curr_matrix_counter];
+			filtered_mosta_scores = null;
 			
 			if (! annotated_matrices.isEmpty()) {
 			
 				// compare to annotated matrix and compute MoSta score
 				System.out.println("    Calculating MoSta scores.\n");
 				all_mosta_scores = new double[annotated_matrices.size()];
+				mostaScoreMap = new HashMap<String, Double>();
 				valid_mosta_scores = new boolean[annotated_matrices.size()];
 				curr_sum_score = 0;
 
@@ -328,9 +377,15 @@ public class PredictionEvaluator {
 						curr_matrix_counter++;
 					}
 				}
+				filtered_mosta_scores = new double[curr_matrix_counter];
 				int cnt = 0;
-				for (int j=0; j<valid_mosta_scores.length; j++) {
-					if (valid_mosta_scores[j]) filtered_mosta_scores[cnt++] = all_mosta_scores[j];
+				for (int j=0; j<valid_mosta_scores.length; j++) {	
+					if (valid_mosta_scores[j]) {
+						filtered_mosta_scores[cnt++] = all_mosta_scores[j];
+						mostaScoreMap.put(tf_names.get(j), all_mosta_scores[j]);
+					} else {
+						mostaScoreMap.put(tf_names.get(j), null);
+					}
 				}
 				
 				curr_mean_score = curr_sum_score / curr_matrix_counter; 
@@ -338,8 +393,8 @@ public class PredictionEvaluator {
 				prediction_rates[i] = ((double) curr_matrix_counter) / annotated_matrices.size();
 				
 				System.out.println("  Mean MoSta score: " + fmt.format(curr_mean_score));
-			}
-			else {
+			
+			} else {
 				for (int j=0; j<all_merged_matrices.size(); j++) {
 					if (! all_merged_matrices.get(j).isEmpty()) 
 						curr_matrix_counter++;
@@ -352,10 +407,12 @@ public class PredictionEvaluator {
 			if (i < bmt_grid.length-1) {
 				System.out.println(" ______________________________" + "\n");
 			}
-			else {
-				String outfile = inputfile + "_t=" + fmt.format(bmt_grid[i]) + "_m=" + max_num_matches;
-				rewriteOutfile(outfile, all_best_matches, all_merged_matrices);
-			}
+			
+			// 
+			String predOutfile = inputfile + "_t=" + fmt.format(bmt_grid[i]) + "_m=" + max_num_matches + ".pred";
+			String scoreOutfile = inputfile + "_t=" + fmt.format(bmt_grid[i]) + "_m=" + max_num_matches + ".score";
+			rewriteOutfile(predOutfile, all_best_matches, all_merged_matrices);
+			writeMoStaScores(mostaScoreMap, scoreOutfile);
 			
 			if (plot_hist && !annotated_matrices.isEmpty()) {
 				PlotGenerator hist_plotter = new PlotGenerator();
@@ -383,7 +440,7 @@ public class PredictionEvaluator {
 			BufferedWriter bw = new BufferedWriter(new FileWriter(new File(outfile)));
 			
 			for (int i=0; i<annotated_matrices.size(); i++) {	
-				if (! predicted_matrices.get(i).isEmpty()) {
+				if (predicted_matrices.get(i) != null) {
 					bw.write(tf_names.get(i) + ": " + mosta_scores[i] + "\n");
 				}
 			}
@@ -394,6 +451,23 @@ public class PredictionEvaluator {
 			System.out.println(ioe.getMessage());
 			System.out.println("IOException occurred writing MoSta scores to text file.");
 		}
+	}
+	
+	/*
+	 *  write MoSta scores to textfile (static function)
+	 */
+	
+	public static void writeMoStaScores(Map<String, Double> mosta_scores, String outfile) {
+
+		List<String> scoreList = new ArrayList<String>();
+		for (String tfName: mosta_scores.keySet()) {	
+			if (mosta_scores.get(tfName) != null) {
+				scoreList.add(tfName + ": " + mosta_scores.get(tfName));
+			} else {
+				scoreList.add(tfName + ": NA");
+			}
+		}
+		BasicTools.writeList2File(scoreList, outfile);
 	}
 	
 	
@@ -474,8 +548,6 @@ public class PredictionEvaluator {
 		 */
 		
 		if (args.length < 1) evaluator.usage();
-		
-		
 
 		String inputfile, threshold, plotoption;
 		inputfile = args[0];
@@ -492,14 +564,16 @@ public class PredictionEvaluator {
 		int max_num_matches = 5; 	// default
 		plotoption = "n";  			// default
 		
-		
 		for(int i=start_idx; i<args.length-1; i+=2) {
 			
 			if(args[i].equals("-t")) { threshold	 	= args[i+1]; 					continue; }
 			if(args[i].equals("-m")) { max_num_matches  = Integer.parseInt(args[i+1]); 	continue; }
 			if(args[i].equals("-p")) { plotoption  		= args[i+1]; 					continue; }
+			if(args[i].equals("-trainTFfile")) { trainTF_file = args[i+1];				continue; }
+			if(args[i].equals("-testTFfile"))  { testTF_file  = args[i+1];				continue; }
 			
-			if( !args[i].equals("-t") && !args[i].equals("-p") && !args[i].equals("-m")) {	
+			if( !args[i].equals("-t") && !args[i].equals("-p") && !args[i].equals("-m")
+					&& !args[i].equals("-trainTFfile") && !args[i].equals("-testTFfile")) {	
 				System.out.println("\n  Invalid argument: " + args[i]);
 				evaluator.usage();
 			}
@@ -507,6 +581,9 @@ public class PredictionEvaluator {
 		
 		if (plotoption.toUpperCase().equals("Y") || plotoption.toUpperCase().equals("YES")) 
 			evaluator.plot_hist = true;
+		
+		evaluator.basedir = SABINE_Main.createBaseDir();
+		SABINE_Main.createTempDirectories(evaluator.basedir);
 		
 		System.out.println();
 		System.out.println("  ---------------------------------------------------------------------");
@@ -537,7 +614,6 @@ public class PredictionEvaluator {
 			}
 			evaluator.varyBestMatchThreshold(bmt, init, incr, term, max_num_matches, inputfile);
 		}
-		
 	}
 	
 	
@@ -550,12 +626,12 @@ public class PredictionEvaluator {
 		System.out.println("\n");
 		System.out.println("  Usage   : evaltool <input_file> <label_file> [OPTIONS]\n");
 		System.out.println("  OPTIONS : -t <best_match_threshold>  (e.g. 0.95, 0.5:0.1:1) ");	
-		System.out.println("            -m <max_num_best_matches>  (max. number of best matches)      default = 5");		
+		System.out.println("            -m <max_num_best_matches>  (max. number of best matches)      default = 5");
+		System.out.println("            -trainTFfile <trainTF_name_file> ");		
+		System.out.println("            -testTFfile <testTF_name_file> ");				
 		System.out.println("            -p <plot_histogram>        (e.g. y (yes), n (no)) \n\n");
 		
-		System.exit(0);
-		
+		System.exit(0);	
 	}
-
 }
 

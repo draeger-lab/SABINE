@@ -44,7 +44,12 @@ public class ModelFileObtainer {
 		
 		filter.setDirectory(model_dir + class_id);
 		
-		String[] files = filter.listFiles();
+		String[] files = null;
+		if (model_dir.startsWith(File.separator)) {
+			files = filter.listFilesFullPath();
+		} else {
+			files = filter.listFiles();
+		}
 		
 		return model_dir + class_id + "/" + files[0];
 	}

@@ -1299,6 +1299,10 @@ public class TransfacParser {
 		newDataParser.parseMatrices("/rahome/eichner/data/biobase/transfac_2011.4/dat/matrix.dat");
 		newDataParser.writeFactorsToFile("/rahome/eichner/projects/tfpredict/data/tf_pred/sabine_files/transfac_2011.4_flatfile.txt");
 		*/
+		
+		TransfacParser trainSetParser = new TransfacParser();
+		trainSetParser.parseFactors("/rahome/eichner/projects/sabine/data/trainingsets/latest/trainingset_private.txt");
+		trainSetParser.writeLabelFile("/rahome/eichner/projects/sabine/data/trainingsets/latest/labelfile_private.txt");
 	}
 }
 
