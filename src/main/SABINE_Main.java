@@ -28,6 +28,8 @@ import java.text.DecimalFormat;
 import java.util.Calendar;
 import java.util.StringTokenizer;
 
+import extension.PredictionEvaluator;
+
 import model.ModelGenerator;
 
 
@@ -240,12 +242,21 @@ public class SABINE_Main {
 			}
 			SABINE_Galaxy.main(newArgs);
 		
+		// run Model Training Mode
 		} else if (args.length >= 1 && args[0].equals("--train")) {
 			String[] newArgs = new String[args.length-1];
 			for (int i=1; i<args.length; i++) {
 				newArgs[i-1] = args[i];
 			}
 			ModelGenerator.main(newArgs);
+			
+		// run Evaluation Mode
+		} else if (args.length >= 1 && args[0].equals("--eval")) {
+			String[] newArgs = new String[args.length-1];
+			for (int i=1; i<args.length; i++) {
+				newArgs[i-1] = args[i];
+			}
+			PredictionEvaluator.main(newArgs);
 			
 		// run Stand-Alone Mode
 		} else {

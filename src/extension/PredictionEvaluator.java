@@ -51,6 +51,7 @@ public class PredictionEvaluator {
 	private boolean splitSetMode = false;
 	private static String  trainTF_file = "";
 	private static String testTF_file = "";
+	private static String output_dir = "";
 	private Set<String> training_tfs = null;
 	private Set<String> test_tfs = null;
 	
@@ -409,8 +410,14 @@ public class PredictionEvaluator {
 			}
 			
 			// 
-			String predOutfile = inputfile + "_t=" + fmt.format(bmt_grid[i]) + "_m=" + max_num_matches + ".pred";
-			String scoreOutfile = inputfile + "_t=" + fmt.format(bmt_grid[i]) + "_m=" + max_num_matches + ".score";
+			String predOutfile = inputfile.replace(".txt", "");
+			String scoreOutfile = inputfile.replace(".txt", "");
+			if (!output_dir.isEmpty()) {
+				predOutfile = output_dir + inputfile.replaceAll(".*/", "").replace(".txt", "");
+				scoreOutfile = output_dir + inputfile.replaceAll(".*/", "").replace(".txt", "");
+			}
+			predOutfile = predOutfile + "_t=" + fmt.format(bmt_grid[i]) + "_m=" + max_num_matches + ".pred";
+			scoreOutfile = scoreOutfile + "_t=" + fmt.format(bmt_grid[i]) + "_m=" + max_num_matches + ".score";
 			rewriteOutfile(predOutfile, all_best_matches, all_merged_matrices);
 			writeMoStaScores(mostaScoreMap, scoreOutfile);
 			
@@ -569,10 +576,11 @@ public class PredictionEvaluator {
 			if(args[i].equals("-t")) { threshold	 	= args[i+1]; 					continue; }
 			if(args[i].equals("-m")) { max_num_matches  = Integer.parseInt(args[i+1]); 	continue; }
 			if(args[i].equals("-p")) { plotoption  		= args[i+1]; 					continue; }
+			if(args[i].equals("-o")) { output_dir  		= args[i+1]; 					continue; }
 			if(args[i].equals("-trainTFfile")) { trainTF_file = args[i+1];				continue; }
 			if(args[i].equals("-testTFfile"))  { testTF_file  = args[i+1];				continue; }
 			
-			if( !args[i].equals("-t") && !args[i].equals("-p") && !args[i].equals("-m")
+			if( !args[i].equals("-t") && !args[i].equals("-p") && !args[i].equals("-m") && !args[i].equals("-o")
 					&& !args[i].equals("-trainTFfile") && !args[i].equals("-testTFfile")) {	
 				System.out.println("\n  Invalid argument: " + args[i]);
 				evaluator.usage();
@@ -628,7 +636,8 @@ public class PredictionEvaluator {
 		System.out.println("  OPTIONS : -t <best_match_threshold>  (e.g. 0.95, 0.5:0.1:1) ");	
 		System.out.println("            -m <max_num_best_matches>  (max. number of best matches)      default = 5");
 		System.out.println("            -trainTFfile <trainTF_name_file> ");		
-		System.out.println("            -testTFfile <testTF_name_file> ");				
+		System.out.println("            -testTFfile <testTF_name_file> ");	
+		System.out.println("            -o <output_dir> ");
 		System.out.println("            -p <plot_histogram>        (e.g. y (yes), n (no)) \n\n");
 		
 		System.exit(0);	
