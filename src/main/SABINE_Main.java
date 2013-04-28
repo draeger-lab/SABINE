@@ -28,6 +28,8 @@ import java.text.DecimalFormat;
 import java.util.Calendar;
 import java.util.StringTokenizer;
 
+import org.apache.commons.lang3.time.StopWatch;
+
 import extension.PredictionEvaluator;
 
 import model.ModelGenerator;
@@ -43,6 +45,9 @@ public class SABINE_Main {
 	double outlier_filter_threshold = 0.5;
 	
 	boolean silent = false;
+	
+	boolean stopTime = false;
+	StopWatch stopwatch = new StopWatch();
 	
 	boolean dynamic_threshold = true;
 	
@@ -257,17 +262,17 @@ public class SABINE_Main {
 				newArgs[i-1] = args[i];
 			}
 			PredictionEvaluator.main(newArgs);
+		
+		// run Installation Validation Mode
+		} else if (args.length == 1 && (args[0].equals("-check-install") || args[0].equals("--check-install"))) {
+			SABINE_Main.printCopyright();
+			SABINE_Validator validator = new SABINE_Validator();
+			validator.verifyInstallation();
 			
 		// run Stand-Alone Mode
 		} else {
 		
 			SABINE_Main.printCopyright();
-			
-			if (args.length == 1 && (args[0].equals("-check-install") || args[0].equals("--check-install"))) {
-				SABINE_Validator validator = new SABINE_Validator();
-				validator.verifyInstallation();
-				return;
-			}
 			
 			if (args.length == 0 || args.length == 1 && (args[0].equals("-help") || args[0].equals("--help"))) {
 				usage();
@@ -280,6 +285,7 @@ public class SABINE_Main {
 			String infile = args[0];
 			String outfile = infile + ".out";
 			String verbose_option = "y";
+			String stopwatch_option = "n";
 			String base_dir = null;
 			String train_dir = FBPPredictor.public_trainingset;
 			String model_dir = FBPPredictor.defaultModelDir;
@@ -296,12 +302,13 @@ public class SABINE_Main {
 				if(args[i].equals("-f")) { outfile	   		   					= args[i+1]; 						continue; }
 				if(args[i].equals("-b")) { base_dir		 						= args[i+1]; 						continue; }
 				if(args[i].equals("-t")) { train_dir		 					= args[i+1]; 						continue; }
-				if(args[i].equals("-v")) { verbose_option	   					= args[i+1]; 						continue; }
 				if(args[i].equals("-c")) { model_dir							= args[i+1]; 						continue; }
+				if(args[i].equals("-v")) { verbose_option	   					= args[i+1]; 						continue; }
+				if(args[i].equals("-w")) { stopwatch_option						= args[i+1]; 						continue; }
 				
 				
 				if( !args[i].equals("-s") && !args[i].equals("-m") && !args[i].equals("-t") && !args[i].equals("-b") &&
-					!args[i].equals("-o") && !args[i].equals("-f") && !args[i].equals("-c") && !args[i].equals("-v")) {
+					!args[i].equals("-o") && !args[i].equals("-f") && !args[i].equals("-c") && !args[i].equals("-v") && !args[i].equals("-w")) {
 					
 					System.out.println("\n  Invalid argument: " + args[i]);
 					usage();
@@ -310,6 +317,10 @@ public class SABINE_Main {
 			 
 			if (verbose_option.equals("n") || verbose_option.equals("no") || verbose_option.equals("h")) {
 				caller.silent = true;
+			}
+			if (stopwatch_option.equals("y") || stopwatch_option.equals("yes")) {
+				caller.stopTime = true;
+				caller.stopwatch.start();
 			}
 			
 			if (! train_dir.endsWith("/")) {
@@ -329,6 +340,10 @@ public class SABINE_Main {
 			}
 			
 			if (! caller.silent) System.out.println("\nOutput file: " + outfile + "\n");
+		}
+		
+		if (caller.stopTime) {
+			System.out.println("Time elapsed: " + caller.stopwatch.toString());
 		}
 	}
 	

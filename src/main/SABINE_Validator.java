@@ -37,7 +37,7 @@ public class SABINE_Validator {
 		// run SABINE on generated input file
 		System.out.print("Checking installation of SABINE...");
 		predictor.silent = true;
-		predictor.predictFBP(validatorInputFile, validatorBaseDir, FBPPredictor.public_trainingset, null);
+		predictor.predictFBP(validatorInputFile, validatorBaseDir, FBPPredictor.public_trainingset, FBPPredictor.defaultModelDir);
 		System.out.println("done.\n");
 		// read output
 		boolean valid = compareOutfiles(validatorOutputFile, validatorBaseDir + "prediction.out");
