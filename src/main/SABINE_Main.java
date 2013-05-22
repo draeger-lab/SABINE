@@ -340,10 +340,10 @@ public class SABINE_Main {
 			}
 			
 			if (! caller.silent) System.out.println("\nOutput file: " + outfile + "\n");
-		}
-		
-		if (caller.stopTime) {
-			System.out.println("Time elapsed: " + caller.stopwatch.toString());
+			
+			if (caller.stopTime) {
+				System.out.println("Time elapsed: " + caller.stopwatch.toString());
+			}
 		}
 	}
 	
