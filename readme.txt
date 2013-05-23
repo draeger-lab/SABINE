@@ -2,7 +2,7 @@
   -------------------------------------------------
   SABINE - StandAlone BINding specificity Estimator
   -------------------------------------------------
-  (version 1.2, Copyright (C) 2012 Johannes Eichner)
+  (version 1.2, Copyright (C) 2013 Johannes Eichner)
 
 
   Contents:
