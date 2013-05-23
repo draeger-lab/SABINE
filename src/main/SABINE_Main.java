@@ -121,7 +121,7 @@ public class SABINE_Main {
 		System.out.println("SABINE - StandAlone BINding specificity Estimator");
 		System.out.println("-------------------------------------------------");
 		System.out.println("(version " + version + ")\n");
-		System.out.println("Copyright (C) 2009-2012 Center for Bioinformatics T\u00fcbingen (ZBIT),");
+		System.out.println("Copyright (C) 2009-2013 Center for Bioinformatics T\u00fcbingen (ZBIT),");
         System.out.println("University of T\u00fcbingen, Johannes Eichner.\n");
         System.out.println("This program comes with ABSOLUTELY NO WARRANTY.");
         System.out.println("This is free software, and you are welcome to redistribute it under certain conditions.");

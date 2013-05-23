@@ -61,7 +61,7 @@ public class SABINE_Runner implements Runnable {
 		dir_creator.createTempDirectories(base_dir);
 
 		// run SABINE on generated input file
-		predictor.predictFBP(base_dir + "infile.tmp", base_dir, FBPPredictor.public_trainingset, null);
+		predictor.predictFBP(base_dir + "infile.tmp", base_dir, FBPPredictor.public_trainingset, FBPPredictor.defaultModelDir);
 		gui.done();
 	}
 
