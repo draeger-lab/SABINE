@@ -51,18 +51,11 @@ The script will install SABINE and all required third-party software packages an
 ### Manual
 
 **DESCRIPTION:**
-              The tool predicts the binding specificity of a transcription factor (TF) in terms of a position frequency 
-              matrix (PFM), given the amino acid sequence, DNA-binding domains, superclass and species of the TF of 
-              interest.  
-              The given factor (query factor) is compared to factors of the same superclass (training factors) 
-              for which experimentally determined PFMs are available. Based on diverse alignment- and kernel-based 
-              similarity measures comparing the DNA-binding domains of the query factor and the training factors, the 
-              PFM-similarity of each training factor to the query factor is estimated using a support-vector-machine-based 
-              regression model. 
-              The tool reports a set of best matches, i.e., training factors for which a PFM-similarity greater than a 
-              predefined similarity threshold (see OPTIONS: `-s`) was predicted. The PFMs of those best matches are in turn 
-              filtered to remove outliers (see OPTIONS: `-o`) and then merged using `STAMP` to generate the predicted PFM. 
-              The maximal number of PFMs that shall be merged can be specified by the user (see OPTIONS: `-m`). 
+The tool predicts the binding specificity of a transcription factor (TF) in terms of a position frequency matrix (PFM), given the amino acid sequence, DNA-binding domains, superclass and species of the TF of interest.
+              
+The given factor (query factor) is compared to factors of the same superclass (training factors) for which experimentally determined PFMs are available. Based on diverse alignment- and kernel-based similarity measures comparing the DNA-binding domains of the query factor and the training factors, the PFM-similarity of each training factor to the query factor is estimated using a support-vector-machine-based regression model. 
+              
+The tool reports a set of best matches, i.e., training factors for which a PFM-similarity greater than a predefined similarity threshold (see OPTIONS: `-s`) was predicted. The PFMs of those best matches are in turn filtered to remove outliers (see OPTIONS: `-o`) and then merged using `STAMP` to generate the predicted PFM. The maximal number of PFMs that shall be merged can be specified by the user (see OPTIONS: `-m`). 
 
 **INPUT:**    SABINE input file contains the query factors in the SABINE input file format (see SABINE Format Specification)
 
