@@ -11,6 +11,9 @@
 
 ____________________________________________________________________________________________________________________________  
 
+### Short description
+SABINE is a tool to predict the binding specificity of a transcription factor (TF), given its amino acid sequence, species, structural superclass and DNA-binding domains. For convenience, the superclass and DNA-binding domains of a given TF can be predicted based on sequence homology with TFs in the training set of SABINE. Alternatively, the tool [TFpredict](https://github.com/draeger-lab/TFpredict), which predicts all structural characteristics of TFs required by SABINE, can be employed in an additional preprocessing step. SABINE compares a given factor to a predefined set of TFs of the same superclass for which experimentally confirmed position frequency matrices (PFM) are available. Based on various features capturing evolutionary, structural and physicochemical similarity of the DNA-binding domains, the PFM similarity is predicted by means of support vector regression. The TFs with highest PFM similarity to the factor of interest are reported and their PFMs are merged using STAMP to generate the predicted consensus PFM.
+
 ### Table of Contents:
   - [License](#license)
   - [Installation](#installation)
