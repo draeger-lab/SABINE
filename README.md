@@ -12,7 +12,7 @@
 ____________________________________________________________________________________________________________________________  
 
 ### Short description
-SABINE is a tool to predict the binding specificity of a transcription factor (TF), given its amino acid sequence, species, structural superclass and DNA-binding domains. For convenience, the superclass and DNA-binding domains of a given TF can be predicted based on sequence homology with TFs in the training set of SABINE. Alternatively, the tool [TFpredict](https://github.com/draeger-lab/TFpredict), which predicts all structural characteristics of TFs required by SABINE, can be employed in an additional preprocessing step. SABINE compares a given factor to a predefined set of TFs of the same superclass for which experimentally confirmed position frequency matrices (PFM) are available. Based on various features capturing evolutionary, structural and physicochemical similarity of the DNA-binding domains, the PFM similarity is predicted by means of support vector regression. The TFs with highest PFM similarity to the factor of interest are reported and their PFMs are merged using STAMP to generate the predicted consensus PFM.
+SABINE is a tool to predict the binding specificity of a transcription factor (TF), given its amino acid sequence, species, structural superclass and DNA-binding domains. For convenience, the superclass and DNA-binding domains of a given TF can be predicted based on sequence homology with TFs in the training set of SABINE. Alternatively, the tool [TFpredict](https://github.com/draeger-lab/TFpredict), which predicts all structural characteristics of TFs required by SABINE, can be employed in an additional preprocessing step. SABINE compares a given factor to a predefined set of TFs of the same superclass for which experimentally confirmed position frequency matrices (PFM) are available. Based on various features capturing evolutionary, structural and physicochemical similarity of the DNA-binding domains, the PFM similarity is predicted utilizing support vector regression. The TFs with highest PFM similarity to the factor of interest is reported, and their PFMs are merged using STAMP to generate the predicted consensus PFM.
 
 ### Table of Contents:
   - [License](#license)
@@ -59,10 +59,10 @@ The script will install SABINE and all required third-party software packages an
               similarity measures comparing the DNA-binding domains of the query factor and the training factors, the 
               PFM-similarity of each training factor to the query factor is estimated using a support-vector-machine-based 
               regression model. 
-              The tool reports a set of best matches, i.e. training factors for which a PFM-similarity greater than a 
-              predefined similarity threshold (see OPTIONS: -s) was predicted. The PFMs of those best matches are in turn 
-              filtered to remove outliers (see OPTIONS: -o) and then merged using STAMP to generate the predicted PFM. 
-              The maximal number of PFMs that shall be merged can be specified by the user (see OPTIONS: -m). 
+              The tool reports a set of best matches, i.e., training factors for which a PFM-similarity greater than a 
+              predefined similarity threshold (see OPTIONS: `-s`) was predicted. The PFMs of those best matches are in turn 
+              filtered to remove outliers (see OPTIONS: `-o`) and then merged using `STAMP` to generate the predicted PFM. 
+              The maximal number of PFMs that shall be merged can be specified by the user (see OPTIONS: `-m`). 
 
 **INPUT:**    SABINE input file contains the query factors in the SABINE input file format (see SABINE Format Specification)
 
