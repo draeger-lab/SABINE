@@ -12,11 +12,11 @@
 ____________________________________________________________________________________________________________________________  
 
 ### Table of Contents:
-  - License
-  - Installation
-  - Manual
-  - Format specification
-  - Website and questions
+  - [License](#license)
+  - [Installation](#installation)
+  - [Manual](#manual)
+  - [Format specification](#format-specification)
+  - [Website and questions](#website-and-questions)
 ____________________________________________________________________________________________________________________________  
 
 
@@ -72,12 +72,15 @@ The script will install SABINE and all required third-party software packages an
     sabine.sh <input_filename> [OPTIONS]
 
 **OPTIONS:**
-* `-s <similarity_threshold>` min. FBP-similarity of best matches      `default = 0.95`
-* `-m <max_num_best_matches>` max. number of best matches              `default = 5`
-* `-o <outlier_filter_param>` max. deviation of a single best match    `default = 0.5`
-  - `-b <base_dir>` directory that contains temporary files  
-* `-f <output_filename>`      file to save the results                 `default = <input_filename>.out`
-* `-v <verbose_mode>`         write status to standard output          `default = y (yes)`
+
+| Option                     | Meaning                                  | Default Value                    |
+|----------------------------|------------------------------------------|----------------------------------|
+|`-s <similarity_threshold>` | min. FBP-similarity of best matches      | `default = 0.95`                 |
+|`-m <max_num_best_matches>` | max. number of best matches              | `default = 5`                    |
+|`-o <outlier_filter_param>` | max. deviation of a single best match    | `default = 0.5`                  |
+| `-b <base_dir>`            | directory that contains temporary files  |                                  |
+|`-f <output_filename>`      | file to save the results                 | `default = <input_filename>.out` |
+|`-v <verbose_mode>`         | write status to standard output          | `default = y (yes)`              |
 
 A full documentation including a tutorial is available at the supplementary website of SABINE: http://www.cogsys.cs.uni-tuebingen.de/software/SABINE/.
 
@@ -120,4 +123,6 @@ XX
   
 ### Website and questions
 
-To obtain more detailed information about SABINE, see the website: http://www.cogsys.cs.uni-tuebingen.de/software/SABINE/. If you have any further questions, please contact me by e-mail:  andreas.draeger@uni-tuebingen.de
+To obtain more detailed information about SABINE, see the project's website:
+http://www.cogsys.cs.uni-tuebingen.de/software/SABINE/.
+If you have any further questions, please contact Andreas Dräger by e-mail: andreas.draeger@uni-tuebingen.de
