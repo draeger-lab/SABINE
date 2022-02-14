@@ -881,7 +881,7 @@ public class DatabaseParser {
 
       base_dir += organism + "/" + curr_date + "_" + curr_time + "/";
 
-      if (! new File(base_dir).mkdir()) {
+      if (!new File(base_dir).mkdirs()) {
         System.out.println("\nInvalid base directory. Aborting.");
         System.out.println("Base directory: " + base_dir + "\n");
         System.exit(0);
@@ -895,7 +895,7 @@ public class DatabaseParser {
 
     tmp_dir = base_dir + "tmp/";
 
-    if (! new File(tmp_dir).exists() && ! new File(tmp_dir).mkdir()) {
+    if (! new File(tmp_dir).exists() && ! new File(tmp_dir).mkdirs()) {
       System.out.println("\nInvalid base directory. Aborting.");
       System.out.println("Base directory: " + base_dir + "\n");
       System.exit(0);
