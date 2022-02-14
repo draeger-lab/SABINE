@@ -5,9 +5,9 @@
 
 [![License (GPL version 3)](https://img.shields.io/badge/license-GPLv3.0-blue.svg?style=plastic)](http://opensource.org/licenses/GPL-3.0)
 [![Latest version](https://img.shields.io/badge/Latest_version-1.2-brightgreen.svg?style=plastic)](https://github.com/draeger-lab/SABINE/releases/)
-[![DOI](http://img.shields.io/badge/DOI-10.1371%20%2F%20journal.pone.0082238-blue.svg?style=plastic)](http://dx.doi.org/10.1371%2Fjournal.pone.0082238)
+[![DOI](https://img.shields.io/badge/DOI-10.1371%20%2F%20journal.pone.0082238-blue.svg?style=plastic)](https://doi.org/10.1371%2Fjournal.pone.0082238)
 
-*Authors:* [Johannes Eichner](https://github.com/jeichner), [Adrian Schröder](http://www.cogsys.cs.uni-tuebingen.de/mitarb/schroeder/), [Andreas Dräger](https://github.com/draeger/), Jonas Eichner, [André Hennig](https://github.com/AndreHennig), Florian Topf, Dierk Wanke, [Klaus Harter](http://www.zmbp.uni-tuebingen.de/plant-physiol/research-groups/harter.html), [Andreas Zell](https://github.com/ZellTuebingen)
+*Authors:* [Johannes Eichner](https://github.com/jeichner), [Adrian Schröder](http://www.cogsys.cs.uni-tuebingen.de/mitarb/schroeder/), [Andreas Dräger](https://github.com/draeger/), Jonas Eichner, [André Hennig](https://github.com/AndreHennig), Florian Topf, Dierk Wanke, [Klaus Harter](https://uni-tuebingen.de/en/5078), [Andreas Zell](https://github.com/ZellTuebingen)
 
 ____________________________________________________________________________________________________________________________  
 
@@ -20,10 +20,10 @@ Article citations are **critical** for us to be able to continue support for SAB
 
 <dl>
   <dt>Original method paper:</dt>
-  <dd>Adrian Schröder, Johannes Eichner, Jochen Supper, Jonas Eichner, Dierk Wanke, Carsten Henneges, and Andreas Zell. <a href="http://dx.doi.org/10.1371%2Fjournal.pone.0013876">Predicting DNA-Binding Specificities of Eukaryotic Transcription Factors</a>. PLoS ONE , 5(11):e13876, November 2010. [ <a href="http://dx.doi.org/10.1371%2Fjournal.pone.0013876">DOI</a> | <a href="http://journals.plos.org/plosone/article/file?id=10.1371/journal.pone.0013876&type=printable">PDF</a> ]</dd>
+  <dd>Adrian Schröder, Johannes Eichner, Jochen Supper, Jonas Eichner, Dierk Wanke, Carsten Henneges, and Andreas Zell. <a href="http://dx.doi.org/10.1371%2Fjournal.pone.0013876">Predicting DNA-Binding Specificities of Eukaryotic Transcription Factors</a>. PLoS ONE , 5(11):e13876, November 2010. [ <a href="https://doi.org/10.1371%2Fjournal.pone.0013876">DOI</a> | <a href="https://journals.plos.org/plosone/article/file?id=10.1371/journal.pone.0013876&type=printable">PDF</a> ]</dd>
   <dt>Research Article:</dt>
-  <dd>Johannes Eichner, Florian Topf, Andreas Dräger, Clemens Wrzodek, Dierk Wanke, and Andreas Zell. <a href="http://dx.doi.org/10.1371%2Fjournal.pone.0082238">TFpredict and SABINE: Sequence-Based Prediction of Structural and Functional Characteristics of Transcription Factors</a>. PLoS ONE, 8(12):e82238, December 2013.
-  [ <a href="http://dx.doi.org/10.1371/journal.pone.0082238">DOI</a> | <a href="http://www.plosone.org/article/fetchObject.action?uri=info%3Adoi%2F10.1371%2Fjournal.pone.0082238&representation=PDF">PDF</a> ]  
+  <dd>Johannes Eichner, Florian Topf, Andreas Dräger, Clemens Wrzodek, Dierk Wanke, and Andreas Zell. <a href="https://doi.org/10.1371%2Fjournal.pone.0082238">TFpredict and SABINE: Sequence-Based Prediction of Structural and Functional Characteristics of Transcription Factors</a>. PLoS ONE, 8(12):e82238, December 2013.
+  [ <a href="https://doi.org/10.1371/journal.pone.0082238">DOI</a> | <a href="https://www.plosone.org/article/fetchObject.action?uri=info%3Adoi%2F10.1371%2Fjournal.pone.0082238&representation=PDF">PDF</a> ]  
   </dd>
 </dl>
 
@@ -38,7 +38,7 @@ ________________________________________________________________________________
 
 ## Installation
 
-To extract the gzipped tar archive of SABINE obtained from our [downloads](releases) section use the command:
+To extract the gzipped tar archive of SABINE obtained from our [downloads](https://github.com/draeger-lab/SABINE/releases) section use the command:
 
     tar -xzf sabine.tar.gz
 
@@ -57,16 +57,16 @@ The script will install SABINE and all required [third-party software packages](
 * Linux system
 * Java (JDK 1.6 or later)
 
-SABINE exclusively runs on Linux as it integrates diverse bioinformatics tools (see [integrated software](#included-third-party-software)) which require a Linux platform. The analysis framework of SABINE is written in Java&trade;. Thus it requires that Java Virtual Machine (JDK version 1.6 or newer) is installed on your system. We recommend to use Sun Java 1.6 which has proven to perform well. 
+SABINE exclusively runs on Linux as it integrates diverse bioinformatics tools (see [integrated software](#included-third-party-software)) which require a Linux platform. The analysis framework of SABINE is written in Java&trade;. Thus it requires that Java Virtual Machine (JDK version 1.6 or newer) is installed on your system. We recommend to use Sun Java 1.6 which has proven to perform well.
 
 ## Manual
 
 **DESCRIPTION:**
 The tool predicts the binding specificity of a transcription factor (TF) in terms of a position frequency matrix (PFM), given the amino acid sequence, DNA-binding domains, superclass and species of the TF of interest.
-              
-The given factor (query factor) is compared to factors of the same superclass (training factors) for which experimentally determined PFMs are available. Based on diverse alignment- and kernel-based similarity measures comparing the DNA-binding domains of the query factor and the training factors, the PFM-similarity of each training factor to the query factor is estimated using a support-vector-machine-based regression model. 
-              
-The tool reports a set of best matches, i.e., training factors for which a PFM-similarity greater than a predefined similarity threshold (see OPTIONS: `-s`) was predicted. The PFMs of those best matches are in turn filtered to remove outliers (see OPTIONS: `-o`) and then merged using `STAMP` to generate the predicted PFM. The maximal number of PFMs that shall be merged can be specified by the user (see OPTIONS: `-m`). 
+
+The given factor (query factor) is compared to factors of the same superclass (training factors) for which experimentally determined PFMs are available. Based on diverse alignment- and kernel-based similarity measures comparing the DNA-binding domains of the query factor and the training factors, the PFM-similarity of each training factor to the query factor is estimated using a support-vector-machine-based regression model.
+
+The tool reports a set of best matches, i.e., training factors for which a PFM-similarity greater than a predefined similarity threshold (see OPTIONS: `-s`) was predicted. The PFMs of those best matches are in turn filtered to remove outliers (see OPTIONS: `-o`) and then merged using `STAMP` to generate the predicted PFM. The maximal number of PFMs that shall be merged can be specified by the user (see OPTIONS: `-m`).
 
 **INPUT:**    SABINE input file contains the query factors in the SABINE input file format (see SABINE Format Specification)
 
@@ -95,9 +95,9 @@ A more detailed description of the progam including usage examples can be found 
 
 If you want to use the [command-line interface](#the-command-line-interface) of SABINE, you have to comply with the following file format guidelines. If you use the [graphical interface](#the-graphical-user-interface) instead, a properly formatted input file will be generated automatically.
 
-To predict a PFM for a TF, SABINE needs information about the organism, superclass, protein sequence and DNA-binding domains of the respective factor. This information has to be formatted as specified in the [SABINE input file format description](#sabine-input-file). 
+To predict a PFM for a TF, SABINE needs information about the organism, superclass, protein sequence and DNA-binding domains of the respective factor. This information has to be formatted as specified in the [SABINE input file format description](#sabine-input-file).
 
-The output of SABINE is a text file containing the predicted best matches, their predicted PFM-similarity to the query factor, and the consensus PFM which results from the merging the annotated PFMs of the best matches (see [SABINE output file format specification](#sabine--output-file)).
+The output of SABINE is a text file containing the predicted best matches, their predicted PFM-similarity to the query factor, and the consensus PFM which results from the merging the annotated PFMs of the best matches (see [SABINE output file format specification](#SABINE-output-file)).
 
 Note, that SABINE can be applied exclusively to eucaryotic transcription factors (see [list of supported organisms](doc/organism_list.txt)). However, the organism does not have a significant impact on the predicted motif returned by SABINE. It is only considered in 1 of 30 features recognized by the support vector regression model, which is the core component of the SABINE algorithm. When analyzing an organism that is not covered by [this list](doc/organism_list.txt), it is recommended to choose the organism from the list that is most closely related to the organism of interest. The prediction model only considers a single feature (distance in phylogenetic tree), which accounts for the organism of input transcription factor and it is known that the contribution of this feature to the predicted outcome is relatively low compared to other features.
 
@@ -143,7 +143,7 @@ Also see the [list of supported organisms](doc/organism_list.txt) and class acc.
 ```
 NA  Identifier
 XX
-BM  Best match (transcription factor ID   PFM similarity score) 
+BM  Best match (transcription factor ID   PFM similarity score)
 XX
 MA  A   C   G   T   rows:	positions within the aligned sequences
 MA		  first column: position index
@@ -165,26 +165,26 @@ This program is free software; you can redistribute it and/or modify it under th
 
 This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
 
-You should have received a copy of the GNU General Public License along with this program; if not, see <http://www.gnu.org/licenses/>.
+You should have received a copy of the GNU General Public License along with this program; if not, see <https://www.gnu.org/licenses/>.
 
 ### Included third-party software
 
-* The Local Alignment Kernel by Hiroto Saigo et al. was integrated in SABINE as a sequence feature to measure the similarity of the DNA-binding domains. Website: http://sunflower.kuicr.kyoto-u.ac.jp/~hiroto/project/homology.html
-* We included the Mismatch Kernel by Christina Leslie et al. as an additional feature which incorporates the domain similarity of transcription factors. Website: http://cbio.mskcc.org/leslielab/software/string-kernels
+* The Local Alignment Kernel by Hiroto Saigo *et al.* was integrated in SABINE as a sequence feature to measure the similarity of the DNA-binding domains. Website: http://sunflower.kuicr.kyoto-u.ac.jp/~hiroto/project/homology.html
+* We included the Mismatch Kernel by Christina Leslie *et al.* as an additional feature which incorporates the domain similarity of transcription factors. Website: http://cbio.mskcc.org/leslielab/software/string-kernels
 * To capture the structural similarity of TF binding domains we applied the PSIPRED secondary structure prediction method by David Jones *et al.* Website: http://bioinf.cs.ucl.ac.uk/psipred/
 * We integrated the Motif statistic software suite (MoSta) by Utz Pape *et al.* to measure the similarity of PFMs. Website: http://mosta.molgen.mpg.de/
 * In order to generate familial binding profiles by merging PFMs, we applied the tool STAMP by Shaun Mahony *et al.* Website: http://www.benoslab.pitt.edu/stamp/
 * For training and evaluation of the support vector regression models we used the libSVM implementation provided by Chih-Chung Chang *et al.* Website: http://www.csie.ntu.edu.tw/~cjlin/libsvm/
-* We computed pairwise sequence alignment scores and generated sequence logos using the open source framework BioJava by Richard Holland *et al.* Website: http://biojava.org/wiki/Main_Page
+* We computed pairwise sequence alignment scores and generated sequence logos using the open source framework BioJava by Richard Holland *et al.* Website: https://biojava.org
 
 ### Integrated data
 
-The basis of our supervised machine learning based approach to predicting DNA-binding specificities of TFs was the generation of a non-redundant training data set. We restricted the sources to databases providing experimentally validated DNA-binding specificity information in terms of DNA-binding sites, consensus sequences or PFMs. Besides intergrating large databases spanning the whole eucaryotic kingdom, we extracted data from diverse smaller databases whose content is specific to particular organisms. An overview of our data sources can be found in the table below.
+The basis of our supervised machine learning based approach to predicting DNA-binding specificities of TFs was the generation of a non-redundant training data set. We restricted the sources to databases providing experimentally validated DNA-binding specificity information in terms of DNA-binding sites, consensus sequences or PFMs. Besides integrating large databases spanning the whole eukaryotic kingdom, we extracted data from diverse smaller databases whose content is specific to particular organisms. An overview of our data sources can be found in the table below.
 
 | Database  | URL                                                              |
 |-----------|------------------------------------------------------------------|
-| TRANSFAC  | http://www.biobase-international.com/pages/index.php?id=transfac |
-| JASPAR    | http://jaspar.cgb.ki.se/                                         |
+| TRANSFAC  | https://genexplain.com/transfac/                                 |
+| JASPAR    | https://jaspar.genereg.net                                       |
 | YEASTRACT | http://www.yeastract.com/                                        |
 | SCPD      | http://rulai.cshl.edu/SCPD/                                      |
 | AGRIS     | http://arabidopsis.med.ohio-state.edu/                           |
@@ -196,7 +196,7 @@ The basis of our supervised machine learning based approach to predicting DNA-bi
 
 The key features of gene-regulatory networks are the interconnections between specific transcription factors (TF) and cis-regulatory elements of the DNA. These connections function as an interface between signaling pathways and the regulation of gene expression. After decades of intensive research effort only a small fraction of these connections is known. A major and labour-intensive part of this effort is the characterization of the DNA-binding specificity of TFs whose DNA-binding domain enables the specific recognition of short DNA motives in the promoter region of their proximal target genes.
 
-The stand-alone application SABINE predicts the binding specificity of eucaryotic transcription factors (TF), based on various features extracted from their annotated protein sequences. The predicted DNA motif is reported as a position frequency matrix (PFM) which is a commonly used format to represent transcription factor binding specificities. In a nutshell, SABINE adopts support vector regression (SVR) models to identify TFs with annotated PFMs that exhibit highly similar binding specificities as the factor of your interest. The PFMs of these functionally similar factors are filtered for outliers and subsequently merged to generate a consensus PFM which is in turn transferred to the factor under study.
+The stand-alone application SABINE predicts the binding specificity of eukaryotic transcription factors (TF), based on various features extracted from their annotated protein sequences. The predicted DNA motif is reported as a position frequency matrix (PFM) which is a commonly used format to represent transcription factor binding specificities. In a nutshell, SABINE adopts support vector regression (SVR) models to identify TFs with annotated PFMs that exhibit highly similar binding specificities as the factor of your interest. The PFMs of these functionally similar factors are filtered for outliers and subsequently merged to generate a consensus PFM which is in turn transferred to the factor under study.
 
 To further increase our knowledge about the specific interactions between TFs and cis-regulatory elements, we designed an algorithm which allows for predicting the binding specificity of transcription factors with high accuracy. Apparently, the protein sequence and structure of the DNA-binding domain determines its function, which is the molecular recognition and binding to a defined set of DNA motives. Thus we approach to estimate the binding specificity of TFs based on structural, physicochemical and properties of their DNA-binding domains. Employing support vector regression we estimate the similarity of the binding specificities of two TFs based on diverse features incorporating domain sequence similarity, secondary structure and phylogenetic distance. This approach provides a quantitative measure for the functional similarity of two factors and enables the transfer of DNA-binding specificity data with low error.
 
