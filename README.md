@@ -99,7 +99,7 @@ To predict a PFM for a TF, SABINE needs information about the organism, supercla
 
 The output of SABINE is a text file containing the predicted best matches, their predicted PFM-similarity to the query factor, and the consensus PFM which results from the merging the annotated PFMs of the best matches (see [SABINE output file format specification](#sabine--output-file)).
 
-Note, that SABINE can be applied exclusively to eucaryotic transcription factors (see [list of supported organisms](doc/organism_list.txt)).
+Note, that SABINE can be applied exclusively to eucaryotic transcription factors (see [list of supported organisms](doc/organism_list.txt)). However, the organism does not have a significant impact on the predicted motif returned by SABINE. It is only considered in 1 of 30 features recognized by the support vector regression model, which is the core component of the SABINE algorithm. When analyzing an organism that is not covered by [this list](doc/organism_list.txt), it is recommended to choose the organism from the list that is most closely related to the organism of interest. The prediction model only considers a single feature (distance in phylogenetic tree), which accounts for the organism of input transcription factor and it is known that the contribution of this feature to the predicted outcome is relatively low compared to other features.
 
 The superclass of the TF specified in the input file has to be denoted as a decimal classification number (see [TF Classification](http://www.gene-regulation.com/pub/databases/transfac/cl.html) in TRANSFAC). The following table itemizes the decimal classification numbers for the five possible superclasses:
 
